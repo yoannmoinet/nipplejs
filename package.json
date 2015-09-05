@@ -1,0 +1,42 @@
+{
+  "version": "0.0.0",
+  "name": "nipplejs",
+  "description": "A virtual joystick for touch capable interfaces",
+  "author": "Yoann Moinet <yoann.moinet@gmail.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yoannmoinet/nipplejs.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yoannmoinet/nipplejs/issues"
+  },
+  "homepage": "https://github.com/yoannmoinet/nipplejs",
+  "main": "./dist/nipplejs.js",
+  "scripts": {
+    "posttest": "npm run format && npm run lint",
+    "preversion": "npm run build",
+    "postversion": "npm run bowerSync && npm run changelog",
+    "build": "npm test",
+    "pretest": "npm run umd && npm run uglify",
+    "test": "mocha",
+    "format": "jscs ./src/nipplejs.js ./test/nipplejs.spec.js",
+    "lint": "eslint ./src/nipplejs.js ./test/nipplejs.spec.js",
+    "umd": "umd nipplejs ./src/nipplejs.js ./dist/nipplejs.js",
+    "changelog": "node ./bin/changelog.js",
+    "bowerSync": "node ./bin/bowerSync.js",
+    "uglify": "uglifyjs ./dist/nipplejs.js -o ./dist/nipplejs.min.js -c -m",
+    "watch": "watch \"npm test\" src test"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "conventional-changelog": "^0.4.1",
+    "eslint": "^1.1.0",
+    "expect.js": "^0.3.1",
+    "jscs": "^2.1.0",
+    "mocha": "^2.2.5",
+    "uglify-js": "^2.4.24",
+    "umd": "^3.0.1",
+    "watch": "^0.16.0"
+  }
+}

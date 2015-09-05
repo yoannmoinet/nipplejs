@@ -1,0 +1,6 @@
+{
+	"env": {
+		"umd": true,
+		"node": true
+	}
+}

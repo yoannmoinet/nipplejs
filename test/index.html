@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>NippleJS</title>
+        <style>
+            body {
+                background: white;
+                padding: 0;
+                margin: 0;
+            }
+
+            #zone {
+                margin: 50px;
+                position: absolute;
+                left: 0;
+                right: 0;
+                top: 0;
+                bottom: 0;
+                background: silver;
+                box-sizing: content-box;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="zone"></div>
+        <script src="../dist/nipplejs.js" charset="utf-8"></script>
+        <script type="text/javascript">
+            var nipple = nipplejs.create({
+                zone: document.getElementById('zone'),
+                size: 200,
+                color: 'steelblue'
+            });
+            // TODO: Review event system to allow passing data
+            nipple.on('move', function (evt, data) {
+                console.log('move', data);
+            });
+        </script>
+    </body>
+</html>

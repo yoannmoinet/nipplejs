@@ -1,0 +1,12 @@
+{
+    "preset": "google",
+    "disallowSpacesInAnonymousFunctionExpression": null,
+    "disallowSpacesInFunctionExpression": null,
+    "disallowMultipleVarDecl": "exceptUndefined",
+    "validateQuoteMarks": {
+        "mark": "'",
+        "escape": true
+    },
+    "validateIndentation": 4,
+    "excludeFiles": ["node_modules/**"]
+}
