@@ -1,4 +1,4 @@
-# nipplejs
+![alt tag](./test/nipplejs.png)
 > A virtual joystick for touch capable interfaces
 
 ## Install
