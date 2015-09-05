@@ -1,0 +1,289 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Nipplejs by yoannmoinet</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/github-light.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>Nipplejs</h1>
+        <p>A virtual joystick for touch capable interfaces.</p>
+
+        <p class="view"><a href="https://github.com/yoannmoinet/nipplejs">View the Project on GitHub <small>yoannmoinet/nipplejs</small></a></p>
+
+
+        <ul>
+          <li><a href="https://github.com/yoannmoinet/nipplejs/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/yoannmoinet/nipplejs/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/yoannmoinet/nipplejs">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <h1>
+<a id="nipplejs" class="anchor" href="#nipplejs" aria-hidden="true"><span class="octicon octicon-link"></span></a>nippleJS</h1>
+
+<blockquote>
+<p>A virtual joystick for touch capable interfaces</p>
+</blockquote>
+
+<h2>
+<a id="install" class="anchor" href="#install" aria-hidden="true"><span class="octicon octicon-link"></span></a>Install</h2>
+
+<div class="highlight highlight-node"><pre>npm install nipplejs <span class="pl-k">--</span>save
+
+<span class="pl-c">// OR</span>
+
+bower install nipplejs <span class="pl-k">--</span>save</pre></div>
+
+<hr>
+
+<h2>
+<a id="usage" class="anchor" href="#usage" aria-hidden="true"><span class="octicon octicon-link"></span></a>Usage</h2>
+
+<p>Import it the way you want into your project :</p>
+
+<div class="highlight highlight-javascript"><pre><span class="pl-c">// CommonJS</span>
+<span class="pl-k">var</span> joystick <span class="pl-k">=</span> <span class="pl-c1">require</span>(<span class="pl-s"><span class="pl-pds">'</span>nipplejs<span class="pl-pds">'</span></span>).create(options);
+
+<span class="pl-c">// AMD</span>
+define([<span class="pl-s"><span class="pl-pds">'</span>nipplejs<span class="pl-pds">'</span></span>], <span class="pl-k">function</span> (<span class="pl-smi">nipplejs</span>) {
+    <span class="pl-k">var</span> joystick <span class="pl-k">=</span> nipplejs.create(options);
+});
+
+<span class="pl-c">// Global</span>
+<span class="pl-k">&lt;</span>script type<span class="pl-k">=</span><span class="pl-s"><span class="pl-pds">"</span>text/javascript<span class="pl-pds">"</span></span> src<span class="pl-k">=</span><span class="pl-s"><span class="pl-pds">"</span>./dist/nipplejs.min.js<span class="pl-pds">"</span></span><span class="pl-k">&gt;&lt;/</span>script<span class="pl-k">&gt;</span>
+<span class="pl-k">&lt;</span>script type<span class="pl-k">=</span><span class="pl-s"><span class="pl-pds">"</span>text/javascript<span class="pl-pds">"</span></span><span class="pl-k">&gt;</span>
+    <span class="pl-k">var</span> joystick <span class="pl-k">=</span> nipplejs.create(options);
+<span class="pl-k">&lt;/</span>script<span class="pl-k">&gt;</span></pre></div>
+
+<hr>
+
+<h2>
+<a id="options" class="anchor" href="#options" aria-hidden="true"><span class="octicon octicon-link"></span></a>Options</h2>
+
+<p>You can configure your joystick in different ways :</p>
+
+<div class="highlight highlight-javascript"><pre><span class="pl-k">var</span> options <span class="pl-k">=</span> {
+    zone<span class="pl-k">:</span> Element,
+    color<span class="pl-k">:</span> <span class="pl-c1">String</span>,
+    size<span class="pl-k">:</span> Integer,
+    threshold<span class="pl-k">:</span> Float,
+    fadeTime<span class="pl-k">:</span> Integer
+};</pre></div>
+
+<p>All options are optional.</p>
+
+<h3>
+<a id="zone-defaults-to-body" class="anchor" href="#zone-defaults-to-body" aria-hidden="true"><span class="octicon octicon-link"></span></a>[<code>zone</code>] defaults to 'body'</h3>
+
+<p>The dom element in which your joystick will be injected.</p>
+
+<div class="highlight highlight-javascript"><pre><span class="pl-k">&lt;</span>div id<span class="pl-k">=</span><span class="pl-s"><span class="pl-pds">"</span>zone_joystick<span class="pl-pds">"</span></span><span class="pl-k">&gt;&lt;/</span>div<span class="pl-k">&gt;</span>
+
+<span class="pl-k">&lt;</span>script type<span class="pl-k">=</span><span class="pl-s"><span class="pl-pds">"</span>text/javascript<span class="pl-pds">"</span></span> src<span class="pl-k">=</span><span class="pl-s"><span class="pl-pds">"</span>./nipplejs.min.js<span class="pl-pds">"</span></span><span class="pl-k">&gt;&lt;/</span>script<span class="pl-k">&gt;</span>
+<span class="pl-k">&lt;</span>script type<span class="pl-k">=</span><span class="pl-s"><span class="pl-pds">"</span>text/javascript<span class="pl-pds">"</span></span><span class="pl-k">&gt;</span>
+    <span class="pl-k">var</span> options <span class="pl-k">=</span> {
+        zone<span class="pl-k">:</span> <span class="pl-c1">document</span>.<span class="pl-c1">getElementById</span>(<span class="pl-s"><span class="pl-pds">'</span>zone_joystick<span class="pl-pds">'</span></span>);
+    };
+    <span class="pl-k">var</span> joystick <span class="pl-k">=</span> nipplejs.create(options);
+<span class="pl-k">&lt;/</span>script<span class="pl-k">&gt;</span></pre></div>
+
+<p>This zone also serve as the mouse/touch events handler.</p>
+
+<p>It represents the zone where your joystick will be active.</p>
+
+<h3>
+<a id="color-defaults-to-white" class="anchor" href="#color-defaults-to-white" aria-hidden="true"><span class="octicon octicon-link"></span></a>[<code>color</code>] defaults to 'white'</h3>
+
+<p>The background color of your joystick's elements.</p>
+
+<p>Can be any valid CSS color.</p>
+
+<h3>
+<a id="size-defaults-to-100" class="anchor" href="#size-defaults-to-100" aria-hidden="true"><span class="octicon octicon-link"></span></a>[<code>size</code>] defaults to 100</h3>
+
+<p>The size in pixel of the outer circle.</p>
+
+<p>The inner circle is 50% of this size.</p>
+
+<h3>
+<a id="threshold-defaults-to-01" class="anchor" href="#threshold-defaults-to-01" aria-hidden="true"><span class="octicon octicon-link"></span></a>[<code>threshold</code>] defaults to 0.1</h3>
+
+<p>This is the strength needed to trigger a directional event.</p>
+
+<p>Basically, the center is 0 and the outer is 1.</p>
+
+<p>You need to at least go to 0.1 to trigger a directional event.</p>
+
+<h3>
+<a id="fadetime-defaults-to-250" class="anchor" href="#fadetime-defaults-to-250" aria-hidden="true"><span class="octicon octicon-link"></span></a>[<code>fadeTime</code>] defaults to 250</h3>
+
+<p>The time it takes for joystick to fade-out and fade-in when activated or de-activated.</p>
+
+<hr>
+
+<h2>
+<a id="api" class="anchor" href="#api" aria-hidden="true"><span class="octicon octicon-link"></span></a>API</h2>
+
+<p>Your <code>nipplejs</code> instance will come back as :</p>
+
+<div class="highlight highlight-javascript"><pre>{
+    el<span class="pl-k">:</span> Element,
+    on<span class="pl-k">:</span> <span class="pl-c1">Function</span>,
+    off<span class="pl-k">:</span> <span class="pl-c1">Function</span>,
+    options<span class="pl-k">:</span> <span class="pl-c1">Object</span>,
+    ui<span class="pl-k">:</span> <span class="pl-c1">Object</span>
+}</pre></div>
+
+<h3>
+<a id="el" class="anchor" href="#el" aria-hidden="true"><span class="octicon octicon-link"></span></a><code>el</code>
+</h3>
+
+<p>Dom element in which the joystick gets created.</p>
+
+<div class="highlight highlight-html"><pre>&lt;<span class="pl-ent">div</span> <span class="pl-e">class</span>=<span class="pl-s"><span class="pl-pds">"</span>nipple<span class="pl-pds">"</span></span>&gt;
+    &lt;<span class="pl-ent">div</span> <span class="pl-e">class</span>=<span class="pl-s"><span class="pl-pds">"</span>front<span class="pl-pds">"</span></span>&gt;&lt;/<span class="pl-ent">div</span>&gt;
+    &lt;<span class="pl-ent">div</span> <span class="pl-e">class</span>=<span class="pl-s"><span class="pl-pds">"</span>back<span class="pl-pds">"</span></span>&gt;&lt;/<span class="pl-ent">div</span>&gt;
+&lt;/<span class="pl-ent">div</span>&gt;</pre></div>
+
+<h3>
+<a id="on" class="anchor" href="#on" aria-hidden="true"><span class="octicon octicon-link"></span></a><code>on</code>
+</h3>
+
+<p>If you whish to listen to internal events like :</p>
+
+<div class="highlight highlight-javascript"><pre>joystick.on(<span class="pl-s"><span class="pl-pds">'</span>event<span class="pl-pds">'</span></span>, <span class="pl-k">function</span> (<span class="pl-smi">data</span>) {
+    <span class="pl-c">// Do something.</span>
+});</pre></div>
+
+<h3>
+<a id="off" class="anchor" href="#off" aria-hidden="true"><span class="octicon octicon-link"></span></a><code>off</code>
+</h3>
+
+<p>To remove an event handler :</p>
+
+<div class="highlight highlight-javascript"><pre>joystick.off(<span class="pl-s"><span class="pl-pds">'</span>event<span class="pl-pds">'</span></span>, handler);</pre></div>
+
+<h3>
+<a id="options-1" class="anchor" href="#options-1" aria-hidden="true"><span class="octicon octicon-link"></span></a><code>options</code>
+</h3>
+
+<p>Simply the options you passed at its creation.</p>
+
+<h3>
+<a id="ui" class="anchor" href="#ui" aria-hidden="true"><span class="octicon octicon-link"></span></a><code>ui</code>
+</h3>
+
+<p>The object that store its ui elements</p>
+
+<div class="highlight highlight-javascript"><pre>{
+    el<span class="pl-k">:</span> <span class="pl-k">&lt;</span>div <span class="pl-k">class</span><span class="pl-k">=</span><span class="pl-s"><span class="pl-pds">"</span>nipple<span class="pl-pds">"</span></span><span class="pl-k">&gt;&lt;/</span>div<span class="pl-k">&gt;</span>
+    back<span class="pl-k">:</span> <span class="pl-k">&lt;</span>div <span class="pl-k">class</span><span class="pl-k">=</span><span class="pl-s"><span class="pl-pds">"</span>back<span class="pl-pds">"</span></span><span class="pl-k">&gt;&lt;/</span>div<span class="pl-k">&gt;</span>
+    front<span class="pl-k">:</span> <span class="pl-k">&lt;</span>div <span class="pl-k">class</span><span class="pl-k">=</span><span class="pl-s"><span class="pl-pds">"</span>front<span class="pl-pds">"</span></span><span class="pl-k">&gt;&lt;/</span>div<span class="pl-k">&gt;</span>
+}</pre></div>
+
+<hr>
+
+<h2>
+<a id="events" class="anchor" href="#events" aria-hidden="true"><span class="octicon octicon-link"></span></a>Events</h2>
+
+<h4>
+<a id="start" class="anchor" href="#start" aria-hidden="true"><span class="octicon octicon-link"></span></a><code>start</code>
+</h4>
+
+<p>The joystick is activated. (the user pressed on the active zone)</p>
+
+<h4>
+<a id="end" class="anchor" href="#end" aria-hidden="true"><span class="octicon octicon-link"></span></a><code>end</code>
+</h4>
+
+<p>The joystick is de-activated. (the user released the active zone)</p>
+
+<h4>
+<a id="move" class="anchor" href="#move" aria-hidden="true"><span class="octicon octicon-link"></span></a><code>move</code>
+</h4>
+
+<p>The joystick is moved.
+Comes with data :</p>
+
+<div class="highlight highlight-javascript"><pre>{
+    position<span class="pl-k">:</span> { <span class="pl-c">// absolute position of the center in pixels</span>
+        x<span class="pl-k">:</span> <span class="pl-c1">125</span>,
+        y<span class="pl-k">:</span> <span class="pl-c1">95</span>
+    },
+    force<span class="pl-k">:</span> <span class="pl-c1">0.2</span>, <span class="pl-c">// strength in %</span>
+    distance<span class="pl-k">:</span> <span class="pl-c1">25.4</span>, <span class="pl-c">// distance from center in pixels</span>
+    angle<span class="pl-k">:</span> {
+        radian<span class="pl-k">:</span> <span class="pl-c1">1.5707963268</span>, <span class="pl-c">// angle in radian</span>
+        degree<span class="pl-k">:</span> <span class="pl-c1">90</span>
+    }
+}</pre></div>
+
+<h4>
+<a id="dir" class="anchor" href="#dir" aria-hidden="true"><span class="octicon octicon-link"></span></a><code>dir</code>
+</h4>
+
+<p>When a direction is reached after the threshold.</p>
+
+<p>Direction are split with a 45° angle.</p>
+
+<div class="highlight highlight-javascript"><pre><span class="pl-c">//     \  UP /</span>
+<span class="pl-c">//      \   /</span>
+<span class="pl-c">// LEFT       RIGHT</span>
+<span class="pl-c">//      /   \</span>
+<span class="pl-c">//     /DOWN \</span></pre></div>
+
+<p>You can also listen to specific direction like :</p>
+
+<ul>
+<li><code>dir:up</code></li>
+<li><code>dir:down</code></li>
+<li><code>dir:right</code></li>
+<li><code>dir:left</code></li>
+</ul>
+
+<p>In this configuration only one direction is triggered at a time.</p>
+
+<h4>
+<a id="plain" class="anchor" href="#plain" aria-hidden="true"><span class="octicon octicon-link"></span></a><code>plain</code>
+</h4>
+
+<p>When a plain direction is reached after the threshold.</p>
+
+<p>Plain directions are split with a 90° angle.</p>
+
+<div class="highlight highlight-javascript"><pre><span class="pl-c">//       U|P</span>
+<span class="pl-c">//LEFT____|___ RIGHT</span>
+<span class="pl-c">//        |</span>
+<span class="pl-c">//      DO|WN</span></pre></div>
+
+<p>You can also listen to specific plain direction like :</p>
+
+<ul>
+<li><code>plain:up</code></li>
+<li><code>plain:down</code></li>
+<li><code>plain:right</code></li>
+<li><code>plain:left</code></li>
+</ul>
+
+<p>In this configuration two directions can be triggered at a time,
+because the user could be both <code>up</code> and <code>left</code> for example.</p>
+      </section>
+      <footer>
+        <p>This project is maintained by <a href="https://github.com/yoannmoinet">yoannmoinet</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <script src="javascripts/scale.fix.js"></script>
+    
+  </body>
+</html>
