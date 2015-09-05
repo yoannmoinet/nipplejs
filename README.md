@@ -158,7 +158,7 @@ Comes with data :
         degree: 90
     }
 }
-``` 
+```
 
 #### `dir`
 When a direction is reached after the threshold.
