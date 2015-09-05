@@ -30,7 +30,7 @@ define(['nipplejs'], function (nipplejs) {
     var joystick = nipplejs.create(options);
 </script>
 ```
-
+----
 ## Options
 You can configure your joystick in different ways :
 
@@ -82,7 +82,7 @@ You need to at least go to 0.1 to trigger a directional event.
 
 ### [`fadeTime`] defaults to 250
 The time it takes for joystick to fade-out and fade-in when activated or de-activated.
-
+----
 ## API
 Your `nipplejs` instance will come back as :
 
@@ -133,7 +133,7 @@ The object that store its ui elements
     front: <div class="front"></div>
 }
 ```
-
+----
 ## Events
 
 #### `start`
