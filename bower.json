@@ -1,5 +1,5 @@
 {
-  "version": "0.0.0",
+  "version": "0.1.0",
   "name": "nipplejs",
   "homepage": "https://github.com/yoannmoinet/nipplejs",
   "author": "Yoann Moinet <yoann.moinet@gmail.com>",
@@ -12,4 +12,3 @@
   "license": "MIT",
   "dependencies": {}
 }
-
