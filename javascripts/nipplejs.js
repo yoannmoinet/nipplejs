@@ -77,19 +77,19 @@ u.prepareEvent = function (evt) {
 };
 
 u.getScroll = function () {
-    var x = (window.pageXOffset !== undefined)
-      ? window.pageXOffset
-      : (document.documentElement || document.body.parentNode || document.body)
-        .scrollLeft;
+    var x = (window.pageXOffset !== undefined) ?
+        window.pageXOffset :
+        (document.documentElement || document.body.parentNode || document.body)
+            .scrollLeft;
 
-    var y = (window.pageYOffset !== undefined)
-      ? window.pageYOffset
-      : (document.documentElement || document.body.parentNode || document.body)
-        .scrollTop;
+    var y = (window.pageYOffset !== undefined) ?
+        window.pageYOffset :
+        (document.documentElement || document.body.parentNode || document.body)
+            .scrollTop;
     return {
         x: x,
         y: y
-    }
+    };
 };
 
 ///////////////////////
@@ -353,14 +353,13 @@ Nipple.prototype.computeDirection = function (evt, obj) {
 
 Nipple.prototype.onstart = function (evt) {
     evt = u.prepareEvent(evt);
-    this.box = this.options.zone.getBoundingClientRect();
     var scroll = u.getScroll();
+    this.box = this.options.zone.getBoundingClientRect();
     this.pos = {
         x: evt.pageX,
         y: evt.pageY
     };
-    console.log(this.pos);
-    console.log(scroll);
+
     this.backPos = {
         x: this.pos.x - (scroll.x + this.box.x + this.options.size / 2),
         y: this.pos.y - (scroll.y + this.box.y + this.options.size / 2)
@@ -369,13 +368,15 @@ Nipple.prototype.onstart = function (evt) {
     this.bindEvt(document, 'move')
         .bindEvt(document, 'end')
         .applyPosition(this.ui.el, this.backPos)
-         .applyPosition(this.ui.front, {
+        .applyPosition(this.ui.front, {
             x: this.options.size / 4,
             y: this.options.size / 4
         })
         .show();
 
-    this.trigger('start');
+    this.trigger('start', {
+        position: this.pos
+    });
     return false;
 };
 
@@ -418,6 +419,7 @@ Nipple.prototype.onmove = function (evt) {
 };
 
 Nipple.prototype.onend = function (evt) {
+    console.log('end');
     evt = u.prepareEvent(evt);
     this.unbindEvt(document, 'move')
         .unbindEvt(document, 'end')
