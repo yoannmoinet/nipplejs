@@ -3,6 +3,8 @@
 
 // Constants
 var isTouch = !!('ontouchstart' in window);
+var isPointer = window.PointerEvent ? true : false;
+var isMSPointer = window.MSPointerEvent ? true : false;
 var events = {
     touch: {
         start: 'touchstart',
@@ -13,10 +15,29 @@ var events = {
         start: 'mousedown',
         move: 'mousemove',
         end: 'mouseup'
+    },
+    pointer: {
+        start: 'pointerdown',
+        move: 'pointermove',
+        end: 'pointerup'
+    },
+    MSPointer: {
+        start: 'MSPointerDown',
+        move: 'MSPointerMove',
+        end: 'MSPointerUp'
     }
 };
 var handlers = {};
-var toBind = isTouch ? events.touch : events.mouse;
+var toBind;
+if (isPointer) {
+    toBind = events.pointer;
+} else if (isMSPointer) {
+    toBind = events.MSPointer;
+} else if (isTouch) {
+    toBind = events.touch;
+} else {
+    toBind = events.mouse;
+}
 
 // Utils
 var u = {};
@@ -306,7 +327,6 @@ Nipple.prototype.unbindEvt = function (el, type) {
 
 Nipple.prototype.computeDirection = function (evt, obj) {
     var rAngle = obj.angle.radian;
-    var dAngle = obj.angle.degree;
     var angle45 = Math.PI / 4;
     var angle90 = Math.PI / 2;
     var direction, directionX, directionY;
@@ -329,10 +349,10 @@ Nipple.prototype.computeDirection = function (evt, obj) {
     }
 
     // Plain direction
-    //       U|P
-    //LEFT____|___ RIGHT
-    //        |
-    //      DO|WN
+    //    UP                 |
+    // _______               | RIGHT
+    //                  LEFT |
+    //   DOWN                |
     if (rAngle > -angle90 && rAngle < angle90) {
         directionX = 'left';
     } else {
@@ -454,6 +474,13 @@ Nipple.prototype.onmove = function (evt) {
     };
 
     this.computeDirection(evt, toSend);
+
+    // Offset angles to follow units circle.
+    toSend.angle = {
+        radian: u.radians(180 - angle),
+        degree: 180 - angle
+    };
+
     this.trigger('move', toSend);
 
     return false;
