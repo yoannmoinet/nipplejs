@@ -115,17 +115,26 @@ var Nipple = function (options) {
 // Basic event system.
 Nipple.prototype.on = function (type, cb) {
     var self = this;
+    var types = type.split(' ');
+
+    if (types.length > 1) {
+        for (var i = 0, max = types.length; i < max; i += 1) {
+            self.on(types[i], cb);
+        }
+        return;
+    }
+
     self.handlers[type] = self.handlers[type] || [];
     self.handlers[type].push(cb);
+    return self;
 };
 
 Nipple.prototype.off = function (type, cb) {
     var self = this;
     if (self.handlers[type] && self.handlers[type].indexOf(cb) >= 0) {
         self.handlers[type].splice(self.handlers[type].indexOf(cb), 1);
-        return true;
     }
-    return false;
+    return self;
 };
 
 Nipple.prototype.trigger = function (type, data) {
@@ -337,17 +346,49 @@ Nipple.prototype.computeDirection = function (evt, obj) {
     }
 
     if (obj.force > this.options.threshold) {
-        obj.direction = {
+        var oldDirection = {};
+        for (var i in this.direction) {
+            if (this.direction.hasOwnProperty(i)) {
+                oldDirection[i] = this.direction[i];
+            }
+        }
+        var same = true;
+
+        this.direction = {
             x: directionX,
             y: directionY,
             angle: direction
         };
 
-        this.trigger('dir', obj);
-        this.trigger('plain', obj);
-        this.trigger('dir:' + direction, obj);
-        this.trigger('plain:' + directionX, obj);
-        this.trigger('plain:' + directionY, obj);
+        obj.direction = this.direction;
+
+        for (var i in oldDirection) {
+            if (oldDirection[i] !== this.direction[i]) {
+                same = false;
+            }
+        }
+
+        if (same) {
+            return;
+        }
+
+        if (oldDirection.x !== this.direction.x ||
+            oldDirection.y !== this.direction.y) {
+            this.trigger('plain', obj);
+        }
+
+        if (oldDirection.x !== this.direction.x) {
+            this.trigger('plain:' + directionX, obj);
+        }
+
+        if (oldDirection.y !== this.direction.y) {
+            this.trigger('plain:' + directionY, obj);
+        }
+
+        if (oldDirection.angle !== this.direction.angle) {
+            this.trigger('dir', obj);
+            this.trigger('dir:' + direction, obj);
+        }
     }
 };
 
