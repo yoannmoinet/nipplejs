@@ -36,12 +36,12 @@ function checkout (next) {
 
 function getBack (next) {
     exec('git checkout master ./dist/nipplejs.js && ' +
-        'mv ./dist/nipplejs.js ./javascript',
+        'mv ./dist/nipplejs.js ./javascripts/',
         next);
 }
 
 function commit (next) {
-    exec('git add ./javascript/nipplejs.js && ' +
+    exec('git add ./javascripts/nipplejs.js && ' +
         'git commit -m "chore: new build" && ' +
         'git push origin gh-pages', next);
 }
