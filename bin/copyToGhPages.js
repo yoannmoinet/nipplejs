@@ -28,7 +28,7 @@ function stash (next) {
 }
 
 function stashPop (next) {
-    exec('git stash pop', next);
+    exec('git stash pop && git checkout master', next);
 }
 
 function checkout (next) {
