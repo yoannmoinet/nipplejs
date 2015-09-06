@@ -24,24 +24,29 @@ function queue (fns) {
 }
 
 function stash (next) {
+    console.log(' - stash current changes');
     exec('git stash', next);
 }
 
 function stashPop (next) {
+    console.log(' - reapply stash and checkout master.');
     exec('git stash pop && git checkout master', next);
 }
 
 function checkout (next) {
+    console.log(' - checkout gh-pages.');
     exec('git checkout gh-pages', next);
 }
 
 function getBack (next) {
+    console.log(' - checkout built file from master and move it.');
     exec('git checkout master ./dist/nipplejs.js && ' +
         'mv ./dist/nipplejs.js ./javascripts/',
         next);
 }
 
 function commit (next) {
+    console.log(' - commit latest build to gh-pages.');
     exec('git add ./javascripts/nipplejs.js && ' +
         'git commit -m "chore: new build" && ' +
         'git push origin gh-pages', next);
