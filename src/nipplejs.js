@@ -367,13 +367,15 @@ Nipple.prototype.onstart = function (evt) {
     this.bindEvt(document, 'move')
         .bindEvt(document, 'end')
         .applyPosition(this.ui.el, this.backPos)
-         .applyPosition(this.ui.front, {
+        .applyPosition(this.ui.front, {
             x: this.options.size / 4,
             y: this.options.size / 4
         })
         .show();
 
-    this.trigger('start');
+    this.trigger('start', {
+        position: this.pos
+    });
     return false;
 };
 
