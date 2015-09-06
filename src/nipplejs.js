@@ -38,8 +38,6 @@ if (isPointer) {
     toBind = events.mouse;
 }
 
-console.log(isPointer, isMSPointer, isTouch);
-
 // Utils
 var u = {};
 u.distance = function (p1, p2) {
@@ -351,10 +349,10 @@ Nipple.prototype.computeDirection = function (evt, obj) {
     }
 
     // Plain direction
-    //       U|P
-    //LEFT____|___ RIGHT
-    //        |
-    //      DO|WN
+    //    UP                 |
+    // _______               | RIGHT
+    //                  LEFT |
+    //   DOWN                |
     if (rAngle > -angle90 && rAngle < angle90) {
         directionX = 'left';
     } else {
