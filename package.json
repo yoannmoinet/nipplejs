@@ -14,11 +14,11 @@
   "homepage": "https://github.com/yoannmoinet/nipplejs",
   "main": "./dist/nipplejs.js",
   "scripts": {
-    "posttest": "npm run format && npm run lint",
+    "postbuild": "npm run copyToGhPages",
     "preversion": "npm run build",
     "postversion": "npm run bowerSync && npm run changelog",
-    "build": "npm test",
-    "pretest": "npm run umd && npm run uglify",
+    "build": "npm run format && npm run lint",
+    "prebuild": "npm run umd && npm run uglify",
     "test": "mocha",
     "format": "jscs ./src/nipplejs.js ./test/nipplejs.spec.js",
     "lint": "eslint ./src/nipplejs.js ./test/nipplejs.spec.js",
@@ -26,7 +26,8 @@
     "changelog": "node ./bin/changelog.js",
     "bowerSync": "node ./bin/bowerSync.js",
     "uglify": "uglifyjs ./dist/nipplejs.js -o ./dist/nipplejs.min.js -c -m",
-    "watch": "watch \"npm test\" src test"
+    "watch": "watch \"npm test\" src test",
+    "copyToGhPages": "node ./bin/copyToGhPages.js"
   },
   "dependencies": {},
   "devDependencies": {
