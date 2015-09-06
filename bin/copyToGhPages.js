@@ -17,7 +17,7 @@ function queue (fns) {
             }
         } else {
             // We log if we have an error.
-            console.error(fn.name + ': ' + err);
+            console.error(fn.name + ': ', err);
             process.exit(1);
         }
     });
