@@ -1,6 +1,6 @@
 var exec = require('child_process').exec;
 
-queue([commitBuild, stash, checkout, getBack, commit, stashPop]);
+queue([commitBuild, checkoutPage, getBack, commit, checkoutMaster]);
 
 function queue (fns) {
     // Execute and remove the first function.
@@ -28,12 +28,7 @@ function commitBuild (next) {
     exec('git add ./dist/* && git commit -m "chore: new build"', next);
 }
 
-function stash (next) {
-    console.log(' - stash current changes');
-    exec('git stash', next);
-}
-
-function checkout (next) {
+function checkoutPage (next) {
     console.log(' - checkout gh-pages.');
     exec('git checkout gh-pages', next);
 }
@@ -53,7 +48,7 @@ function commit (next) {
         'git push origin gh-pages', next);
 }
 
-function stashPop (next) {
-    console.log(' - checkout master and reapply stash.');
-    exec('git checkout master && git stash pop', next);
+function checkoutMaster (next) {
+    console.log(' - checkout master.');
+    exec('git checkout master', next);
 }
