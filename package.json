@@ -14,7 +14,6 @@
   "homepage": "https://github.com/yoannmoinet/nipplejs",
   "main": "./dist/nipplejs.js",
   "scripts": {
-    "postbuild": "npm run copyToGhPages",
     "postversion": "npm run bowerSync && npm run changelog",
     "build": "npm run umd && npm run uglify",
     "prebuild": "npm run format && npm run lint",
