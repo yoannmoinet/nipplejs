@@ -2,6 +2,8 @@
 
 // Constants
 var isTouch = !!('ontouchstart' in window);
+var isPointer = window.PointerEvent ? true : false;
+var isMSPointer = window.MSPointerEvent ? true : false;
 var events = {
     touch: {
         start: 'touchstart',
@@ -12,10 +14,31 @@ var events = {
         start: 'mousedown',
         move: 'mousemove',
         end: 'mouseup'
+    },
+    pointer: {
+        start: 'pointerdown',
+        move: 'pointermove',
+        end: 'pointerup'
+    },
+    MSPointer: {
+        start: 'MSPointerDown',
+        move: 'MSPointerMove',
+        end: 'MSPointerUp'
     }
 };
 var handlers = {};
-var toBind = isTouch ? events.touch : events.mouse;
+var toBind;
+if (isPointer) {
+    toBind = events.pointer;
+} else if (isMSPointer) {
+    toBind = events.MSPointer;
+} else if (isTouch) {
+    toBind = events.touch;
+} else {
+    toBind = events.mouse;
+}
+
+console.log(isPointer, isMSPointer, isTouch);
 
 // Utils
 var u = {};
