@@ -11,6 +11,10 @@ bower install nipplejs --save
 ```
 
 ----
+## Demo
+Check out the [demo here](http://yoannmoinet.github.io/nipplejs/#demo).
+
+----
 ## Usage
 
 Import it the way you want into your project :
