@@ -476,6 +476,13 @@ Nipple.prototype.onmove = function (evt) {
     };
 
     this.computeDirection(evt, toSend);
+
+    // Offset angles to follow units circle.
+    toSend.angle = {
+        radian: u.radians(180 - angle),
+        degree: 180 - angle
+    };
+
     this.trigger('move', toSend);
 
     return false;
