@@ -1,6 +1,6 @@
 var exec = require('child_process').exec;
 
-queue([commitBuild, checkoutPage, getBack, commit, checkoutMaster]);
+queue([checkoutPage, getBack, commit, checkoutMaster]);
 
 function queue (fns) {
     // Execute and remove the first function.
@@ -21,11 +21,6 @@ function queue (fns) {
             process.exit(1);
         }
     });
-}
-
-function commitBuild (next) {
-    console.log(' - commit the build');
-    exec('git add ./dist/* && git commit -m "chore: new build"', next);
 }
 
 function checkoutPage (next) {
