@@ -337,12 +337,15 @@ Nipple.prototype.computeDirection = function (evt, obj) {
     }
 
     if (obj.force > this.options.threshold) {
-        obj.direction = {
+        var oldDirection = this.direction;
+        var same = true;
+        this.direction = {
             x: directionX,
             y: directionY,
             angle: direction
         };
-
+        obj.direction = this.direction;
+        console.log(oldDirection === this.direction);
         this.trigger('dir', obj);
         this.trigger('plain', obj);
         this.trigger('dir:' + direction, obj);
