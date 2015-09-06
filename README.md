@@ -110,7 +110,7 @@ Dom element in which the joystick gets created.
 If you whish to listen to internal events like :
 
 ```javascript
-joystick.on('event', function (data) {
+joystick.on('event', function (evt, data) {
     // Do something.
 });
 ```
