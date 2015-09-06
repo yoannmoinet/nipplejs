@@ -5,7 +5,7 @@ queue([stash, checkout, getBack, commit, stashPop]);
 function queue (fns) {
     // Execute and remove the first function.
     var fn = fns.shift();
-    fn()(function (err) {
+    fn(function (err) {
         if (!err) {
             if (fns.length) {
                 // If we still have functions
