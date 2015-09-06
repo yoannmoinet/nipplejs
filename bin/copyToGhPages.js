@@ -4,7 +4,8 @@ queue([stash, checkout, getBack, commit, stashPop]);
 
 function queue (fns) {
     // Execute and remove the first function.
-    fns.shift()(function (err) {
+    var fn = fns.shift();
+    fn()(function (err) {
         if (!err) {
             if (fns.length) {
                 // If we still have functions
@@ -16,7 +17,7 @@ function queue (fns) {
             }
         } else {
             // We log if we have an error.
-            console.error(err);
+            console.error(fn.name + ': ' + err);
             process.exit(1);
         }
     });
