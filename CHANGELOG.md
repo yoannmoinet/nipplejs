@@ -1,6 +1,17 @@
-<a name="0.2.1"></a>
-## [0.2.1](https://github.com/yoannmoinet/nipplejs/compare/v0.2.1...v0.2.1) (2015-09-06)
+<a name="0.3.0"></a>
+# [0.3.0](https://github.com/yoannmoinet/nipplejs/compare/v0.3.0...v0.3.0) (2015-09-06)
 
+
+
+
+<a name="0.3.0"></a>
+# [0.3.0](https://github.com/yoannmoinet/nipplejs/compare/v0.2.1...v0.3.0) (2015-09-06)
+
+
+### Features
+
+* offset angle by 180 for units circle ([3002014](https://github.com/yoannmoinet/nipplejs/commit/3002014))
+* support IE PointerEvents ([ed65d1e](https://github.com/yoannmoinet/nipplejs/commit/ed65d1e)), closes [#1](https://github.com/yoannmoinet/nipplejs/issues/1)
 
 
 
