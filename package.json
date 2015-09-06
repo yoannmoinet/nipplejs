@@ -16,8 +16,9 @@
   "scripts": {
     "postbuild": "npm run copyToGhPages",
     "postversion": "npm run bowerSync && npm run changelog",
-    "build": "npm run format && npm run lint",
-    "prebuild": "npm run umd && npm run uglify",
+    "build": "npm run umd && npm run uglify",
+    "prebuild": "npm run format && npm run lint",
+    "pretest": "npm run prebuild",
     "test": "mocha",
     "format": "jscs ./src/nipplejs.js ./test/nipplejs.spec.js",
     "lint": "eslint ./src/nipplejs.js ./test/nipplejs.spec.js",
