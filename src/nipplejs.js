@@ -345,17 +345,49 @@ Nipple.prototype.computeDirection = function (evt, obj) {
     }
 
     if (obj.force > this.options.threshold) {
-        obj.direction = {
+        var oldDirection = {};
+        for (var i in this.direction) {
+            if (this.direction.hasOwnProperty(i)) {
+                oldDirection[i] = this.direction[i];
+            }
+        }
+        var same = true;
+
+        this.direction = {
             x: directionX,
             y: directionY,
             angle: direction
         };
 
-        this.trigger('dir', obj);
-        this.trigger('plain', obj);
-        this.trigger('dir:' + direction, obj);
-        this.trigger('plain:' + directionX, obj);
-        this.trigger('plain:' + directionY, obj);
+        obj.direction = this.direction;
+
+        for (var i in oldDirection) {
+            if (oldDirection[i] !== this.direction[i]) {
+                same = false;
+            }
+        }
+
+        if (same) {
+            return;
+        }
+
+        if (oldDirection.x !== this.direction.x ||
+            oldDirection.y !== this.direction.y) {
+            this.trigger('plain', obj);
+        }
+
+        if (oldDirection.x !== this.direction.x) {
+            this.trigger('plain:' + directionX, obj);
+        }
+
+        if (oldDirection.y !== this.direction.y) {
+            this.trigger('plain:' + directionY, obj);
+        }
+
+        if (oldDirection.angle !== this.direction.angle) {
+            this.trigger('dir', obj);
+            this.trigger('dir:' + direction, obj);
+        }
     }
 };
 
