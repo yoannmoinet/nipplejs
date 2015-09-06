@@ -402,8 +402,8 @@ Nipple.prototype.onstart = function (evt) {
     };
 
     this.backPos = {
-        x: this.pos.x - (scroll.x + this.box.x + this.options.size / 2),
-        y: this.pos.y - (scroll.y + this.box.y + this.options.size / 2)
+        x: this.pos.x - (scroll.x + this.box.left + this.options.size / 2),
+        y: this.pos.y - (scroll.y + this.box.top + this.options.size / 2)
     };
 
     this.bindEvt(document, 'move')
