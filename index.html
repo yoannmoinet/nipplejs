@@ -22,14 +22,21 @@
             position: absolute;
             top: 0;
             right: 0;
-            padding: 20px 0;
+            padding: 5px 0 5px 0;
             width: 300px;
             height: 450px;
-            background: rgba(255, 0, 0, 0.1);
             box-sizing: padding-box;
+            color: white;
         }
         #debug ul {
             list-style: none;
+        }
+        #debug>ul {
+            padding-left: 0;
+        }
+        #debug .data {
+            color: #333333;
+            font-weight: 800;
         }
     </style>
   </head>
@@ -83,31 +90,37 @@ bower install nipplejs <span class="pl-k">--</span>save</pre></div>
     </pre>
 </div>
 
+<p>Feel free to look at <a title="the code behind it" href="./javascripts/app.js" target="blank">the code behind it</a>. Most of it is for the debug panel.</p>
+
 <div id="zone_joystick">
     <div id="debug">
         <ul>
             <li class="position">
+                position :
                 <ul>
-                    <li class="x"></li>
-                    <li class="y"></li>
+                    <li class="x">x : <span class='data'></span></li>
+                    <li class="y">y : <span class='data'></span></li>
                 </ul>
             </li>
-            <li class="force"></li>
-            <li class="distance"></li>
+            <li class="force">force : <span class='data'></span></li>
+            <li class="distance">distance : <span class='data'></span></li>
             <li class="angle">
+                angle :
                 <ul>
-                    <li class="radian"></li>
-                    <li class="degree"></li>
+                    <li class="radian">radian : <span class='data'></span></li>
+                    <li class="degree">degree : <span class='data'></span></li>
                 </ul>
             </li>
             <li class="direction">
+                direction :
                 <ul>
-                    <li class="x"></li>
-                    <li class="y"></li>
-                    <li class="angle"></li>
+                    <li class="x">x : <span class='data'></span></li>
+                    <li class="y">y : <span class='data'></span></li>
+                    <li class="angle">angle : <span class='data'></span></li>
                 </ul>
             </li>
         </ul>
+        <div class="dump"></div>
     </div>
 </div>
 <hr>
@@ -227,7 +240,7 @@ define([<span class="pl-s"><span class="pl-pds">'</span>nipplejs<span class="pl-
 
 <p>If you whish to listen to internal events like :</p>
 
-<div class="highlight highlight-javascript"><pre>joystick.on(<span class="pl-s"><span class="pl-pds">'</span>event<span class="pl-pds">'</span></span>, <span class="pl-k">function</span> (<span class="pl-smi">data</span>) {
+<div class="highlight highlight-javascript"><pre>joystick.on(<span class="pl-s"><span class="pl-pds">'</span>event<span class="pl-pds">'</span></span>, <span class="pl-k">function</span> (<span class="pl-smi">evt</span>, <span class="pl-smi">data</span>) {
     <span class="pl-c">// Do something.</span>
 });</pre></div>
 
