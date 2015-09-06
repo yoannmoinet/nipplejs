@@ -114,6 +114,15 @@ var Nipple = function (options) {
 // Basic event system.
 Nipple.prototype.on = function (type, cb) {
     var self = this;
+    var types = type.split(/[ ,]/g);
+
+    if (types.length > 1) {
+        for (var i = 0, max = types.length; i < max; i += 1) {
+            self.on(types[i], cb);
+        }
+        return;
+    }
+
     self.handlers[type] = self.handlers[type] || [];
     self.handlers[type].push(cb);
 };
