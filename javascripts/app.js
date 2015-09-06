@@ -24,47 +24,15 @@ var els = {
 
 };
 
-joystick.on('start', function (evt, data) {
+joystick.on('start end', function (evt, data) {
 	dump(evt.type);
 	debug(data);
-});
-joystick.on('move', function (evt, data) {
-	dump(evt.type);
+})
+.on('move', function (evt, data) {
 	debug(data);
-});
-joystick.on('dir', function (evt, data) {
+})
+.on('dir:up plain:up dir:left plain:left dir:down plain:down dir:right plain:right', function (evt, data) {
 	dump(evt.type);
-});
-joystick.on('plain', function (evt, data) {
-	dump(evt.type);
-});
-joystick.on('dir:top', function (evt, data) {
-	dump(evt.type);
-});
-joystick.on('plain:top', function (evt, data) {
-	dump(evt.type);
-});
-joystick.on('dir:left', function (evt, data) {
-	dump(evt.type);
-});
-joystick.on('plain:left', function (evt, data) {
-	dump(evt.type);
-});
-joystick.on('dir:bottom', function (evt, data) {
-	dump(evt.type);
-});
-joystick.on('plain:bottom', function (evt, data) {
-	dump(evt.type);
-});
-joystick.on('dir:right', function (evt, data) {
-	dump(evt.type);
-});
-joystick.on('plain:right', function (evt, data) {
-	dump(evt.type);
-});
-joystick.on('end', function (evt, data) {
-	dump(evt.type);
-	debug(data);
 });
 
 // Print data into elements
