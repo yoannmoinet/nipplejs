@@ -418,7 +418,6 @@ Nipple.prototype.onmove = function (evt) {
 };
 
 Nipple.prototype.onend = function (evt) {
-    console.log('end');
     evt = u.prepareEvent(evt);
     this.unbindEvt(document, 'move')
         .unbindEvt(document, 'end')
