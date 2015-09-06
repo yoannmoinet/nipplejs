@@ -125,15 +125,15 @@ Nipple.prototype.on = function (type, cb) {
 
     self.handlers[type] = self.handlers[type] || [];
     self.handlers[type].push(cb);
+    return self;
 };
 
 Nipple.prototype.off = function (type, cb) {
     var self = this;
     if (self.handlers[type] && self.handlers[type].indexOf(cb) >= 0) {
         self.handlers[type].splice(self.handlers[type].indexOf(cb), 1);
-        return true;
     }
-    return false;
+    return self;
 };
 
 Nipple.prototype.trigger = function (type, data) {
