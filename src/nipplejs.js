@@ -120,7 +120,7 @@ Nipple.prototype.on = function (type, cb) {
         for (var i = 0, max = types.length; i < max; i += 1) {
             self.on(types[i], cb);
         }
-        return;
+        return self;
     }
 
     self.handlers[type] = self.handlers[type] || [];
