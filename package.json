@@ -1,5 +1,5 @@
 {
-  "version": "0.2.1",
+  "version": "0.3.0",
   "name": "nipplejs",
   "description": "A virtual joystick for touch capable interfaces",
   "author": "Yoann Moinet <yoann.moinet@gmail.com>",
