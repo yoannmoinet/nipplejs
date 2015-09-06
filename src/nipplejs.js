@@ -326,7 +326,6 @@ Nipple.prototype.unbindEvt = function (el, type) {
 
 Nipple.prototype.computeDirection = function (evt, obj) {
     var rAngle = obj.angle.radian;
-    var dAngle = obj.angle.degree;
     var angle45 = Math.PI / 4;
     var angle90 = Math.PI / 2;
     var direction, directionX, directionY;
