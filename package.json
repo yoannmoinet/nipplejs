@@ -15,7 +15,6 @@
   "main": "./dist/nipplejs.js",
   "scripts": {
     "postbuild": "npm run copyToGhPages",
-    "preversion": "npm run build",
     "postversion": "npm run bowerSync && npm run changelog",
     "build": "npm run format && npm run lint",
     "prebuild": "npm run umd && npm run uglify",
