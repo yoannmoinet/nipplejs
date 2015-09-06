@@ -36,7 +36,7 @@ function checkout (next) {
 
 function getBack (next) {
     exec('git checkout master ./dist/nipplejs.js && ' +
-        'mv ./dist/nipplejs.js ./javascript/nipplejs.js',
+        'mv ./dist/nipplejs.js ./javascript',
         next);
 }
 
