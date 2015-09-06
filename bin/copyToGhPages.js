@@ -41,6 +41,7 @@ function checkout (next) {
 function getBack (next) {
     console.log(' - checkout built file from master and move it.');
     exec('git checkout master ./dist/nipplejs.js && ' +
+        'git reset ./dist/nipplejs.js && ' +
         'mv ./dist/nipplejs.js ./javascripts/',
         next);
 }
