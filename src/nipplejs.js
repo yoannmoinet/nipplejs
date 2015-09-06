@@ -75,6 +75,22 @@ u.prepareEvent = function (evt) {
     return isTouch ? evt.touches[0] : evt;
 };
 
+u.getScroll = function () {
+    var x = (window.pageXOffset !== undefined) ?
+        window.pageXOffset :
+        (document.documentElement || document.body.parentNode || document.body)
+            .scrollLeft;
+
+    var y = (window.pageYOffset !== undefined) ?
+        window.pageYOffset :
+        (document.documentElement || document.body.parentNode || document.body)
+            .scrollTop;
+    return {
+        x: x,
+        y: y
+    };
+};
+
 ///////////////////////
 ///   THE NIPPLE    ///
 ///////////////////////
@@ -336,6 +352,7 @@ Nipple.prototype.computeDirection = function (evt, obj) {
 
 Nipple.prototype.onstart = function (evt) {
     evt = u.prepareEvent(evt);
+    var scroll = u.getScroll();
     this.box = this.options.zone.getBoundingClientRect();
     this.pos = {
         x: evt.pageX,
@@ -343,8 +360,8 @@ Nipple.prototype.onstart = function (evt) {
     };
 
     this.backPos = {
-        x: this.pos.x - (this.box.left + this.options.size / 2),
-        y: this.pos.y - (this.box.top + this.options.size / 2)
+        x: this.pos.x - (scroll.x + this.box.x + this.options.size / 2),
+        y: this.pos.y - (scroll.y + this.box.y + this.options.size / 2)
     };
 
     this.bindEvt(document, 'move')
