@@ -11,6 +11,27 @@
     <!--[if lt IE 9]>
     <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
+    <style>
+        #zone_joystick {
+            position: relative;
+            background: silver;
+            box-sizing: content-box;
+            height: 450px;
+        }
+        #debug {
+            position: absolute;
+            top: 0;
+            right: 0;
+            padding: 20px 0;
+            width: 300px;
+            height: 450px;
+            background: rgba(255, 0, 0, 0.1);
+            box-sizing: padding-box;
+        }
+        #debug ul {
+            list-style: none;
+        }
+    </style>
   </head>
   <body>
     <div class="wrapper">
@@ -44,6 +65,51 @@
 
 bower install nipplejs <span class="pl-k">--</span>save</pre></div>
 
+<hr>
+
+<h2>
+<a id="demo" class="anchor" href="#demo" aria-hidden="true"><span class="octicon octicon-link"></span></a>Demo</h2>
+
+<p>First thing first. A demo. Executed with this configuration : </p>
+
+<div class="highlight highlight-javascript">
+    <pre>
+<span class="pl-k">&lt;</span>script src<span class="pl-k">=</span><span class="pl-s"><span class="pl-pds">"</span>./dist/nipplejs.min.js<span class="pl-pds">"</span></span><span class="pl-k">&gt;&lt;/</span>script<span class="pl-k">&gt;</span>
+<span class="pl-k">&lt;</span>script<span class="pl-k">&gt;</span>
+    <span class="pl-k">var</span> joystick <span class="pl-k">=</span> nipplejs.create({
+        zone: document.getElementById('zone_joystick')
+    });
+<span class="pl-k">&lt;/</span>script<span class="pl-k">&gt;</span>
+    </pre>
+</div>
+
+<div id="zone_joystick">
+    <div id="debug">
+        <ul>
+            <li class="position">
+                <ul>
+                    <li class="x"></li>
+                    <li class="y"></li>
+                </ul>
+            </li>
+            <li class="force"></li>
+            <li class="distance"></li>
+            <li class="angle">
+                <ul>
+                    <li class="radian"></li>
+                    <li class="degree"></li>
+                </ul>
+            </li>
+            <li class="direction">
+                <ul>
+                    <li class="x"></li>
+                    <li class="y"></li>
+                    <li class="angle"></li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+</div>
 <hr>
 
 <h2>
@@ -284,6 +350,7 @@ because the user could be both <code>up</code> and <code>left</code> for example
       </footer>
     </div>
     <script src="javascripts/scale.fix.js"></script>
-    
+    <script src="javascripts/nipplejs.js"></script>
+    <script src="javascripts/app.js"></script>
   </body>
 </html>
