@@ -1,6 +1,16 @@
-<a name="0.2.0"></a>
-# [0.2.0](https://github.com/yoannmoinet/nipplejs/compare/v0.2.0...v0.2.0) (2015-09-06)
+<a name="0.2.1"></a>
+## [0.2.1](https://github.com/yoannmoinet/nipplejs/compare/v0.2.1...v0.2.1) (2015-09-06)
 
+
+
+
+<a name="0.2.1"></a>
+## [0.2.1](https://github.com/yoannmoinet/nipplejs/compare/v0.2.0...v0.2.1) (2015-09-06)
+
+
+### Bug Fixes
+
+* correct chrome's clientBoundingBox ([b94bc43](https://github.com/yoannmoinet/nipplejs/commit/b94bc43))
 
 
 
