@@ -133,19 +133,16 @@ var Nipple = function (options) {
 };
 
 // Basic event system.
-Nipple.prototype.on = function (type, cb) {
+Nipple.prototype.on = function (arg, cb) {
     var self = this;
-    var types = type.split(/[ ,]/g);
+    var types = arg.split(/[ ,]+/g);
+    var type;
 
-    if (types.length > 1) {
-        for (var i = 0, max = types.length; i < max; i += 1) {
-            self.on(types[i], cb);
-        }
-        return self;
+    for (var i = 0; i < types.length; i += 1) {
+        type = types[i];
+        self.handlers[type] = self.handlers[type] || [];
+        self.handlers[type].push(cb);
     }
-
-    self.handlers[type] = self.handlers[type] || [];
-    self.handlers[type].push(cb);
     return self;
 };
 
