@@ -189,10 +189,9 @@ When a plain direction is reached after the threshold.
 
 Plain directions are split with a 90° angle.
 ```javascript
-//       U|P
-//LEFT____|___ RIGHT
-//        |
-//      DO|WN
+//       UP               |
+//     ------        LEFT | RIGHT
+//      DOWN              |
 ```
 You can also listen to specific plain direction like :
 - `plain:up`
