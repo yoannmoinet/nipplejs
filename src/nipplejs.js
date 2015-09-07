@@ -133,9 +133,9 @@ var Nipple = function (options) {
 };
 
 // Basic event system.
-Nipple.prototype.on = function (type, cb) {
+Nipple.prototype.on = function (arg, cb) {
     var self = this;
-    var types = type.split(/[ ,]+/g);
+    var types = arg.split(/[ ,]+/g);
     var type;
 
     for (var i = 0; i < types.length; i += 1) {
