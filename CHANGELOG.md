@@ -1,6 +1,17 @@
-<a name="0.3.0"></a>
-# [0.3.0](https://github.com/yoannmoinet/nipplejs/compare/v0.3.0...v0.3.0) (2015-09-06)
+<a name="0.3.1"></a>
+## [0.3.1](https://github.com/yoannmoinet/nipplejs/compare/v0.3.1...v0.3.1) (2015-09-07)
 
+
+
+
+<a name="0.3.1"></a>
+## [0.3.1](https://github.com/yoannmoinet/nipplejs/compare/v0.3.0...v0.3.1) (2015-09-07)
+
+
+### Bug Fixes
+
+* **on:** allows multiple spaces in event string ([b89bd0e](https://github.com/yoannmoinet/nipplejs/commit/b89bd0e))
+* **on:** removes variable name clash. ([3d70a3c](https://github.com/yoannmoinet/nipplejs/commit/3d70a3c))
 
 
 
