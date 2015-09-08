@@ -23,12 +23,16 @@ Import it the way you want into your project :
 ```javascript
 // CommonJS
 var joystick = require('nipplejs').create(options);
+```
 
+```javascript
 // AMD
 define(['nipplejs'], function (nipplejs) {
     var joystick = nipplejs.create(options);
 });
+```
 
+```html
 // Global
 <script type="text/javascript" src="./dist/nipplejs.min.js"></script>
 <script type="text/javascript">
@@ -136,13 +140,14 @@ Simply the options you passed at its creation.
 ### `ui`
 The object that store its ui elements
 
-```javascript
+```html
 {
     el: <div class="nipple"></div>
     back: <div class="back"></div>
     front: <div class="front"></div>
 }
 ```
+
 ----
 ## Events
 
@@ -185,6 +190,7 @@ Direction are split with a 45° angle.
 ```
 
 You can also listen to specific direction like :
+
 - `dir:up`
 - `dir:down`
 - `dir:right`
