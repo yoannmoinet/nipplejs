@@ -26,7 +26,7 @@
     "bowerSync": "node ./bin/bowerSync.js",
     "uglify": "uglifyjs ./dist/nipplejs.js -o ./dist/nipplejs.min.js -c -m",
     "watch": "watch \"npm test\" src test",
-    "copyToGhPages": "node ./bin/copyToGhPages.js"
+    "copyGh": "node ./bin/copyToGhPages.js"
   },
   "dependencies": {},
   "devDependencies": {
