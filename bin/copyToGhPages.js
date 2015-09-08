@@ -1,6 +1,7 @@
 var exec = require('child_process').exec;
+var fs = require('fs');
 
-queue([checkoutPage, getBack, commit, checkoutMaster]);
+queue([checkoutPage, getBack, modifyFile, commit, checkoutMaster]);
 
 function queue (fns) {
     // Execute and remove the first function.
@@ -29,17 +30,31 @@ function checkoutPage (next) {
 }
 
 function getBack (next) {
-    console.log(' - checkout built file from master and move it.');
-    exec('git checkout master ./dist/nipplejs.js && ' +
-        'git reset ./dist/nipplejs.js && ' +
-        'mv ./dist/nipplejs.js ./javascripts/',
+    console.log(' - checkout README from master and rename it to index.md');
+    exec('git checkout master -- README.md && ' +
+        'git reset README.md && ' +
+        'mv README.md index.md',
         next);
 }
 
+function modifyFile (next) {
+    console.log(' - reading the new index.md');
+    fs.readFile('index.md', function (err, data) {
+        if (err) {
+            next(err);
+            return;
+        }
+        console.log(' - writing the new content for Jekyll');
+        var body = data.split('\n');
+        body.splice(0, 3, '---', 'layout: index', '---');
+        fs.writeFile('index.md', body.join('\n'), next);
+    });
+}
+
 function commit (next) {
-    console.log(' - commit latest build to gh-pages.');
-    exec('git add ./javascripts/nipplejs.js && ' +
-        'git commit -m "chore: new build" && ' +
+    console.log(' - commit latest doc to gh-pages');
+    exec('git add index.md && ' +
+        'git commit -m "docs: sync from master" && ' +
         'git push origin gh-pages', next);
 }
 
