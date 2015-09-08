@@ -2,6 +2,7 @@
 layout: index
 ---
 ## Install
+
 ```bash
 npm install nipplejs --save
 
@@ -34,6 +35,7 @@ define(['nipplejs'], function (nipplejs) {
     var joystick = nipplejs.create(options);
 </script>
 ```
+
 ----
 ## Options
 You can configure your joystick in different ways :
@@ -105,6 +107,7 @@ Your `nipplejs` instance will come back as :
 
 ### `el`
 Dom element in which the joystick gets created.
+
 ```html
 <div class="nipple">
     <div class="front"></div>
@@ -152,6 +155,7 @@ The joystick is de-activated. (the user released the active zone)
 #### `move`
 The joystick is moved.
 Comes with data :
+
 ```javascript
 {
     position: { // absolute position of the center in pixels
@@ -171,6 +175,7 @@ Comes with data :
 When a direction is reached after the threshold.
 
 Direction are split with a 45° angle.
+
 ```javascript
 //     \  UP /
 //      \   /
@@ -178,6 +183,7 @@ Direction are split with a 45° angle.
 //      /   \
 //     /DOWN \
 ```
+
 You can also listen to specific direction like :
 - `dir:up`
 - `dir:down`
@@ -190,12 +196,15 @@ In this configuration only one direction is triggered at a time.
 When a plain direction is reached after the threshold.
 
 Plain directions are split with a 90° angle.
+
 ```javascript
 //       UP               |
 //     ------        LEFT | RIGHT
 //      DOWN              |
 ```
+
 You can also listen to specific plain direction like :
+
 - `plain:up`
 - `plain:down`
 - `plain:right`
@@ -204,6 +213,7 @@ You can also listen to specific plain direction like :
 In this configuration two directions can be triggered at a time,
 because the user could be both `up` and `left` for example.
 
+----
 ## Contributing
 Your help is more than welcome, I would be very honored to have you on my side.
 
