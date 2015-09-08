@@ -2,7 +2,7 @@
 layout: index
 ---
 ## Install
-```node
+```bash
 npm install nipplejs --save
 
 // OR
@@ -52,7 +52,8 @@ All options are optional.
 
 ### [`zone`] defaults to 'body'
 The dom element in which your joystick will be injected.
-```javascript
+
+```html
 <div id="zone_joystick"></div>
 
 <script type="text/javascript" src="./nipplejs.min.js"></script>
@@ -63,6 +64,7 @@ The dom element in which your joystick will be injected.
     var joystick = nipplejs.create(options);
 </script>
 ```
+
 This zone also serve as the mouse/touch events handler.
 
 It represents the zone where your joystick will be active.
@@ -221,5 +223,4 @@ We follow a 4 spaces rule around here.
 Once you're satisfied with your changes, you can also include a build.
 
 1. `npm run build` to generate built files. Commit is automatic.
-3. `npm run copyToGhPages` will copy the new build over to Github-Pages with. Have a clean slate for this to work.
 4. `npm version patch|minor|major` depending on your change. Changelog will be generated and bower's version synced and everything is automatically committed (not pushed though).
