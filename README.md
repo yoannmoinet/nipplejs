@@ -2,7 +2,7 @@
 > A virtual joystick for touch capable interfaces
 
 ## Install
-```node
+```bash
 npm install nipplejs --save
 
 // OR
@@ -52,7 +52,8 @@ All options are optional.
 
 ### [`zone`] defaults to 'body'
 The dom element in which your joystick will be injected.
-```javascript
+
+```html
 <div id="zone_joystick"></div>
 
 <script type="text/javascript" src="./nipplejs.min.js"></script>
@@ -63,6 +64,7 @@ The dom element in which your joystick will be injected.
     var joystick = nipplejs.create(options);
 </script>
 ```
+
 This zone also serve as the mouse/touch events handler.
 
 It represents the zone where your joystick will be active.
