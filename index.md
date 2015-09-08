@@ -1,7 +1,6 @@
 ---
 layout: index
 ---
-
 ## Install
 ```node
 npm install nipplejs --save
@@ -190,10 +189,9 @@ When a plain direction is reached after the threshold.
 
 Plain directions are split with a 90° angle.
 ```javascript
-//       U|P
-//LEFT____|___ RIGHT
-//        |
-//      DO|WN
+//       UP               |
+//     ------        LEFT | RIGHT
+//      DOWN              |
 ```
 You can also listen to specific plain direction like :
 - `plain:up`
@@ -203,3 +201,25 @@ You can also listen to specific plain direction like :
 
 In this configuration two directions can be triggered at a time,
 because the user could be both `up` and `left` for example.
+
+## Contributing
+Your help is more than welcome, I would be very honored to have you on my side.
+
+Here are some very basic guidelines.
+
+#### Commits
+Please follow these [guidelines](https://github.com/angular/angular.js/blob/master/CONTRIBUTING.md#commit) so your commits will be taken by the self-generated changelog.
+
+#### Style
+There are both [JSCS](http://jscs.info/) and [ESLint](http://eslint.org/) in the project.
+
+To test your code against them simply run `npm run prebuild`.
+
+We follow a 4 spaces rule around here.
+
+#### Build
+Once you're satisfied with your changes, you can also include a build.
+
+1. `npm run build` to generate built files. Commit is automatic.
+3. `npm run copyToGhPages` will copy the new build over to Github-Pages with. Have a clean slate for this to work.
+4. `npm version patch|minor|major` depending on your change. Changelog will be generated and bower's version synced and everything is automatically committed (not pushed though).
