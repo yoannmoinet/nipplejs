@@ -45,7 +45,7 @@ function modifyFile (next) {
             return;
         }
         console.log(' - writing the new content for Jekyll');
-        var body = data.split('\n');
+        var body = data.toString().split('\n');
         body.splice(0, 3, '---', 'layout: index', '---');
         fs.writeFile('index.md', body.join('\n'), next);
     });
