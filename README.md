@@ -223,5 +223,4 @@ We follow a 4 spaces rule around here.
 Once you're satisfied with your changes, you can also include a build.
 
 1. `npm run build` to generate built files. Commit is automatic.
-3. `npm run copyToGhPages` will copy the new build over to Github-Pages with. Have a clean slate for this to work.
 4. `npm version patch|minor|major` depending on your change. Changelog will be generated and bower's version synced and everything is automatically committed (not pushed though).
