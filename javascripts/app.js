@@ -1,4 +1,4 @@
-var elDemo = document.getElementById('demo').parentNode.nextElementSibling;
+var elDemo = document.getElementsByTagName('h2')[1].nextElementSibling;
 elDemo.innerHTML = 'See the Pen <a href="http://codepen.io/YoannM/pen/gapmMG/">nippleJS</a>'+
 	'by Yoann Moinet (<a href="http://codepen.io/YoannM">@YoannM</a>) on'+
 	'<a href="http://codepen.io">CodePen</a>.';
