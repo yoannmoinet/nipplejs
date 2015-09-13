@@ -15,9 +15,9 @@
   "main": "./dist/nipplejs.js",
   "scripts": {
     "postversion": "npm run bowerSync && npm run changelog",
-    "build": "npm run umd && npm run uglify && git add \"./dist/*.js\" && git commit -m \"chore: build\"",
+    "build": "npm run umd && npm run uglify",
     "prebuild": "npm run format && npm run lint",
-    "pretest": "npm run prebuild",
+    "pretest": "npm run build",
     "test": "mocha",
     "format": "jscs ./src/nipplejs.js ./test/nipplejs.spec.js",
     "lint": "eslint ./src/nipplejs.js ./test/nipplejs.spec.js",
