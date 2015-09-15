@@ -216,7 +216,7 @@ Manager.prototype.processOnMove = function (evt) {
         instance: nipple
     };
 
-    nipple.computeDirection(toSend);
+    toSend = nipple.computeDirection(toSend);
 
     // Offset angles to follow units circle.
     toSend.angle = {
