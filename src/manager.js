@@ -103,12 +103,8 @@ Manager.prototype.onstart = function (evt) {
     if (!this.started) {
         this.bindEvt(document, 'move')
             .bindEvt(document, 'end');
-        var toSend = this.nipples[0].pos;
-        toSend.nipples = this.nipples;
-        this.trigger('start', toSend);
+        this.started = true;
     }
-
-    this.started = true;
 
     return false;
 };
@@ -153,8 +149,9 @@ Manager.prototype.processOnStart = function (evt) {
 
     nipple.show();
     this.nipples.push(nipple);
+    this.trigger('added ' + identifier + ':added', nipple);
     nipple.trigger('start', nipple);
-    this.trigger(identifier + ':start', nipple);
+    this.trigger('start ' + identifier + ':start', nipple);
 };
 
 Manager.prototype.onmove = function (evt) {
@@ -169,8 +166,6 @@ Manager.prototype.onmove = function (evt) {
         toSends.push(this.processOnMove(evt[0] || evt));
     }
 
-    toSends[0].nipples = this.nipples;
-    this.trigger('move', toSends[0]);
     return false;
 };
 
@@ -217,7 +212,8 @@ Manager.prototype.processOnMove = function (evt) {
         angle: {
             radian: rAngle,
             degree: angle
-        }
+        },
+        instance: nipple
     };
 
     nipple.computeDirection(toSend);
@@ -229,7 +225,7 @@ Manager.prototype.processOnMove = function (evt) {
     };
 
     nipple.trigger('move', toSend);
-    this.trigger(identifier + ':move', toSend);
+    this.trigger('move ' + identifier + ':move', toSend);
     return toSend;
 };
 
@@ -246,8 +242,7 @@ Manager.prototype.onend = function (evt) {
 
     if (!this.nipples.length) {
         this.unbindEvt(document, 'move')
-            .unbindEvt(document, 'end')
-            .trigger('end');
+            .unbindEvt(document, 'end');
         this.started = false;
     }
 
@@ -258,16 +253,20 @@ Manager.prototype.processOnEnd = function (evt) {
     var identifier = (evt.identifier !== undefined ?
         evt.identifier :
         evt.pointerId) || 0;
-    var nipple = this.nipples.get(identifier);
+    var self = this;
+    var nipple = self.nipples.get(identifier);
 
     if (!nipple) {
         console.error('END: Couldn\'t find the nipple n°' + identifier + '.');
-        console.error(this.nipples);
+        console.error(self.nipples);
         return;
     }
-    var index = this.nipples.indexOf(nipple);
-    nipple.hide();
-    nipple.trigger('end');
-    this.trigger(identifier + ':end');
-    this.nipples.splice(index, 1);
+    nipple.hide(function () {
+        nipple.trigger('removed', nipple);
+        self.trigger('removed ' + identifier + ':removed', nipple);
+    });
+    nipple.trigger('end', nipple);
+    self.trigger('end ' + identifier + ':end', nipple);
+    var index = self.nipples.indexOf(nipple);
+    self.nipples.splice(index, 1);
 };
