@@ -449,9 +449,8 @@ Nipple.prototype.computeDirection = function (obj) {
                 this.identifier + ':dir ' +
                 this.identifier + ':dir:' + direction, obj);
         }
-
-        return obj;
     }
+    return obj;
 };
 ///////////////////////
 ///     MANAGER     ///
