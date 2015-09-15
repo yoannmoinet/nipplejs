@@ -203,6 +203,7 @@ Manager.prototype.processOnMove = function (evt) {
         identifier: nipple.identifier,
         position: pos,
         force: force,
+        pressure: evt.force || evt.pressure || evt.webkitForce,
         distance: dist,
         angle: {
             radian: rAngle,
