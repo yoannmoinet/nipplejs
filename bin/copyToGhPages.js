@@ -1,7 +1,14 @@
 var exec = require('child_process').exec;
 var fs = require('fs');
 
-queue([checkoutPage, getBack, modifyFile, commit, checkoutMaster]);
+queue([
+    checkoutPage,
+    importReadme,
+    importBuild,
+    modifyFile,
+    commit,
+    checkoutMaster
+]);
 
 function queue (fns) {
     // Execute and remove the first function.
@@ -29,11 +36,19 @@ function checkoutPage (next) {
     exec('git checkout gh-pages', next);
 }
 
-function getBack (next) {
+function importReadme (next) {
     console.log(' - checkout README from master and rename it to index.md');
     exec('git checkout master -- README.md && ' +
         'git reset README.md && ' +
         'mv README.md index.md',
+        next);
+}
+
+function importBuild (next) {
+    console.log(' - checkout build from master and move it to ./javascripts/');
+    exec('git checkout master -- ./dist/nipplejs.js && ' +
+        'git reset ./dist/nipplejs.js && ' +
+        'mv ./dist/nipplejs.js ./javascripts/',
         next);
 }
 
@@ -54,7 +69,8 @@ function modifyFile (next) {
 function commit (next) {
     console.log(' - commit latest doc to gh-pages');
     exec('git add index.md && ' +
-        'git commit -m "docs: sync from master" && ' +
+        'git add ./javascripts/nipplejs.js && ' +
+        'git commit -m "chore: sync from master" && ' +
         'git push origin gh-pages', next);
 }
 
