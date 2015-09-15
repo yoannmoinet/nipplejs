@@ -40,7 +40,8 @@ Super.prototype.trigger = function (arg, data) {
         if (self.handlers[type] && self.handlers[type].length) {
             self.handlers[type].forEach(function (handler) {
                 handler.call(self, {
-                    type: type
+                    type: type,
+                    target: self
                 }, data);
             });
         }
