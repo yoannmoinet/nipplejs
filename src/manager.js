@@ -123,29 +123,33 @@ Manager.prototype.processOnStart = function (evt) {
     }
 
     var scroll = u.getScroll();
+    var position = {
+        x: evt.pageX,
+        y: evt.pageY
+    };
+    var backPosition = {
+        x: position.x -
+            (scroll.x + this.box.left + this.nippleOptions.size / 2),
+        y: position.y -
+            (scroll.y + this.box.top + this.nippleOptions.size / 2)
+    };
+    var frontPosition = {
+        x: this.nippleOptions.size / 4,
+        y: this.nippleOptions.size / 4
+    };
     var nipple = new Nipple(this, {
         color: this.nippleOptions.color,
         size: this.nippleOptions.size,
         threshold: this.nippleOptions.threshold,
         fadeTime: this.nippleOptions.fadeTime,
-        identifier: identifier
+        identifier: identifier,
+        position: position,
+        backPosition: backPosition,
+        frontPosition: frontPosition
     });
 
-    nipple.pos = {
-        x: evt.pageX,
-        y: evt.pageY
-    };
-
-    nipple.backPos = {
-        x: nipple.pos.x - (scroll.x + this.box.left + nipple.options.size / 2),
-        y: nipple.pos.y - (scroll.y + this.box.top + nipple.options.size / 2)
-    };
-
-    u.applyPosition(nipple.ui.el, nipple.backPos);
-    u.applyPosition(nipple.ui.front, {
-        x: nipple.options.size / 4,
-        y: nipple.options.size / 4
-    });
+    u.applyPosition(nipple.ui.el, nipple.backPosition);
+    u.applyPosition(nipple.ui.front, nipple.frontPosition);
 
     nipple.show();
     this.nipples.push(nipple);
@@ -187,20 +191,22 @@ Manager.prototype.processOnMove = function (evt) {
         x: evt.pageX,
         y: evt.pageY
     };
-    var dist = u.distance(pos, nipple.pos);
-    var angle = u.angle(pos, nipple.pos);
+    var dist = u.distance(pos, nipple.position);
+    var angle = u.angle(pos, nipple.position);
     var rAngle = u.radians(angle);
     var force = dist / size;
 
     if (dist > size) {
         dist = size;
-        pos = u.findCoord(nipple.pos, dist, angle);
+        pos = u.findCoord(nipple.position, dist, angle);
     }
 
-    u.applyPosition(nipple.ui.front, {
-        x: pos.x - nipple.pos.x + nipple.options.size / 4,
-        y: pos.y - nipple.pos.y + nipple.options.size / 4
-    });
+    nipple.frontPosition = {
+        x: pos.x - nipple.position.x + nipple.options.size / 4,
+        y: pos.y - nipple.position.y + nipple.options.size / 4
+    };
+
+    u.applyPosition(nipple.ui.front, nipple.frontPosition);
 
     var toSend = {
         identifier: nipple.identifier,
@@ -221,8 +227,6 @@ Manager.prototype.processOnMove = function (evt) {
         radian: u.radians(180 - angle),
         degree: 180 - angle
     };
-
-    nipple.values = toSend;
 
     nipple.trigger('move', toSend);
     this.trigger(identifier + ':move', toSend);
