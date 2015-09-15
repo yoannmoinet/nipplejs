@@ -220,6 +220,8 @@ Manager.prototype.processOnMove = function (evt) {
         degree: 180 - angle
     };
 
+    nipple.values = toSend;
+
     nipple.trigger('move', toSend);
     this.trigger(identifier + ':move', toSend);
     return toSend;
