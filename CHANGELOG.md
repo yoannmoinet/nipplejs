@@ -1,6 +1,16 @@
-<a name="0.4.1"></a>
-## [0.4.1](https://github.com/yoannmoinet/nipplejs/compare/v0.4.1...v0.4.1) (2015-09-15)
+<a name="0.4.2"></a>
+## [0.4.2](https://github.com/yoannmoinet/nipplejs/compare/v0.4.2...v0.4.2) (2015-09-15)
 
+
+
+
+<a name="0.4.2"></a>
+## [0.4.2](https://github.com/yoannmoinet/nipplejs/compare/v0.4.1...v0.4.2) (2015-09-15)
+
+
+### Bug Fixes
+
+* correctly return directions ([871d782](https://github.com/yoannmoinet/nipplejs/commit/871d782))
 
 
 
