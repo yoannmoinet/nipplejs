@@ -1,6 +1,16 @@
-<a name="0.4.0"></a>
-# [0.4.0](https://github.com/yoannmoinet/nipplejs/compare/v0.4.0...v0.4.0) (2015-09-15)
+<a name="0.4.1"></a>
+## [0.4.1](https://github.com/yoannmoinet/nipplejs/compare/v0.4.1...v0.4.1) (2015-09-15)
 
+
+
+
+<a name="0.4.1"></a>
+## [0.4.1](https://github.com/yoannmoinet/nipplejs/compare/v0.4.0...v0.4.1) (2015-09-15)
+
+
+### Bug Fixes
+
+* return the computed direction ([b3d80b3](https://github.com/yoannmoinet/nipplejs/commit/b3d80b3))
 
 
 
