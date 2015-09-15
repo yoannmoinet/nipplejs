@@ -147,7 +147,8 @@ Manager.prototype.processOnStart = function (evt) {
 
     nipple.show();
     this.nipples.push(nipple);
-    this.trigger('add', nipple);
+    nipple.trigger('start', nipple);
+    this.trigger(identifier + ':start', nipple);
 };
 
 Manager.prototype.onmove = function (evt) {
@@ -220,7 +221,7 @@ Manager.prototype.processOnMove = function (evt) {
     };
 
     nipple.trigger('move', toSend);
-    this.trigger(nipple.identifier + ':move', toSend);
+    this.trigger(identifier + ':move', toSend);
     return toSend;
 };
 
@@ -258,5 +259,7 @@ Manager.prototype.processOnEnd = function (evt) {
     }
     var index = this.nipples.indexOf(nipple);
     nipple.hide();
+    nipple.trigger('end');
+    this.trigger(identifier + ':end');
     this.nipples.splice(index, 1);
 };
