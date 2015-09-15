@@ -137,10 +137,11 @@ Nipple.prototype.removeFromDom = function () {
 };
 
 // Fade in the Nipple instance.
-Nipple.prototype.show = function () {
+Nipple.prototype.show = function (cb) {
     var self = this;
 
     clearTimeout(self.removeTimeout);
+    clearTimeout(self.showTimeout);
 
     self.ui.el.style.opacity = 0;
     self.addToDom();
@@ -150,19 +151,33 @@ Nipple.prototype.show = function () {
         self.ui.el.style.opacity = 1;
     }, 0);
 
+    if (typeof cb === 'function') {
+        self.showTimeout = setTimeout(function () {
+            self.trigger('shown', self);
+            self.manager.trigger('shown ' + self.identifier + ':shown', self);
+            cb.call(this);
+        }, self.options.fadeTime);
+    }
+
     return self;
 };
 
 // Fade out the Nipple instance.
-Nipple.prototype.hide = function () {
+Nipple.prototype.hide = function (cb) {
     var self = this;
 
     self.ui.el.style.opacity = 0;
     clearTimeout(self.removeTimeout);
+    clearTimeout(self.showTimeout);
 
     self.removeTimeout = setTimeout(
         function () {
             self.ui.el.style.display = 'none';
+            if (typeof cb === 'function') {
+                cb.call(this);
+            }
+            self.trigger('hidden', self);
+            self.manager.trigger('hidden ' + self.identifier + ':hidden', self);
             self.removeFromDom();
         },
         self.options.fadeTime
