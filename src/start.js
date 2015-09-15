@@ -28,12 +28,14 @@ var events = {
 };
 var handlers = {};
 var toBind;
+var secondBind = {};
 if (isPointer) {
     toBind = events.pointer;
 } else if (isMSPointer) {
     toBind = events.MSPointer;
 } else if (isTouch) {
     toBind = events.touch;
+    secondBind = events.mouse;
 } else {
     toBind = events.mouse;
 }

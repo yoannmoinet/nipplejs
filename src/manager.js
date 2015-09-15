@@ -60,6 +60,11 @@ Manager.prototype.bindEvt = function (el, type) {
 
     u.bindEvt(el, toBind[type], handlers[type]);
 
+    if (secondBind[type]) {
+        // Support for both touch and mouse at the same time.
+        u.bindEvt(el, secondBind[type], handlers[type]);
+    }
+
     return self;
 };
 
