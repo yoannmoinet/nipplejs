@@ -33,6 +33,7 @@ Manager.prototype.config = function (options) {
     // Defaults
     this.options.zone = document.body;
     this.options.multitouch = false;
+    this.options.maxNumberOfNipples = 1;
     this.nippleOptions.size = 100;
     this.nippleOptions.threshold = 0.1;
     this.nippleOptions.color = 'white';
@@ -82,7 +83,8 @@ Manager.prototype.onstart = function (evt) {
     this.box = this.options.zone.getBoundingClientRect();
 
     // If we have touches and multitouch
-    if (evt.length && this.options.multitouch) {
+    if (evt.length && this.options.multitouch &&
+        this.nipples.length < this.options.maxNumberOfNipples) {
 
         for (var i = 0, max = evt.length; i < max; i += 1) {
             this.processOnStart(evt[i]);
