@@ -422,7 +422,7 @@ Nipple.prototype.computeDirection = function (obj) {
         }
 
         if (same) {
-            return;
+            return obj;
         }
 
         if (oldDirection.x !== this.direction.x ||
@@ -449,6 +449,8 @@ Nipple.prototype.computeDirection = function (obj) {
                 this.identifier + ':dir ' +
                 this.identifier + ':dir:' + direction, obj);
         }
+
+        return obj;
     }
 };
 ///////////////////////
@@ -669,7 +671,7 @@ Manager.prototype.processOnMove = function (evt) {
         instance: nipple
     };
 
-    nipple.computeDirection(toSend);
+    toSend = nipple.computeDirection(toSend);
 
     // Offset angles to follow units circle.
     toSend.angle = {
