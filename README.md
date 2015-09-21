@@ -122,6 +122,7 @@ Your manager has the following signature :
     on: Function,
     off: Function,
     get: Function, // get a specific joystick
+    destroy: Function,
     options: {
         zone: Element,
         multitouch: Boolean,
@@ -162,6 +163,14 @@ An helper to get an instance via its identifier.
 ```javascript
 // Will return the nipple instanciated by the touch identified by 0
 manager.get(0);
+```
+
+#### `manager.destroy()`
+
+Gently remove all nipples from the DOM and unbind all events.
+
+```javascript
+manager.destroy();
 ```
 
 ### nipple instance (joystick)

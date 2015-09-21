@@ -12,6 +12,7 @@ var Manager = function (options) {
     self.nipples.on = self.on.bind(self);
     self.nipples.off = self.off.bind(self);
     self.nipples.options = self.options;
+    self.nipples.destroy = self.destroy.bind(self);
     self.nipples.get = function (id) {
         for (var i = 0, max = self.nipples.length; i < max; i += 1) {
             if (self.nipples[i].identifier === id) {
@@ -278,4 +279,15 @@ Manager.prototype.ondestroyed = function(evt, nipple) {
     if (nipple) {
         this.nipples.splice(this.nipples.indexOf(nipple), 1);
     }
+};
+
+// Cleanly destroy the manager
+Manager.prototype.destroy = function () {
+    this.unbindEvt(this.options.zone, 'start');
+    this.unbindEvt(document, 'move');
+    this.unbindEvt(document, 'end');
+    this.nipples.forEach(function(nipple) {
+        nipple.destroy();
+    });
+    this.off();
 };
