@@ -22,8 +22,10 @@ Super.prototype.on = function (arg, cb) {
 
 Super.prototype.off = function (type, cb) {
     var self = this;
-    if (cb === undefined) {
-        self.handlers[type] = [];
+    if (type === undefined) {
+        self.handlers = {};
+    } else if (cb === undefined) {
+        self.handlers[type] = null;
     } else if (self.handlers[type] && self.handlers[type].indexOf(cb) >= 0) {
         self.handlers[type].splice(self.handlers[type].indexOf(cb), 1);
     }

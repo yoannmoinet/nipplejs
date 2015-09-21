@@ -143,7 +143,7 @@ manager.on('event#1 event#2', function (evt, data) {
 Note that you can listen to multiple events at once by separating
 them either with a space or a comma (or both, I don't care).
 
-#### `manager.off(type [, handler])`
+#### `manager.off([type, handler])`
 
 To remove an event handler :
 
@@ -151,7 +151,9 @@ To remove an event handler :
 manager.off('event', handler);
 ```
 
-If you don't specify the handler, all handlers for that type will be removed.
+If you call off without arguments, all handlers will be removed.
+
+If you don't specify the handler but just a type, all handlers for that type will be removed.
 
 #### `manager.get(identifier)`
 
