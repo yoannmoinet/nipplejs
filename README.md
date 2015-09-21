@@ -177,6 +177,7 @@ Each joystick has the following signature :
     hide: Function,         // fade-out
     add: Function,          // inject into dom
     remove: Function,       // remove from dom
+    destroy: Function,
     identifier: Number,
     trigger: Function,
     position: {             // position of the center
@@ -239,6 +240,10 @@ Add the joystick's element to the dom.
 ### `joystick.remove()`
 
 Remove the joystick's element from the dom.
+
+### `joystick.destroy()`
+
+Gently remove this nipple from the DOM and unbind all related events.
 
 ### `joystick.identifier`
 
@@ -411,6 +416,12 @@ Will pass the instance alongside the event.
 #### `hidden`
 
 Is triggered at the end of the fade-out animation.
+
+Will pass the instance alongside the event.
+
+#### `destroyed`
+
+Is trigger at the end of destroy.
 
 Will pass the instance alongside the event.
 

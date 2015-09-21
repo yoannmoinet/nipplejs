@@ -7,6 +7,7 @@ var Manager = function (options) {
     self.config(options);
     self.nipples = [];
     self.bindEvt(self.options.zone, 'start');
+    self.on('destroyed', this.ondestroyed);
 
     self.nipples.on = self.on.bind(self);
     self.nipples.off = self.off.bind(self);
@@ -269,4 +270,12 @@ Manager.prototype.processOnEnd = function (evt) {
     self.trigger('end ' + identifier + ':end', nipple);
     var index = self.nipples.indexOf(nipple);
     self.nipples.splice(index, 1);
+};
+
+// Remove destroyed nipple from the list
+Manager.prototype.ondestroyed = function(evt, nipple) {
+    nipple = this.nipples.get(nipple.identifier);
+    if (nipple) {
+        this.nipples.splice(this.nipples.indexOf(nipple), 1);
+    }
 };
