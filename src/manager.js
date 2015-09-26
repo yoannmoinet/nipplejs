@@ -11,6 +11,7 @@ var Manager = function (options) {
     self.nipples.on = self.on.bind(self);
     self.nipples.off = self.off.bind(self);
     self.nipples.options = self.options;
+    self.nipples.nippleOptions = self.nippleOptions;
     self.nipples.get = function (id) {
         for (var i = 0, max = self.nipples.length; i < max; i += 1) {
             if (self.nipples[i].identifier === id) {
