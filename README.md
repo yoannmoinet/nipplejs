@@ -52,7 +52,8 @@ var options = {
     threshold: Float,   // before triggering a directional event
     fadeTime: Integer,
     multitouch: Boolean,
-    maxNumberOfNipples: Number
+    maxNumberOfNipples: Number,
+    dataOnly: Boolean
 };
 ```
 
@@ -97,7 +98,6 @@ You need to at least go to 0.1 to trigger a directional event.
 ### `options.fadeTime` defaults to 250
 The time it takes for joystick to fade-out and fade-in when activated or de-activated.
 
-
 ### `options.multitouch` defaults to false
 Enable the multitouch capabilities.
 
@@ -109,6 +109,9 @@ Otherwise it will only get one, and all new touches won't do a thing.
 If you need to, you can also control the maximum number of instance that could be created.
 
 Obviously in a multitouch configuration.
+
+### `options.dataOnly` defaults to false
+The library won't draw anything in the DOM and will only trigger events with data.
 
 ----
 ## API
@@ -126,7 +129,8 @@ Your manager has the following signature :
     options: {
         zone: Element,
         multitouch: Boolean,
-        maxNumberOfNipples: Number
+        maxNumberOfNipples: Number,
+        dataOnly: Boolean
     }
 }
 ```
@@ -325,6 +329,8 @@ Fired at the end of the fade-out animation.
 
 Will pass the instance alongside the event.
 
+Won't be trigger in a `dataOnly` configuration.
+
 ### manager and joysticks
 
 Other events are available on both the manager and joysticks.
@@ -422,11 +428,15 @@ Is triggered at the end of the fade-in animation.
 
 Will pass the instance alongside the event.
 
+Won't be trigger in a `dataOnly` configuration.
+
 #### `hidden`
 
 Is triggered at the end of the fade-out animation.
 
 Will pass the instance alongside the event.
+
+Won't be trigger in a `dataOnly` configuration.
 
 #### `destroyed`
 
