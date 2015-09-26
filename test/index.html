@@ -3,34 +3,134 @@
     <head>
         <meta charset="utf-8">
         <title>NippleJS</title>
+        <link rel="stylesheet" href="http://yoannmoinet.github.io/nipplejs/stylesheets/styles.css" media="screen" title="no title" charset="utf-8">
+        <link rel="stylesheet" href="http://yoannmoinet.github.io/nipplejs/stylesheets/github-light.css" media="screen" title="no title" charset="utf-8">
         <style>
             body {
-                background: white;
-                padding: 0;
                 margin: 0;
-            }
-
-            #zone {
-                margin: 50px;
-                position: absolute;
-                left: 0;
-                right: 0;
-                top: 0;
-                bottom: 0;
-                background: silver;
-                box-sizing: content-box;
+                padding: 0;
+                margin-top: 20px;
+                max-width: 1024px;
+                margin-left: auto;
+                margin-right: auto;
             }
         </style>
     </head>
     <body>
-        <div id="zone"></div>
-        <script src="../dist/nipplejs.js" charset="utf-8"></script>
-        <script type="text/javascript">
-            var nipple = nipplejs.create({
-                zone: document.getElementById('zone'),
-                size: 200,
-                color: 'steelblue'
+        <p>First thing first. A demo. Executed with this configuration : </p>
+        <div class="highlight highlight-javascript">
+            <pre>
+        <span class="pl-k">&lt;</span>script src<span class="pl-k">=</span><span class="pl-s"><span class="pl-pds">"</span>./dist/nipplejs.min.js<span class="pl-pds">"</span></span><span class="pl-k">&gt;&lt;/</span>script<span class="pl-k">&gt;</span>
+        <span class="pl-k">&lt;</span>script<span class="pl-k">&gt;</span>
+            <span class="pl-k">var</span> joystick <span class="pl-k">=</span> nipplejs.create({
+                zone: document.getElementById('zone_joystick')
             });
+        <span class="pl-k">&lt;/</span>script<span class="pl-k">&gt;</span></pre>
+        </div>
+
+        <div id="zone_joystick">
+            <div id="debug">
+                <ul>
+                    <li class="position">
+                        position :
+                        <ul>
+                            <li class="x">x : <span class='data'></span></li>
+                            <li class="y">y : <span class='data'></span></li>
+                        </ul>
+                    </li>
+                    <li class="force">force : <span class='data'></span></li>
+                    <li class="distance">distance : <span class='data'></span></li>
+                    <li class="angle">
+                        angle :
+                        <ul>
+                            <li class="radian">radian : <span class='data'></span></li>
+                            <li class="degree">degree : <span class='data'></span></li>
+                        </ul>
+                    </li>
+                    <li class="direction">
+                        direction :
+                        <ul>
+                            <li class="x">x : <span class='data'></span></li>
+                            <li class="y">y : <span class='data'></span></li>
+                            <li class="angle">angle : <span class='data'></span></li>
+                        </ul>
+                    </li>
+                </ul>
+                <div class="dump"></div>
+            </div>
+        </div>
+        <script src="../dist/nipplejs.js" charset="utf-8"></script>
+        <script>
+            var joystick = nipplejs.create({
+                zone: document.getElementById('zone_joystick'),
+                dataOnly: true
+            });
+
+            // Get debug elements and map them
+            var elDebug = document.getElementById('debug');
+            var elDump = elDebug.querySelector('.dump');
+            var els = {
+                position: {
+                    x: elDebug.querySelector('.position .x .data'),
+                    y: elDebug.querySelector('.position .y .data')
+                },
+                force: elDebug.querySelector('.force .data'),
+                distance: elDebug.querySelector('.distance .data'),
+                angle: {
+                    radian: elDebug.querySelector('.angle .radian .data'),
+                    degree: elDebug.querySelector('.angle .degree .data')
+                },
+                direction: {
+                    x: elDebug.querySelector('.direction .x .data'),
+                    y: elDebug.querySelector('.direction .y .data'),
+                    angle: elDebug.querySelector('.direction .angle .data')
+                }
+
+            };
+
+            joystick.on('start end', function(evt, data) {
+                dump(evt.type);
+                debug(data);
+            })
+                .on('move', function(evt, data) {
+                    debug(data);
+                })
+                .on('dir:up plain:up dir:left plain:left dir:down' +
+                    'plain:down dir:right plain:right',
+                    function(evt, data) {
+                        dump(evt.type);
+                    }
+                );
+
+            // Print data into elements
+            function debug(obj) {
+                function parseObj(sub, el) {
+                    for (var i in sub) {
+                        if (typeof sub[i] === 'object' && el) {
+                            parseObj(sub[i], el[i]);
+                        } else if (el && el[i]) {
+                            el[i].innerHTML = sub[i];
+                        }
+                    }
+                }
+                setTimeout(function() {
+                    parseObj(obj, els);
+                }, 0);
+            }
+            var nbEvents = 0;
+            // Dump data
+            function dump(evt) {
+                setTimeout(function() {
+                    if (elDump.children.length > 5) {
+                        elDump.removeChild(elDump.firstChild);
+                    }
+                    var newEvent = document.createElement('div');
+                    newEvent.innerHTML = '#' + nbEvents + ' : <span class="data">' +
+                        evt + '</span>';
+                    elDump.appendChild(newEvent);
+                    nbEvents += 1;
+                }, 0);
+            }
         </script>
     </body>
 </html>
