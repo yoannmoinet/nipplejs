@@ -41,6 +41,7 @@ Manager.prototype.config = function (options) {
     this.nippleOptions.threshold = 0.1;
     this.nippleOptions.color = 'white';
     this.nippleOptions.fadeTime = 250;
+    this.nippleOptions.dataOnly = false;
 
     // Overwrites
     for (var i in options) {
@@ -147,10 +148,12 @@ Manager.prototype.processOnStart = function (evt) {
         frontPosition: frontPosition
     });
 
-    u.applyPosition(nipple.ui.el, nipple.backPosition);
-    u.applyPosition(nipple.ui.front, nipple.frontPosition);
+    if (!this.nippleOptions.dataOnly) {
+        u.applyPosition(nipple.ui.el, nipple.backPosition);
+        u.applyPosition(nipple.ui.front, nipple.frontPosition);
+        nipple.show();
+    }
 
-    nipple.show();
     this.nipples.push(nipple);
     this.trigger('added ' + identifier + ':added', nipple);
     nipple.trigger('start', nipple);
@@ -204,7 +207,9 @@ Manager.prototype.processOnMove = function (evt) {
         y: pos.y - nipple.position.y + nipple.options.size / 4
     };
 
-    u.applyPosition(nipple.ui.front, nipple.frontPosition);
+    if (!this.nippleOptions.dataOnly) {
+        u.applyPosition(nipple.ui.front, nipple.frontPosition);
+    }
 
     var toSend = {
         identifier: nipple.identifier,
@@ -264,10 +269,14 @@ Manager.prototype.processOnEnd = function (evt) {
         console.error(self.nipples);
         return;
     }
-    nipple.hide(function () {
-        nipple.trigger('removed', nipple);
-        self.trigger('removed ' + identifier + ':removed', nipple);
-    });
+
+    if (!this.nippleOptions.dataOnly) {
+        nipple.hide(function () {
+            nipple.trigger('removed', nipple);
+            self.trigger('removed ' + identifier + ':removed', nipple);
+        });
+    }
+
     nipple.trigger('end', nipple);
     self.trigger('end ' + identifier + ':end', nipple);
     var index = self.nipples.indexOf(nipple);

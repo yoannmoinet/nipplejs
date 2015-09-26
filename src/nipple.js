@@ -56,6 +56,9 @@ Nipple.prototype.config = function (options) {
 
 // Build the dom element of the Nipple instance.
 Nipple.prototype.buildEl = function (options) {
+    if (this.options.dataOnly) {
+        return;
+    }
     this.ui = {};
     this.ui.el = document.createElement('div');
     this.ui.back = document.createElement('div');
@@ -75,6 +78,9 @@ Nipple.prototype.buildEl = function (options) {
 
 // Apply CSS to the Nipple instance.
 Nipple.prototype.stylize = function () {
+    if (this.options.dataOnly) {
+        return;
+    }
     this.styles = {};
     this.styles.el = {
         width: this.options.size + 'px',
@@ -127,12 +133,18 @@ Nipple.prototype.stylize = function () {
 
 // Inject the Nipple instance into DOM.
 Nipple.prototype.addToDom = function () {
+    if (this.options.dataOnly) {
+        return;
+    }
     this.manager.options.zone.appendChild(this.ui.el);
     return this;
 };
 
 // Remove the Nipple instance from DOM.
 Nipple.prototype.removeFromDom = function () {
+    if (this.options.dataOnly) {
+        return;
+    }
     this.manager.options.zone.removeChild(this.ui.el);
     return this;
 };
@@ -150,6 +162,10 @@ Nipple.prototype.destroy = function () {
 // Fade in the Nipple instance.
 Nipple.prototype.show = function (cb) {
     var self = this;
+
+    if (self.options.dataOnly) {
+        return;
+    }
 
     clearTimeout(self.removeTimeout);
     clearTimeout(self.showTimeout);
@@ -176,6 +192,10 @@ Nipple.prototype.show = function (cb) {
 // Fade out the Nipple instance.
 Nipple.prototype.hide = function (cb) {
     var self = this;
+
+    if (self.options.dataOnly) {
+        return;
+    }
 
     self.ui.el.style.opacity = 0;
     clearTimeout(self.removeTimeout);
