@@ -20,6 +20,7 @@ var Nipple = function (manager, options) {
         hide: this.hide.bind(this),
         add: this.addToDom.bind(this),
         remove: this.removeFromDom.bind(this),
+        destroy: this.destroy.bind(this),
         computeDirection: this.computeDirection.bind(this),
         trigger: this.trigger.bind(this),
         position: this.position,
@@ -134,6 +135,16 @@ Nipple.prototype.addToDom = function () {
 Nipple.prototype.removeFromDom = function () {
     this.manager.options.zone.removeChild(this.ui.el);
     return this;
+};
+
+// Entirely destroy this nipple
+Nipple.prototype.destroy = function () {
+    clearTimeout(this.removeTimeout);
+    clearTimeout(this.showTimeout);
+    this.off();
+    this.removeFromDom();
+    this.trigger('destroyed', this);
+    this.manager.trigger('destroyed ' + this.identifier + ':destroyed', this);
 };
 
 // Fade in the Nipple instance.

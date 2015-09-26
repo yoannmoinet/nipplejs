@@ -122,6 +122,7 @@ Your manager has the following signature :
     on: Function,
     off: Function,
     get: Function, // get a specific joystick
+    destroy: Function,
     options: {
         zone: Element,
         multitouch: Boolean,
@@ -143,7 +144,7 @@ manager.on('event#1 event#2', function (evt, data) {
 Note that you can listen to multiple events at once by separating
 them either with a space or a comma (or both, I don't care).
 
-#### `manager.off(type [, handler])`
+#### `manager.off([type, handler])`
 
 To remove an event handler :
 
@@ -151,7 +152,9 @@ To remove an event handler :
 manager.off('event', handler);
 ```
 
-If you don't specify the handler, all handlers for that type will be removed.
+If you call off without arguments, all handlers will be removed.
+
+If you don't specify the handler but just a type, all handlers for that type will be removed.
 
 #### `manager.get(identifier)`
 
@@ -160,6 +163,14 @@ An helper to get an instance via its identifier.
 ```javascript
 // Will return the nipple instanciated by the touch identified by 0
 manager.get(0);
+```
+
+#### `manager.destroy()`
+
+Gently remove all nipples from the DOM and unbind all events.
+
+```javascript
+manager.destroy();
 ```
 
 ### nipple instance (joystick)
@@ -175,6 +186,7 @@ Each joystick has the following signature :
     hide: Function,         // fade-out
     add: Function,          // inject into dom
     remove: Function,       // remove from dom
+    destroy: Function,
     identifier: Number,
     trigger: Function,
     position: {             // position of the center
@@ -237,6 +249,10 @@ Add the joystick's element to the dom.
 ### `joystick.remove()`
 
 Remove the joystick's element from the dom.
+
+### `joystick.destroy()`
+
+Gently remove this nipple from the DOM and unbind all related events.
 
 ### `joystick.identifier`
 
@@ -409,6 +425,12 @@ Will pass the instance alongside the event.
 #### `hidden`
 
 Is triggered at the end of the fade-out animation.
+
+Will pass the instance alongside the event.
+
+#### `destroyed`
+
+Is trigger at the end of destroy.
 
 Will pass the instance alongside the event.
 
