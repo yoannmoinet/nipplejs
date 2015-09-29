@@ -12,7 +12,7 @@ var Nipple = function (manager, options) {
     this.buildEl()
         .stylize();
 
-    return {
+    this.toReturn = {
         el: this.ui.el,
         on: this.on.bind(this),
         off: this.off.bind(this),
@@ -30,6 +30,8 @@ var Nipple = function (manager, options) {
         identifier: this.identifier,
         options: this.options
     };
+
+    return this.toReturn;
 };
 
 Nipple.prototype = new Super();
@@ -170,8 +172,9 @@ Nipple.prototype.destroy = function () {
     clearTimeout(this.restTimeout);
     this.off();
     this.removeFromDom();
-    this.trigger('destroyed', this);
-    this.manager.trigger('destroyed ' + this.identifier + ':destroyed', this);
+    this.trigger('destroyed', this.toReturn);
+    this.manager.trigger('destroyed ' + this.identifier + ':destroyed',
+        this.toReturn);
 };
 
 // Fade in the Nipple instance.
@@ -186,9 +189,7 @@ Nipple.prototype.show = function (cb) {
     clearTimeout(self.showTimeout);
     clearTimeout(self.restTimeout);
 
-    self.ui.el.style.opacity = 0;
     self.addToDom();
-    self.ui.el.style.display = 'block';
 
     self.restCallback();
 
@@ -196,13 +197,14 @@ Nipple.prototype.show = function (cb) {
         self.ui.el.style.opacity = 1;
     }, 0);
 
-    if (typeof cb === 'function') {
-        self.showTimeout = setTimeout(function () {
-            self.trigger('shown', self);
-            self.manager.trigger('shown ' + self.identifier + ':shown', self);
+    self.showTimeout = setTimeout(function () {
+        self.trigger('shown', self.toReturn);
+        self.manager.trigger('shown ' + self.identifier + ':shown',
+            self.toReturn);
+        if (typeof cb === 'function') {
             cb.call(this);
-        }, self.options.fadeTime);
-    }
+        }
+    }, self.options.fadeTime);
 
     return self;
 };
@@ -226,11 +228,12 @@ Nipple.prototype.hide = function (cb) {
             var display = self.options.mode === 'dynamic' ? 'none' : 'block';
             self.ui.el.style.display = display;
             if (typeof cb === 'function') {
-                cb.call(this);
+                cb.call(self);
             }
-            self.trigger('hidden', self);
-            self.manager.trigger('hidden ' + self.identifier + ':hidden', self);
 
+            self.trigger('hidden', self.toReturn);
+            self.manager.trigger('hidden ' + self.identifier + ':hidden',
+                self.toReturn);
         },
         self.options.fadeTime
     );
