@@ -14,20 +14,59 @@
                 margin-left: auto;
                 margin-right: auto;
             }
+            .zone {
+                position: absolute;
+                width: 33%;
+                height: 100%;
+            }
+            .zone:last-child {
+                width: 34%;
+            }
+            .zone > h1 {
+                position: absolute;
+                padding: 5px 10px;
+                color: white;
+                right: 0;
+                bottom: 0;
+            }
+            #dynamic {
+                background: rgba(0, 0, 255, 0.1);
+                left: 0;
+            }
+            #semi {
+                background: rgba(255, 255, 255, 0.1);
+                left: 33%;
+            }
+            #static {
+                background: rgba(255, 0, 0, 0.1);
+                left: 66%;
+            }
         </style>
     </head>
     <body>
         <p>First thing first. A demo. Executed with this configuration : </p>
         <div class="highlight highlight-javascript">
             <pre>
-        <span class="pl-k">&lt;</span>script src<span class="pl-k">=</span><span class="pl-s"><span class="pl-pds">"</span>./dist/nipplejs.min.js<span class="pl-pds">"</span></span><span class="pl-k">&gt;&lt;/</span>script<span class="pl-k">&gt;</span>
-        <span class="pl-k">&lt;</span>script<span class="pl-k">&gt;</span>
-            <span class="pl-k">var</span> joystick <span class="pl-k">=</span> nipplejs.create({
-                zone: document.getElementById('zone_joystick')
-            });
-        <span class="pl-k">&lt;/</span>script<span class="pl-k">&gt;</span></pre>
+<span class="pl-k">&lt;</span>script src<span class="pl-k">=</span><span class="pl-s"><span class="pl-pds">"</span>./dist/nipplejs.min.js<span class="pl-pds">"</span></span><span class="pl-k">&gt;&lt;/</span>script<span class="pl-k">&gt;</span>
+<span class="pl-k">&lt;</span>script<span class="pl-k">&gt;</span>
+    <span class="pl-k">var</span> dynamic <span class="pl-k">=</span> nipplejs.create({
+        zone: document.getElementById('dynamic'),
+        color: 'blue'
+    });
+    <span class="pl-k">var</span> semi <span class="pl-k">=</span> nipplejs.create({
+        zone: document.getElementById('semi'),
+        mode: 'semi',
+        catchDistance: 150,
+        color: 'white'
+    });
+    <span class="pl-k">var</span> static <span class="pl-k">=</span> nipplejs.create({
+        zone: document.getElementById('static'),
+        mode: 'static',
+        position: {left: '50%', top: '50%'},
+        color: 'red'
+    });
+<span class="pl-k">&lt;/</span>script<span class="pl-k">&gt;</span></pre>
         </div>
-
         <div id="zone_joystick">
             <div id="debug">
                 <ul>
@@ -39,6 +78,7 @@
                         </ul>
                     </li>
                     <li class="force">force : <span class='data'></span></li>
+                    <li class="pressure">pressure : <span class='data'></span></li>
                     <li class="distance">distance : <span class='data'></span></li>
                     <li class="angle">
                         angle :
@@ -58,13 +98,34 @@
                 </ul>
                 <div class="dump"></div>
             </div>
+            <div class="zone" id="dynamic"><h1>dynamic</h1></div>
+            <div class="zone" id="semi"><h1>semi</h1></div>
+            <div class="zone" id="static"><h1>static</h1></div>
+        </div>
+        <br/>
+        <div>
+            <a href="https://codepen.io/YoannM/full/gapmMG" target="_blank">> Open the demo in a new window.</a>
         </div>
         <script src="../dist/nipplejs.js" charset="utf-8"></script>
         <script>
-            var joystick = nipplejs.create({
-                zone: document.getElementById('zone_joystick'),
-                dataOnly: true
+            var joystick_dynamic = nipplejs.create({
+                zone: document.getElementById('dynamic'),
+                color: 'blue'
             });
+            var joystick_semi = nipplejs.create({
+                zone: document.getElementById('semi'),
+                mode: 'semi',
+                catchDistance: 150,
+                color: 'white'
+            });
+            var joystick_static = nipplejs.create({
+                zone: document.getElementById('static'),
+                mode: 'static',
+                position: {left: '50%', top: '50%'},
+                color: 'red'
+            });
+
+            var joysticks = [joystick_dynamic, joystick_semi, joystick_static];
 
             // Get debug elements and map them
             var elDebug = document.getElementById('debug');
@@ -75,6 +136,7 @@
                     y: elDebug.querySelector('.position .y .data')
                 },
                 force: elDebug.querySelector('.force .data'),
+                pressure: elDebug.querySelector('.pressure .data'),
                 distance: elDebug.querySelector('.distance .data'),
                 angle: {
                     radian: elDebug.querySelector('.angle .radian .data'),
@@ -85,22 +147,21 @@
                     y: elDebug.querySelector('.direction .y .data'),
                     angle: elDebug.querySelector('.direction .angle .data')
                 }
-
             };
 
-            joystick.on('start end', function(evt, data) {
-                dump(evt.type);
-                debug(data);
-            })
-                .on('move', function(evt, data) {
+            joysticks.forEach(function (joystick) {
+                joystick.on('start end', function(evt, data) {
+                    dump(evt.type);
                     debug(data);
-                })
-                .on('dir:up plain:up dir:left plain:left dir:down' +
+                }).on('move', function(evt, data) {
+                    debug(data);
+                }).on('dir:up plain:up dir:left plain:left dir:down' +
                     'plain:down dir:right plain:right',
                     function(evt, data) {
                         dump(evt.type);
                     }
                 );
+            });
 
             // Print data into elements
             function debug(obj) {
@@ -117,11 +178,13 @@
                     parseObj(obj, els);
                 }, 0);
             }
+
             var nbEvents = 0;
+
             // Dump data
             function dump(evt) {
                 setTimeout(function() {
-                    if (elDump.children.length > 5) {
+                    if (elDump.children.length > 4) {
                         elDump.removeChild(elDump.firstChild);
                     }
                     var newEvent = document.createElement('div');
