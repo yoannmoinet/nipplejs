@@ -1,6 +1,25 @@
-<a name="0.4.2"></a>
-## [0.4.2](https://github.com/yoannmoinet/nipplejs/compare/v0.4.2...v0.4.2) (2015-09-15)
+<a name="0.5.0"></a>
+# [0.5.0](https://github.com/yoannmoinet/nipplejs/compare/v0.4.2...v0.5.0) (2015-09-29)
 
+
+### Bug Fixes
+
+* remove useless rimraf ([26db70f](https://github.com/yoannmoinet/nipplejs/commit/26db70f))
+* **manager:** add default pressure at 0 ([1cb31d0](https://github.com/yoannmoinet/nipplejs/commit/1cb31d0))
+* **nipple:** control dom presence before add or remove ([7cc1d8c](https://github.com/yoannmoinet/nipplejs/commit/7cc1d8c))
+* **nipple:** return the manager's known object in event triggers ([2deb42c](https://github.com/yoannmoinet/nipplejs/commit/2deb42c))
+* **npm:** add rimraf as a dev dependency ([deb7acc](https://github.com/yoannmoinet/nipplejs/commit/deb7acc)), closes [#12](https://github.com/yoannmoinet/nipplejs/issues/12)
+
+### Features
+
+* **manager:** add destroy method ([295654f](https://github.com/yoannmoinet/nipplejs/commit/295654f))
+* **manager:** expose nippleOptions ([968103c](https://github.com/yoannmoinet/nipplejs/commit/968103c))
+* add dataOnly option ([2f527b1](https://github.com/yoannmoinet/nipplejs/commit/2f527b1))
+* add two modes, static and semi ([347feaa](https://github.com/yoannmoinet/nipplejs/commit/347feaa))
+* **manager:** handle resize and reinit positions ([261fb59](https://github.com/yoannmoinet/nipplejs/commit/261fb59))
+* **nipple:** add destroy method ([713e505](https://github.com/yoannmoinet/nipplejs/commit/713e505))
+* **nipple:** remove position offset ([be59bc4](https://github.com/yoannmoinet/nipplejs/commit/be59bc4))
+* **off:** allow unsubscribing on all events at once ([c30bfad](https://github.com/yoannmoinet/nipplejs/commit/c30bfad))
 
 
 
@@ -109,7 +128,3 @@
 
 <a name="0.1.0"></a>
 # 0.1.0 (2015-09-05)
-
-
-
-
