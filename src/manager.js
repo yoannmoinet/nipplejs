@@ -292,8 +292,8 @@ Manager.prototype.processOnMove = function (evt) {
     }
 
     nipple.frontPosition = {
-        x: pos.x - nipple.position.x + nipple.options.size / 4,
-        y: pos.y - nipple.position.y + nipple.options.size / 4
+        x: pos.x - nipple.position.x,
+        y: pos.y - nipple.position.y
     };
 
     if (!this.nippleOptions.dataOnly) {
