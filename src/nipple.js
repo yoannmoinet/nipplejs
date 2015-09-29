@@ -149,7 +149,8 @@ Nipple.prototype.applyStyles = function (styles) {
 
 // Inject the Nipple instance into DOM.
 Nipple.prototype.addToDom = function () {
-    if (this.options.dataOnly) {
+    // We're not adding it if we're dataOnly or already in dom.
+    if (this.options.dataOnly || document.contains(this.ui.el)) {
         return;
     }
     this.manager.options.zone.appendChild(this.ui.el);
@@ -158,7 +159,7 @@ Nipple.prototype.addToDom = function () {
 
 // Remove the Nipple instance from DOM.
 Nipple.prototype.removeFromDom = function () {
-    if (this.options.dataOnly) {
+    if (this.options.dataOnly || !document.contains(this.ui.el)) {
         return;
     }
     this.manager.options.zone.removeChild(this.ui.el);
