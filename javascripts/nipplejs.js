@@ -118,8 +118,61 @@ u.getScroll = function () {
 };
 
 u.applyPosition = function (el, pos) {
-    el.style.left = pos.x + 'px';
-    el.style.top = pos.y + 'px';
+    if (pos.x && pos.y) {
+        el.style.left = pos.x + 'px';
+        el.style.top = pos.y + 'px';
+    } else if (pos.top || pos.right || pos.bottom || pos.left) {
+        el.style.top = pos.top;
+        el.style.right = pos.right;
+        el.style.bottom = pos.bottom;
+        el.style.left = pos.left;
+    }
+};
+
+u.getTransitionStyle = function (property, values, time) {
+    var obj = u.configStylePropertyObject(property);
+    for (var i in obj) {
+        if (obj.hasOwnProperty(i)) {
+            if (typeof values === 'string') {
+                obj[i] = values + ' ' + time;
+            } else {
+                var st = '';
+                for (var j = 0, max = values.length; j < max; j += 1) {
+                    st += values[j] + ' ' + time + ', ';
+                }
+                obj[i] = st.slice(0, -2);
+            }
+        }
+    }
+    return obj;
+};
+
+u.getVendorStyle = function (property, value) {
+    var obj = u.configStylePropertyObject(property);
+    for (var i in obj) {
+        if (obj.hasOwnProperty(i)) {
+            obj[i] = value;
+        }
+    }
+    return obj;
+};
+
+u.configStylePropertyObject = function (prop) {
+    var obj = {};
+    obj[prop] = '';
+    var vendors = ['webkit', 'Moz', 'o'];
+    vendors.forEach(function (vendor) {
+        obj[vendor + prop.charAt(0).toUpperCase() + prop.slice(1)] = '';
+    });
+    return obj;
+};
+
+u.extend = function (objA, objB) {
+    for (var i in objB) {
+        if (objB.hasOwnProperty(i)) {
+            objA[i] = objB[i];
+        }
+    }
 };
 ///////////////////////
 ///   SUPER CLASS   ///
@@ -145,8 +198,10 @@ Super.prototype.on = function (arg, cb) {
 
 Super.prototype.off = function (type, cb) {
     var self = this;
-    if (cb === undefined) {
-        self.handlers[type] = [];
+    if (type === undefined) {
+        self.handlers = {};
+    } else if (cb === undefined) {
+        self.handlers[type] = null;
     } else if (self.handlers[type] && self.handlers[type].indexOf(cb) >= 0) {
         self.handlers[type].splice(self.handlers[type].indexOf(cb), 1);
     }
@@ -184,7 +239,7 @@ var Nipple = function (manager, options) {
     this.buildEl()
         .stylize();
 
-    return {
+    this.toReturn = {
         el: this.ui.el,
         on: this.on.bind(this),
         off: this.off.bind(this),
@@ -192,6 +247,7 @@ var Nipple = function (manager, options) {
         hide: this.hide.bind(this),
         add: this.addToDom.bind(this),
         remove: this.removeFromDom.bind(this),
+        destroy: this.destroy.bind(this),
         computeDirection: this.computeDirection.bind(this),
         trigger: this.trigger.bind(this),
         position: this.position,
@@ -201,6 +257,8 @@ var Nipple = function (manager, options) {
         identifier: this.identifier,
         options: this.options
     };
+
+    return this.toReturn;
 };
 
 Nipple.prototype = new Super();
@@ -214,6 +272,9 @@ Nipple.prototype.config = function (options) {
     this.options.threshold = 0.1;
     this.options.color = 'white';
     this.options.fadeTime = 250;
+    this.options.dataOnly = false;
+    this.options.restOpacity = 0.5;
+    this.options.mode = 'dynamic';
 
     // Overwrites
     for (var i in options) {
@@ -222,11 +283,18 @@ Nipple.prototype.config = function (options) {
         }
     }
 
+    if (this.options.mode === 'dynamic') {
+        this.options.restOpacity = 0;
+    }
+
     return this;
 };
 
 // Build the dom element of the Nipple instance.
 Nipple.prototype.buildEl = function (options) {
+    if (this.options.dataOnly) {
+        return;
+    }
     this.ui = {};
     this.ui.el = document.createElement('div');
     this.ui.back = document.createElement('div');
@@ -246,49 +314,59 @@ Nipple.prototype.buildEl = function (options) {
 
 // Apply CSS to the Nipple instance.
 Nipple.prototype.stylize = function () {
-    this.styles = {};
-    this.styles.el = {
+    if (this.options.dataOnly) {
+        return;
+    }
+    var animTime = this.options.fadeTime + 'ms';
+    var borderStyle = u.getVendorStyle('borderRadius', '50%');
+    var transitStyle = u.getTransitionStyle('transition', 'opacity', animTime);
+    var styles = {};
+    styles.el = {
         width: this.options.size + 'px',
         height: this.options.size + 'px',
         position: 'absolute',
-        opacity: 0,
-        display: 'none',
-        'transition': 'opacity ' + this.options.fadeTime + 'ms',
-        'webkitTransition': 'opacity ' + this.options.fadeTime + 'ms',
-        'MozTransition': 'opacity ' + this.options.fadeTime + 'ms',
-        'oTransition': 'opacity ' + this.options.fadeTime + 'ms',
+        opacity: this.options.restOpacity,
+        display: 'block',
         'zIndex': 999
     };
 
-    this.styles.back = {
-        position: 'relative',
+    styles.back = {
+        position: 'absolute',
         display: 'block',
         width: '100%',
         height: '100%',
+        marginLeft: -this.options.size / 2 + 'px',
+        marginTop: -this.options.size / 2 + 'px',
         background: this.options.color,
-        'borderRadius': '50%',
-        'webkitBorderRadius': '50%',
-        'MozBorderRadius': '50%',
         'opacity': '.5'
     };
 
-    this.styles.front = {
+    styles.front = {
         width: '50%',
         height: '50%',
         position: 'absolute',
         display: 'block',
+        marginLeft: -this.options.size / 4 + 'px',
+        marginTop: -this.options.size / 4 + 'px',
         background: this.options.color,
-        'borderRadius': '50%',
-        'webkitBorderRadius': '50%',
-        'MozBorderRadius': '50%',
         'opacity': '.5'
     };
 
+    u.extend(styles.el, transitStyle);
+    u.extend(styles.back, borderStyle);
+    u.extend(styles.front, borderStyle);
+
+    this.applyStyles(styles);
+
+    return this;
+};
+
+Nipple.prototype.applyStyles = function (styles) {
     // Apply styles
     for (var i in this.ui) {
         if (this.ui.hasOwnProperty(i)) {
-            for (var j in this.styles[i]) {
-                this.ui[i].style[j] = this.styles[i][j];
+            for (var j in styles[i]) {
+                this.ui[i].style[j] = styles[i][j];
             }
         }
     }
@@ -298,38 +376,63 @@ Nipple.prototype.stylize = function () {
 
 // Inject the Nipple instance into DOM.
 Nipple.prototype.addToDom = function () {
+    // We're not adding it if we're dataOnly or already in dom.
+    if (this.options.dataOnly || document.contains(this.ui.el)) {
+        return;
+    }
     this.manager.options.zone.appendChild(this.ui.el);
     return this;
 };
 
 // Remove the Nipple instance from DOM.
 Nipple.prototype.removeFromDom = function () {
+    if (this.options.dataOnly || !document.contains(this.ui.el)) {
+        return;
+    }
     this.manager.options.zone.removeChild(this.ui.el);
     return this;
+};
+
+// Entirely destroy this nipple
+Nipple.prototype.destroy = function () {
+    clearTimeout(this.removeTimeout);
+    clearTimeout(this.showTimeout);
+    clearTimeout(this.restTimeout);
+    this.off();
+    this.removeFromDom();
+    this.trigger('destroyed', this.toReturn);
+    this.manager.trigger('destroyed ' + this.identifier + ':destroyed',
+        this.toReturn);
 };
 
 // Fade in the Nipple instance.
 Nipple.prototype.show = function (cb) {
     var self = this;
 
+    if (self.options.dataOnly) {
+        return;
+    }
+
     clearTimeout(self.removeTimeout);
     clearTimeout(self.showTimeout);
+    clearTimeout(self.restTimeout);
 
-    self.ui.el.style.opacity = 0;
     self.addToDom();
-    self.ui.el.style.display = 'block';
+
+    self.restCallback();
 
     setTimeout(function () {
         self.ui.el.style.opacity = 1;
     }, 0);
 
-    if (typeof cb === 'function') {
-        self.showTimeout = setTimeout(function () {
-            self.trigger('shown', self);
-            self.manager.trigger('shown ' + self.identifier + ':shown', self);
+    self.showTimeout = setTimeout(function () {
+        self.trigger('shown', self.toReturn);
+        self.manager.trigger('shown ' + self.identifier + ':shown',
+            self.toReturn);
+        if (typeof cb === 'function') {
             cb.call(this);
-        }, self.options.fadeTime);
-    }
+        }
+    }, self.options.fadeTime);
 
     return self;
 };
@@ -338,24 +441,75 @@ Nipple.prototype.show = function (cb) {
 Nipple.prototype.hide = function (cb) {
     var self = this;
 
-    self.ui.el.style.opacity = 0;
+    if (self.options.dataOnly) {
+        return;
+    }
+
+    self.ui.el.style.opacity = self.options.restOpacity;
+
     clearTimeout(self.removeTimeout);
     clearTimeout(self.showTimeout);
+    clearTimeout(self.restTimeout);
 
     self.removeTimeout = setTimeout(
         function () {
-            self.ui.el.style.display = 'none';
+            var display = self.options.mode === 'dynamic' ? 'none' : 'block';
+            self.ui.el.style.display = display;
             if (typeof cb === 'function') {
-                cb.call(this);
+                cb.call(self);
             }
-            self.trigger('hidden', self);
-            self.manager.trigger('hidden ' + self.identifier + ':hidden', self);
-            self.removeFromDom();
+
+            self.trigger('hidden', self.toReturn);
+            self.manager.trigger('hidden ' + self.identifier + ':hidden',
+                self.toReturn);
         },
         self.options.fadeTime
     );
+    self.restPosition();
 
     return self;
+};
+
+Nipple.prototype.restPosition = function (cb) {
+    var self = this;
+    self.frontPosition = {
+        x: 0,
+        y: 0
+    };
+    var animTime = self.options.fadeTime + 'ms';
+
+    var transitStyle = {};
+    transitStyle.front = u.getTransitionStyle('transition',
+        ['top', 'left'], animTime);
+
+    var styles = {front: {}};
+    styles.front = {
+        left: self.frontPosition.x + 'px',
+        top: self.frontPosition.y + 'px'
+    };
+
+    self.applyStyles(transitStyle);
+    self.applyStyles(styles);
+
+    self.restTimeout = setTimeout(
+        function () {
+            if (typeof cb === 'function') {
+                cb.call(self);
+            }
+            self.restCallback();
+        },
+        self.options.fadeTime
+    );
+};
+
+Nipple.prototype.restCallback = function () {
+    var self = this;
+    var transitStyle = {};
+    transitStyle.front = u.getTransitionStyle('transition', 'none', '');
+    self.applyStyles(transitStyle);
+    self.trigger('rested', self.toReturn);
+    self.manager.trigger('rested ' + self.identifier + ':rested',
+        self.toReturn);
 };
 
 Nipple.prototype.computeDirection = function (obj) {
@@ -459,12 +613,16 @@ Nipple.prototype.computeDirection = function (obj) {
 var Manager = function (options) {
     var self = this;
     self.config(options);
+    self.box = this.options.zone.getBoundingClientRect();
     self.nipples = [];
     self.bindEvt(self.options.zone, 'start');
+    self.on('destroyed', this.ondestroyed);
 
     self.nipples.on = self.on.bind(self);
     self.nipples.off = self.off.bind(self);
     self.nipples.options = self.options;
+    self.nipples.nippleOptions = self.nippleOptions;
+    self.nipples.destroy = self.destroy.bind(self);
     self.nipples.get = function (id) {
         for (var i = 0, max = self.nipples.length; i < max; i += 1) {
             if (self.nipples[i].identifier === id) {
@@ -473,7 +631,29 @@ var Manager = function (options) {
         }
     };
 
-    return this.nipples;
+    if (self.options.mode === 'static') {
+        var nipple = this.createNipple(this.options.position, 0);
+        nipple.add();
+    }
+
+    // Listen for resize, to reposition every joysticks
+    var resizeTimer;
+    window.onresize = function (evt) {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(function () {
+            var pos;
+            var scroll = u.getScroll();
+            self.nipples.forEach(function (nipple) {
+                pos = nipple.el.getBoundingClientRect();
+                nipple.position = {
+                    x: scroll.x + pos.left,
+                    y: scroll.y + pos.top
+                };
+            });
+        }, 100);
+    };
+
+    return self.nipples;
 };
 
 // Extend Super.
@@ -488,10 +668,16 @@ Manager.prototype.config = function (options) {
     this.options.zone = document.body;
     this.options.multitouch = false;
     this.options.maxNumberOfNipples = 1;
+    this.options.mode = 'dynamic'; //static, semi;
+    this.options.position = {top: 0, left: 0};
+    this.options.catchDistance = 200;
     this.nippleOptions.size = 100;
     this.nippleOptions.threshold = 0.1;
     this.nippleOptions.color = 'white';
     this.nippleOptions.fadeTime = 250;
+    this.nippleOptions.dataOnly = false;
+    this.nippleOptions.restOpacity = 0.5;
+    this.nippleOptions.mode = this.options.mode;
 
     // Overwrites
     for (var i in options) {
@@ -502,7 +688,79 @@ Manager.prototype.config = function (options) {
         }
     }
 
+    if (this.options.mode === 'static' || this.options.mode === 'semi') {
+        this.options.multitouch = false;
+        this.options.maxNumberOfNipples = 1;
+    }
+
     return this;
+};
+
+// Nipple Factory
+Manager.prototype.createNipple = function (position, identifier) {
+    var scroll = u.getScroll();
+    var backPosition = {};
+
+    if (position.x && position.y) {
+        backPosition = {
+            x: position.x -
+                (scroll.x + this.box.left),
+            y: position.y -
+                (scroll.y + this.box.top)
+        };
+    } else if (
+            position.top ||
+            position.right ||
+            position.bottom ||
+            position.left
+        ) {
+
+        // We need to compute the position X / Y of the joystick.
+        var dumb = document.createElement('DIV');
+        dumb.style.display = 'hidden';
+        dumb.style.top = position.top;
+        dumb.style.right = position.right;
+        dumb.style.bottom = position.bottom;
+        dumb.style.left = position.left;
+        dumb.style.position = 'absolute';
+
+        this.options.zone.appendChild(dumb);
+        var dumbBox = dumb.getBoundingClientRect();
+        this.options.zone.removeChild(dumb);
+
+        backPosition = position;
+        position = {
+            x: dumbBox.left + scroll.x,
+            y: dumbBox.top + scroll.y
+        };
+    }
+
+    var frontPosition = {
+        x: 0,
+        y: 0
+    };
+
+    var nipple = new Nipple(this, {
+        color: this.nippleOptions.color,
+        size: this.nippleOptions.size,
+        threshold: this.nippleOptions.threshold,
+        fadeTime: this.nippleOptions.fadeTime,
+        dataOnly: this.nippleOptions.dataOnly,
+        restOpacity: this.nippleOptions.restOpacity,
+        mode: this.options.mode,
+        identifier: identifier,
+        position: position,
+        backPosition: backPosition,
+        frontPosition: frontPosition
+    });
+
+    if (!this.nippleOptions.dataOnly) {
+        u.applyPosition(nipple.ui.el, nipple.backPosition);
+        u.applyPosition(nipple.ui.front, nipple.frontPosition);
+    }
+
+    this.nipples.push(nipple);
+    return nipple;
 };
 
 // Bind internal events for the Manager.
@@ -533,10 +791,10 @@ Manager.prototype.unbindEvt = function (el, type) {
 
 Manager.prototype.onstart = function (evt) {
     evt = u.prepareEvent(evt);
-
     this.box = this.options.zone.getBoundingClientRect();
+    this.scroll = u.getScroll();
 
-    // If we have touches and multitouch
+    // if we have touches and multitouch
     if (evt.length && this.options.multitouch &&
         this.nipples.length < this.options.maxNumberOfNipples) {
 
@@ -544,14 +802,9 @@ Manager.prototype.onstart = function (evt) {
             this.processOnStart(evt[i]);
         }
     // if we don't already have a nipple in place.
-    } else if (this.nipples.length === 0) {
-
+    // we process a new one
+    } else if (this.nipples.length === 0 || this.options.mode !== 'dynamic') {
         this.processOnStart(evt[0] || evt);
-
-    } else {
-
-        return false;
-
     }
 
     if (!this.started) {
@@ -568,44 +821,39 @@ Manager.prototype.processOnStart = function (evt) {
         evt.identifier :
         evt.pointerId) || 0;
 
-    if (this.nipples.get(identifier)) {
-        return;
-    }
+    var nipple = this.nipples.get(identifier);
 
-    var scroll = u.getScroll();
     var position = {
         x: evt.pageX,
         y: evt.pageY
     };
-    var backPosition = {
-        x: position.x -
-            (scroll.x + this.box.left + this.nippleOptions.size / 2),
-        y: position.y -
-            (scroll.y + this.box.top + this.nippleOptions.size / 2)
-    };
-    var frontPosition = {
-        x: this.nippleOptions.size / 4,
-        y: this.nippleOptions.size / 4
-    };
-    var nipple = new Nipple(this, {
-        color: this.nippleOptions.color,
-        size: this.nippleOptions.size,
-        threshold: this.nippleOptions.threshold,
-        fadeTime: this.nippleOptions.fadeTime,
-        identifier: identifier,
-        position: position,
-        backPosition: backPosition,
-        frontPosition: frontPosition
-    });
 
-    u.applyPosition(nipple.ui.el, nipple.backPosition);
-    u.applyPosition(nipple.ui.front, nipple.frontPosition);
+    if (nipple) {
+        if (this.options.mode === 'static') {
+            nipple.show();
+            // We're not 'dynamic' so we process the first touch as a move.
+            this.processOnMove(evt);
+        }
 
-    nipple.show();
-    this.nipples.push(nipple);
-    this.trigger('added ' + identifier + ':added', nipple);
+        if (this.options.mode === 'semi') {
+            var distance = u.distance(position, nipple.position);
+            if (distance <= this.options.catchDistance) {
+                nipple.show();
+                this.processOnMove(evt);
+            } else {
+                nipple.destroy();
+                this.processOnStart(evt);
+            }
+        }
+    } else {
+        nipple = this.createNipple(position, identifier);
+        this.trigger('added ' + nipple.identifier + ':added', nipple);
+        nipple.show();
+    }
+
     nipple.trigger('start', nipple);
-    this.trigger('start ' + identifier + ':start', nipple);
+    this.trigger('start ' + nipple.identifier + ':start', nipple);
+    return nipple;
 };
 
 Manager.prototype.onmove = function (evt) {
@@ -640,6 +888,7 @@ Manager.prototype.processOnMove = function (evt) {
         x: evt.pageX,
         y: evt.pageY
     };
+
     var dist = u.distance(pos, nipple.position);
     var angle = u.angle(pos, nipple.position);
     var rAngle = u.radians(angle);
@@ -651,17 +900,19 @@ Manager.prototype.processOnMove = function (evt) {
     }
 
     nipple.frontPosition = {
-        x: pos.x - nipple.position.x + nipple.options.size / 4,
-        y: pos.y - nipple.position.y + nipple.options.size / 4
+        x: pos.x - nipple.position.x,
+        y: pos.y - nipple.position.y
     };
 
-    u.applyPosition(nipple.ui.front, nipple.frontPosition);
+    if (!this.nippleOptions.dataOnly) {
+        u.applyPosition(nipple.ui.front, nipple.frontPosition);
+    }
 
     var toSend = {
         identifier: nipple.identifier,
         position: pos,
         force: force,
-        pressure: evt.force || evt.pressure || evt.webkitForce,
+        pressure: evt.force || evt.pressure || evt.webkitForce || 0,
         distance: dist,
         angle: {
             radian: rAngle,
@@ -694,7 +945,7 @@ Manager.prototype.onend = function (evt) {
         this.processOnEnd(evt[0] || evt);
     }
 
-    if (!this.nipples.length) {
+    if (!this.nipples.length || this.options.mode !== 'dynamic') {
         this.unbindEvt(document, 'move')
             .unbindEvt(document, 'end');
         this.started = false;
@@ -715,14 +966,42 @@ Manager.prototype.processOnEnd = function (evt) {
         console.error(self.nipples);
         return;
     }
-    nipple.hide(function () {
-        nipple.trigger('removed', nipple);
-        self.trigger('removed ' + identifier + ':removed', nipple);
-    });
+
+    if (!this.nippleOptions.dataOnly) {
+        nipple.hide(function () {
+            if (self.options.mode === 'dynamic') {
+                nipple.trigger('removed', nipple);
+                self.trigger('removed ' + identifier + ':removed', nipple);
+                nipple.destroy();
+            }
+        });
+    }
+
     nipple.trigger('end', nipple);
     self.trigger('end ' + identifier + ':end', nipple);
-    var index = self.nipples.indexOf(nipple);
-    self.nipples.splice(index, 1);
+
+    if (this.options.mode === 'dynamic') {
+        this.nipples.splice(this.nipples.indexOf(nipple), 1);
+    }
+};
+
+// Remove destroyed nipple from the list
+Manager.prototype.ondestroyed = function(evt, nipple) {
+    if (this.nipples.indexOf(nipple) < 0) {
+        return false;
+    }
+    this.nipples.splice(this.nipples.indexOf(nipple), 1);
+};
+
+// Cleanly destroy the manager
+Manager.prototype.destroy = function () {
+    this.unbindEvt(this.options.zone, 'start');
+    this.unbindEvt(document, 'move');
+    this.unbindEvt(document, 'end');
+    this.nipples.forEach(function(nipple) {
+        nipple.destroy();
+    });
+    this.off();
 };
 return {
     create: function (options) {
