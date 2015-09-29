@@ -43,12 +43,19 @@ Nipple.prototype.config = function (options) {
     this.options.threshold = 0.1;
     this.options.color = 'white';
     this.options.fadeTime = 250;
+    this.options.dataOnly = false;
+    this.options.restOpacity = 0.5;
+    this.options.mode = 'dynamic';
 
     // Overwrites
     for (var i in options) {
         if (this.options.hasOwnProperty(i)) {
             this.options[i] = options[i];
         }
+    }
+
+    if (this.options.mode === 'dynamic') {
+        this.options.restOpacity = 0;
     }
 
     return this;
@@ -153,6 +160,7 @@ Nipple.prototype.removeFromDom = function () {
 Nipple.prototype.destroy = function () {
     clearTimeout(this.removeTimeout);
     clearTimeout(this.showTimeout);
+    clearTimeout(this.restTimeout);
     this.off();
     this.removeFromDom();
     this.trigger('destroyed', this);
@@ -169,10 +177,13 @@ Nipple.prototype.show = function (cb) {
 
     clearTimeout(self.removeTimeout);
     clearTimeout(self.showTimeout);
+    clearTimeout(self.restTimeout);
 
     self.ui.el.style.opacity = 0;
     self.addToDom();
     self.ui.el.style.display = 'block';
+
+    self.restCallback();
 
     setTimeout(function () {
         self.ui.el.style.opacity = 1;
@@ -197,24 +208,70 @@ Nipple.prototype.hide = function (cb) {
         return;
     }
 
-    self.ui.el.style.opacity = 0;
+    self.ui.el.style.opacity = self.options.restOpacity;
+
     clearTimeout(self.removeTimeout);
     clearTimeout(self.showTimeout);
+    clearTimeout(self.restTimeout);
 
     self.removeTimeout = setTimeout(
         function () {
-            self.ui.el.style.display = 'none';
+            var display = self.options.mode === 'dynamic' ? 'none' : 'block';
+            self.ui.el.style.display = display;
             if (typeof cb === 'function') {
                 cb.call(this);
             }
             self.trigger('hidden', self);
             self.manager.trigger('hidden ' + self.identifier + ':hidden', self);
-            self.removeFromDom();
+
         },
         self.options.fadeTime
     );
+    self.restPosition();
 
     return self;
+};
+
+Nipple.prototype.restPosition = function (cb) {
+    var self = this;
+    self.frontPosition = {
+        x: 0,
+        y: 0
+    };
+    var animTime = self.options.fadeTime + 'ms';
+
+    var transitStyle = {};
+    transitStyle.front = u.getTransitionStyle('transition',
+        ['top', 'left'], animTime);
+
+    var styles = {front: {}};
+    styles.front = {
+        left: self.frontPosition.x + 'px',
+        top: self.frontPosition.y + 'px'
+    };
+
+    self.applyStyles(transitStyle);
+    self.applyStyles(styles);
+
+    self.restTimeout = setTimeout(
+        function () {
+            if (typeof cb === 'function') {
+                cb.call(self);
+            }
+            self.restCallback();
+        },
+        self.options.fadeTime
+    );
+};
+
+Nipple.prototype.restCallback = function () {
+    var self = this;
+    var transitStyle = {};
+    transitStyle.front = u.getTransitionStyle('transition', 'none', '');
+    self.applyStyles(transitStyle);
+    self.trigger('rested', self.toReturn);
+    self.manager.trigger('rested ' + self.identifier + ':rested',
+        self.toReturn);
 };
 
 Nipple.prototype.computeDirection = function (obj) {

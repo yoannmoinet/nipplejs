@@ -5,6 +5,7 @@
 var Manager = function (options) {
     var self = this;
     self.config(options);
+    self.box = this.options.zone.getBoundingClientRect();
     self.nipples = [];
     self.bindEvt(self.options.zone, 'start');
     self.on('destroyed', this.ondestroyed);
@@ -22,7 +23,12 @@ var Manager = function (options) {
         }
     };
 
-    return this.nipples;
+    if (self.options.mode === 'static') {
+        var nipple = this.createNipple(this.options.position, 0);
+        nipple.add();
+    }
+
+    return self.nipples;
 };
 
 // Extend Super.
@@ -37,11 +43,16 @@ Manager.prototype.config = function (options) {
     this.options.zone = document.body;
     this.options.multitouch = false;
     this.options.maxNumberOfNipples = 1;
+    this.options.mode = 'dynamic'; //static, semi;
+    this.options.position = {top: 0, left: 0};
+    this.options.catchDistance = 200;
     this.nippleOptions.size = 100;
     this.nippleOptions.threshold = 0.1;
     this.nippleOptions.color = 'white';
     this.nippleOptions.fadeTime = 250;
     this.nippleOptions.dataOnly = false;
+    this.nippleOptions.restOpacity = 0.5;
+    this.nippleOptions.mode = this.options.mode;
 
     // Overwrites
     for (var i in options) {
@@ -52,7 +63,79 @@ Manager.prototype.config = function (options) {
         }
     }
 
+    if (this.options.mode === 'static' || this.options.mode === 'semi') {
+        this.options.multitouch = false;
+        this.options.maxNumberOfNipples = 1;
+    }
+
     return this;
+};
+
+// Nipple Factory
+Manager.prototype.createNipple = function (position, identifier) {
+    var scroll = u.getScroll();
+    var backPosition = {};
+
+    if (position.x && position.y) {
+        backPosition = {
+            x: position.x -
+                (scroll.x + this.box.left),
+            y: position.y -
+                (scroll.y + this.box.top)
+        };
+    } else if (
+            position.top ||
+            position.right ||
+            position.bottom ||
+            position.left
+        ) {
+
+        // We need to compute the position X / Y of the joystick.
+        var dumb = document.createElement('DIV');
+        dumb.style.display = 'hidden';
+        dumb.style.top = position.top;
+        dumb.style.right = position.right;
+        dumb.style.bottom = position.bottom;
+        dumb.style.left = position.left;
+        dumb.style.position = 'absolute';
+
+        this.options.zone.appendChild(dumb);
+        var dumbBox = dumb.getBoundingClientRect();
+        this.options.zone.removeChild(dumb);
+
+        backPosition = position;
+        position = {
+            x: dumbBox.left + scroll.x,
+            y: dumbBox.top + scroll.y
+        };
+    }
+
+    var frontPosition = {
+        x: 0,
+        y: 0
+    };
+
+    var nipple = new Nipple(this, {
+        color: this.nippleOptions.color,
+        size: this.nippleOptions.size,
+        threshold: this.nippleOptions.threshold,
+        fadeTime: this.nippleOptions.fadeTime,
+        dataOnly: this.nippleOptions.dataOnly,
+        restOpacity: this.nippleOptions.restOpacity,
+        mode: this.options.mode,
+        identifier: identifier,
+        position: position,
+        backPosition: backPosition,
+        frontPosition: frontPosition
+    });
+
+    if (!this.nippleOptions.dataOnly) {
+        u.applyPosition(nipple.ui.el, nipple.backPosition);
+        u.applyPosition(nipple.ui.front, nipple.frontPosition);
+    }
+
+    this.nipples.push(nipple);
+    return nipple;
 };
 
 // Bind internal events for the Manager.
@@ -83,10 +166,10 @@ Manager.prototype.unbindEvt = function (el, type) {
 
 Manager.prototype.onstart = function (evt) {
     evt = u.prepareEvent(evt);
-
     this.box = this.options.zone.getBoundingClientRect();
+    this.scroll = u.getScroll();
 
-    // If we have touches and multitouch
+    // if we have touches and multitouch
     if (evt.length && this.options.multitouch &&
         this.nipples.length < this.options.maxNumberOfNipples) {
 
@@ -94,14 +177,9 @@ Manager.prototype.onstart = function (evt) {
             this.processOnStart(evt[i]);
         }
     // if we don't already have a nipple in place.
-    } else if (this.nipples.length === 0) {
-
+    // we process a new one
+    } else if (this.nipples.length === 0 || this.options.mode !== 'dynamic') {
         this.processOnStart(evt[0] || evt);
-
-    } else {
-
-        return false;
-
     }
 
     if (!this.started) {
@@ -118,46 +196,39 @@ Manager.prototype.processOnStart = function (evt) {
         evt.identifier :
         evt.pointerId) || 0;
 
-    if (this.nipples.get(identifier)) {
-        return;
-    }
+    var nipple = this.nipples.get(identifier);
 
-    var scroll = u.getScroll();
     var position = {
         x: evt.pageX,
         y: evt.pageY
     };
-    var backPosition = {
-        x: position.x -
-            (scroll.x + this.box.left + this.nippleOptions.size / 2),
-        y: position.y -
-            (scroll.y + this.box.top + this.nippleOptions.size / 2)
-    };
-    var frontPosition = {
-        x: this.nippleOptions.size / 4,
-        y: this.nippleOptions.size / 4
-    };
-    var nipple = new Nipple(this, {
-        color: this.nippleOptions.color,
-        size: this.nippleOptions.size,
-        threshold: this.nippleOptions.threshold,
-        fadeTime: this.nippleOptions.fadeTime,
-        identifier: identifier,
-        position: position,
-        backPosition: backPosition,
-        frontPosition: frontPosition
-    });
 
-    if (!this.nippleOptions.dataOnly) {
-        u.applyPosition(nipple.ui.el, nipple.backPosition);
-        u.applyPosition(nipple.ui.front, nipple.frontPosition);
+    if (nipple) {
+        if (this.options.mode === 'static') {
+            nipple.show();
+            // We're not 'dynamic' so we process the first touch as a move.
+            this.processOnMove(evt);
+        }
+
+        if (this.options.mode === 'semi') {
+            var distance = u.distance(position, nipple.position);
+            if (distance <= this.options.catchDistance) {
+                nipple.show();
+                this.processOnMove(evt);
+            } else {
+                nipple.destroy();
+                this.processOnStart(evt);
+            }
+        }
+    } else {
+        nipple = this.createNipple(position, identifier);
+        this.trigger('added ' + nipple.identifier + ':added', nipple);
         nipple.show();
     }
 
-    this.nipples.push(nipple);
-    this.trigger('added ' + identifier + ':added', nipple);
     nipple.trigger('start', nipple);
-    this.trigger('start ' + identifier + ':start', nipple);
+    this.trigger('start ' + nipple.identifier + ':start', nipple);
+    return nipple;
 };
 
 Manager.prototype.onmove = function (evt) {
@@ -192,6 +263,7 @@ Manager.prototype.processOnMove = function (evt) {
         x: evt.pageX,
         y: evt.pageY
     };
+
     var dist = u.distance(pos, nipple.position);
     var angle = u.angle(pos, nipple.position);
     var rAngle = u.radians(angle);
@@ -248,7 +320,7 @@ Manager.prototype.onend = function (evt) {
         this.processOnEnd(evt[0] || evt);
     }
 
-    if (!this.nipples.length) {
+    if (!this.nipples.length || this.options.mode !== 'dynamic') {
         this.unbindEvt(document, 'move')
             .unbindEvt(document, 'end');
         this.started = false;
@@ -272,23 +344,28 @@ Manager.prototype.processOnEnd = function (evt) {
 
     if (!this.nippleOptions.dataOnly) {
         nipple.hide(function () {
-            nipple.trigger('removed', nipple);
-            self.trigger('removed ' + identifier + ':removed', nipple);
+            if (self.options.mode === 'dynamic') {
+                nipple.trigger('removed', nipple);
+                self.trigger('removed ' + identifier + ':removed', nipple);
+                nipple.destroy();
+            }
         });
     }
 
     nipple.trigger('end', nipple);
     self.trigger('end ' + identifier + ':end', nipple);
-    var index = self.nipples.indexOf(nipple);
-    self.nipples.splice(index, 1);
+
+    if (this.options.mode === 'dynamic') {
+        this.nipples.splice(this.nipples.indexOf(nipple), 1);
+    }
 };
 
 // Remove destroyed nipple from the list
 Manager.prototype.ondestroyed = function(evt, nipple) {
-    nipple = this.nipples.get(nipple.identifier);
-    if (nipple) {
-        this.nipples.splice(this.nipples.indexOf(nipple), 1);
+    if (this.nipples.indexOf(nipple) < 0) {
+        return false;
     }
+    this.nipples.splice(this.nipples.indexOf(nipple), 1);
 };
 
 // Cleanly destroy the manager
