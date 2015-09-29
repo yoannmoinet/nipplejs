@@ -28,6 +28,23 @@ var Manager = function (options) {
         nipple.add();
     }
 
+    // Listen for resize, to reposition every joysticks
+    var resizeTimer;
+    window.onresize = function (evt) {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(function () {
+            var pos;
+            var scroll = u.getScroll();
+            self.nipples.forEach(function (nipple) {
+                pos = nipple.el.getBoundingClientRect();
+                nipple.position = {
+                    x: scroll.x + pos.left,
+                    y: scroll.y + pos.top
+                };
+            });
+        }, 100);
+    };
+
     return self.nipples;
 };
 
