@@ -86,4 +86,49 @@ u.applyPosition = function (el, pos) {
         el.style.left = pos.left;
     }
 };
+
+u.getTransitionStyle = function (property, values, time) {
+    var obj = u.configStylePropertyObject(property);
+    for (var i in obj) {
+        if (obj.hasOwnProperty(i)) {
+            if (typeof values === 'string') {
+                obj[i] = values + ' ' + time;
+            } else {
+                var st = '';
+                for (var j = 0, max = values.length; j < max; j += 1) {
+                    st += values[j] + ' ' + time + ', ';
+                }
+                obj[i] = st.slice(0, -2);
+            }
+        }
+    }
+    return obj;
+};
+
+u.getVendorStyle = function (property, value) {
+    var obj = u.configStylePropertyObject(property);
+    for (var i in obj) {
+        if (obj.hasOwnProperty(i)) {
+            obj[i] = value;
+        }
+    }
+    return obj;
+};
+
+u.configStylePropertyObject = function (prop) {
+    var obj = {};
+    obj[prop] = '';
+    var vendors = ['webkit', 'Moz', 'o'];
+    vendors.forEach(function (vendor) {
+        obj[vendor + prop.charAt(0).toUpperCase() + prop.slice(1)] = '';
+    });
+    return obj;
+};
+
+u.extend = function (objA, objB) {
+    for (var i in objB) {
+        if (objB.hasOwnProperty(i)) {
+            objA[i] = objB[i];
+        }
+    }
 };

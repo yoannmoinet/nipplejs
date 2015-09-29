@@ -88,35 +88,31 @@ Nipple.prototype.stylize = function () {
     if (this.options.dataOnly) {
         return;
     }
-    this.styles = {};
-    this.styles.el = {
+    var animTime = this.options.fadeTime + 'ms';
+    var borderStyle = u.getVendorStyle('borderRadius', '50%');
+    var transitStyle = u.getTransitionStyle('transition', 'opacity', animTime);
+    var styles = {};
+    styles.el = {
         width: this.options.size + 'px',
         height: this.options.size + 'px',
         position: 'absolute',
-        opacity: 0,
-        display: 'none',
-        'transition': 'opacity ' + this.options.fadeTime + 'ms',
-        'webkitTransition': 'opacity ' + this.options.fadeTime + 'ms',
-        'MozTransition': 'opacity ' + this.options.fadeTime + 'ms',
-        'oTransition': 'opacity ' + this.options.fadeTime + 'ms',
+        opacity: this.options.restOpacity,
+        display: 'block',
         'zIndex': 999
     };
 
-    this.styles.back = {
-        position: 'relative',
+    styles.back = {
+        position: 'absolute',
         display: 'block',
         width: '100%',
         height: '100%',
         marginLeft: -this.options.size / 2 + 'px',
         marginTop: -this.options.size / 2 + 'px',
         background: this.options.color,
-        'borderRadius': '50%',
-        'webkitBorderRadius': '50%',
-        'MozBorderRadius': '50%',
         'opacity': '.5'
     };
 
-    this.styles.front = {
+    styles.front = {
         width: '50%',
         height: '50%',
         position: 'absolute',
@@ -124,17 +120,24 @@ Nipple.prototype.stylize = function () {
         marginLeft: -this.options.size / 4 + 'px',
         marginTop: -this.options.size / 4 + 'px',
         background: this.options.color,
-        'borderRadius': '50%',
-        'webkitBorderRadius': '50%',
-        'MozBorderRadius': '50%',
         'opacity': '.5'
     };
 
+    u.extend(styles.el, transitStyle);
+    u.extend(styles.back, borderStyle);
+    u.extend(styles.front, borderStyle);
+
+    this.applyStyles(styles);
+
+    return this;
+};
+
+Nipple.prototype.applyStyles = function (styles) {
     // Apply styles
     for (var i in this.ui) {
         if (this.ui.hasOwnProperty(i)) {
-            for (var j in this.styles[i]) {
-                this.ui[i].style[j] = this.styles[i][j];
+            for (var j in styles[i]) {
+                this.ui[i].style[j] = styles[i][j];
             }
         }
     }
