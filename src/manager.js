@@ -1,9 +1,12 @@
 ///////////////////////
 ///     MANAGER     ///
 ///////////////////////
+Manager.prototype = new Super();
+Manager.constructor = Manager;
 
-var Manager = function (options) {
+function Manager (options) {
     var self = this;
+    self.handlers = {};
     self.config(options);
     self.box = this.options.zone.getBoundingClientRect();
     self.nipples = [];
@@ -47,9 +50,6 @@ var Manager = function (options) {
 
     return self.nipples;
 };
-
-// Extend Super.
-Manager.prototype = new Super();
 
 // Configure Manager.
 Manager.prototype.config = function (options) {

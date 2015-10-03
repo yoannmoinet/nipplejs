@@ -2,9 +2,7 @@
 ///   SUPER CLASS   ///
 ///////////////////////
 ///
-var Super = function () {
-    this.handlers = {};
-};
+var Super = function () {};
 
 // Basic event system.
 Super.prototype.on = function (arg, cb) {

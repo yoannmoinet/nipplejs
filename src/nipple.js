@@ -2,7 +2,11 @@
 ///   THE NIPPLE    ///
 ///////////////////////
 
-var Nipple = function (manager, options) {
+Nipple.prototype = new Super();
+Nipple.constructor = Nipple;
+
+function Nipple (manager, options) {
+    this.handlers = {};
     this.identifier = options.identifier;
     this.position = options.position;
     this.backPosition = options.backPosition;
@@ -33,8 +37,6 @@ var Nipple = function (manager, options) {
 
     return this.toReturn;
 };
-
-Nipple.prototype = new Super();
 
 // Configure Nipple instance.
 Nipple.prototype.config = function (options) {
