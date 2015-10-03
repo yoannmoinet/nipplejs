@@ -255,10 +255,6 @@ Each joystick has the following signature :
         x: Number,
         y: Number
     },
-    backPosition: {         // position of the back part
-        x: Number,
-        y: Number
-    },
     frontPosition: {        // position of the front part
         x: Number,
         y: Number
@@ -335,10 +331,6 @@ The absolute position of the center of the joystick.
 ### `joystick.frontPosition`
 
 The absolute position of the back part of the joystick's ui.
-
-### `joystick.backPosition`
-
-The absolute position of the front part of the joystick's ui.
 
 ### `joystick.ui`
 

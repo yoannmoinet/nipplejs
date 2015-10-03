@@ -9,7 +9,6 @@ function Nipple (manager, options) {
     this.handlers = {};
     this.identifier = options.identifier;
     this.position = options.position;
-    this.backPosition = options.backPosition;
     this.frontPosition = options.frontPosition;
     this.manager = manager;
     this.config(options);
@@ -28,7 +27,6 @@ function Nipple (manager, options) {
         computeDirection: this.computeDirection.bind(this),
         trigger: this.trigger.bind(this),
         position: this.position,
-        backPosition: this.backPosition,
         frontPosition: this.frontPosition,
         ui: this.ui,
         identifier: this.identifier,

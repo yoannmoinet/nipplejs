@@ -91,10 +91,10 @@ Manager.prototype.config = function (options) {
 // Nipple Factory
 Manager.prototype.createNipple = function (position, identifier) {
     var scroll = u.getScroll();
-    var backPosition = {};
+    var toPutOn = {};
 
     if (position.x && position.y) {
-        backPosition = {
+        toPutOn = {
             x: position.x -
                 (scroll.x + this.box.left),
             y: position.y -
@@ -120,7 +120,7 @@ Manager.prototype.createNipple = function (position, identifier) {
         var dumbBox = dumb.getBoundingClientRect();
         this.options.zone.removeChild(dumb);
 
-        backPosition = position;
+        toPutOn = position;
         position = {
             x: dumbBox.left + scroll.x,
             y: dumbBox.top + scroll.y
@@ -142,12 +142,11 @@ Manager.prototype.createNipple = function (position, identifier) {
         mode: this.options.mode,
         identifier: identifier,
         position: position,
-        backPosition: backPosition,
         frontPosition: frontPosition
     });
 
     if (!this.nippleOptions.dataOnly) {
-        u.applyPosition(nipple.ui.el, nipple.backPosition);
+        u.applyPosition(nipple.ui.el, toPutOn);
         u.applyPosition(nipple.ui.front, nipple.frontPosition);
     }
 
