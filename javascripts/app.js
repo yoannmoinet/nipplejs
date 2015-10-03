@@ -7,7 +7,7 @@ elDemo.setAttribute('data-user', 'YoannM');
 elDemo.setAttribute('data-default-tab', 'result');
 elDemo.setAttribute('data-slug-hash', 'gapmMG');
 elDemo.setAttribute('data-theme-id', '1775');
-elDemo.setAttribute('data-height', '1000');
+elDemo.setAttribute('data-height', '950');
 
 var codepenScript = document.createElement('script');
 codepenScript.src = '//assets.codepen.io/assets/embed/ei.js';
