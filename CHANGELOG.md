@@ -1,3 +1,20 @@
+<a name="0.5.1"></a>
+## [0.5.1](https://github.com/yoannmoinet/nipplejs/compare/v0.5.1...v0.5.1) (2015-10-03)
+
+
+
+
+<a name="0.5.1"></a>
+## [0.5.1](https://github.com/yoannmoinet/nipplejs/compare/v0.5.0...v0.5.1) (2015-10-03)
+
+
+### Bug Fixes
+
+* **nipple:** remove useless backPosition ([4c76adc](https://github.com/yoannmoinet/nipplejs/commit/4c76adc))
+* **super:** better inheritance ([4a3a8dc](https://github.com/yoannmoinet/nipplejs/commit/4a3a8dc))
+
+
+
 <a name="0.5.0"></a>
 # [0.5.0](https://github.com/yoannmoinet/nipplejs/compare/v0.4.2...v0.5.0) (2015-09-29)
 
@@ -128,3 +145,7 @@
 
 <a name="0.1.0"></a>
 # 0.1.0 (2015-09-05)
+
+
+
+
