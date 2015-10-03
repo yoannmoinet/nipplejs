@@ -14,38 +14,88 @@
                 margin-left: auto;
                 margin-right: auto;
             }
-            .zone {
-                position: absolute;
-                width: 33%;
-                height: 100%;
+            #buttons {
+                position: relative;
+                border: solid 1px #aaa;
+                display: inline-block;
+                width: 100%;
+                border-radius: 10px;
+                height: 50px;
+                overflow: hidden;
+                margin-bottom: 20px;
             }
-            .zone:last-child {
+            .button {
+                display: inline-block;
+                background: #ccc;
+                color: black;
+                height: 50px;
+                width: 33%;
+                margin: 0;
+                margin-right: -3px;
+                text-align: center;
+                line-height: 45px;
+                font-size: 25px;
+                cursor: pointer;
+                -webkit-touch-callout: none;
+                -webkit-user-select: none;
+                -khtml-user-select: none;
+                -moz-user-select: none;
+                -ms-user-select: none;
+                user-select: none;
+            }
+            .button:hover {
+                background: #eee;
+            }
+            .button:active {
+                background: #ddd;
+            }
+            .button.active {
+                color: white;
+                background: #888;
+            }
+            .button:nth-child(2) {
                 width: 34%;
+                border-left: solid 1px #aaa;
+                border-right: solid 1px #aaa;
+            }
+            .highlight {
+                display: none;
+            }
+            .highlight.active {
+                display: block;
+            }
+            .zone {
+                display: none;
+                position: absolute;
+                width: 100%;
+                height: 100%;
+                left: 0;
+            }
+            .zone.active {
+                display: block;
             }
             .zone > h1 {
                 position: absolute;
-                padding: 5px 10px;
+                padding: 10px 10px;
+                margin: 0;
                 color: white;
                 right: 0;
                 bottom: 0;
             }
-            #dynamic {
+            .zone.dynamic {
                 background: rgba(0, 0, 255, 0.1);
-                left: 0;
             }
-            #semi {
+            .zone.semi {
                 background: rgba(255, 255, 255, 0.1);
-                left: 33%;
             }
-            #static {
+            .zone.static {
                 background: rgba(255, 0, 0, 0.1);
-                left: 66%;
             }
         </style>
     </head>
     <body>
         <p>First thing first. A demo. Executed with this configuration : </p>
-        <div class="highlight highlight-javascript">
+        <div class="dynamic active highlight highlight-javascript">
             <pre>
 <span class="pl-k">&lt;</span>script src<span class="pl-k">=</span><span class="pl-s"><span class="pl-pds">"</span>./dist/nipplejs.min.js<span class="pl-pds">"</span></span><span class="pl-k">&gt;&lt;/</span>script<span class="pl-k">&gt;</span>
 <span class="pl-k">&lt;</span>script<span class="pl-k">&gt;</span>
@@ -53,12 +103,24 @@
         zone: document.getElementById('dynamic'),
         color: 'blue'
     });
+<span class="pl-k">&lt;/</span>script<span class="pl-k">&gt;</span></pre>
+        </div>
+        <div class="semi highlight highlight-javascript">
+            <pre>
+<span class="pl-k">&lt;</span>script src<span class="pl-k">=</span><span class="pl-s"><span class="pl-pds">"</span>./dist/nipplejs.min.js<span class="pl-pds">"</span></span><span class="pl-k">&gt;&lt;/</span>script<span class="pl-k">&gt;</span>
+<span class="pl-k">&lt;</span>script<span class="pl-k">&gt;</span>
     <span class="pl-k">var</span> semi <span class="pl-k">=</span> nipplejs.create({
         zone: document.getElementById('semi'),
         mode: 'semi',
         catchDistance: 150,
         color: 'white'
     });
+<span class="pl-k">&lt;/</span>script<span class="pl-k">&gt;</span></pre>
+        </div>
+        <div class="static highlight highlight-javascript">
+            <pre>
+<span class="pl-k">&lt;</span>script src<span class="pl-k">=</span><span class="pl-s"><span class="pl-pds">"</span>./dist/nipplejs.min.js<span class="pl-pds">"</span></span><span class="pl-k">&gt;&lt;/</span>script<span class="pl-k">&gt;</span>
+<span class="pl-k">&lt;</span>script<span class="pl-k">&gt;</span>
     <span class="pl-k">var</span> static <span class="pl-k">=</span> nipplejs.create({
         zone: document.getElementById('static'),
         mode: 'static',
@@ -66,6 +128,12 @@
         color: 'red'
     });
 <span class="pl-k">&lt;/</span>script<span class="pl-k">&gt;</span></pre>
+        </div>
+        <p>Choose the mode you want to test.</p>
+        <div id="buttons">
+            <div data-type="dynamic" class="active button dynamic">dynamic</div>
+            <div data-type="semi" class="button semi">semi</div>
+            <div data-type="static" class="button static">static</div>
         </div>
         <div id="zone_joystick">
             <div id="debug">
@@ -98,9 +166,9 @@
                 </ul>
                 <div class="dump"></div>
             </div>
-            <div class="zone" id="dynamic"><h1>dynamic</h1></div>
-            <div class="zone" id="semi"><h1>semi</h1></div>
-            <div class="zone" id="static"><h1>static</h1></div>
+            <div class="zone dynamic active"><h1>dynamic</h1></div>
+            <div class="zone semi"><h1>semi</h1></div>
+            <div class="zone static"><h1>static</h1></div>
         </div>
         <br/>
         <div>
@@ -108,27 +176,33 @@
         </div>
         <script src="../dist/nipplejs.js" charset="utf-8"></script>
         <script>
-            var joystick_dynamic = nipplejs.create({
-                zone: document.getElementById('dynamic'),
-                color: 'blue'
-            });
-            var joystick_semi = nipplejs.create({
-                zone: document.getElementById('semi'),
-                mode: 'semi',
-                catchDistance: 150,
-                color: 'white'
-            });
-            var joystick_static = nipplejs.create({
-                zone: document.getElementById('static'),
-                mode: 'static',
-                position: {left: '50%', top: '50%'},
-                color: 'red'
-            });
-
-            var joysticks = [joystick_dynamic, joystick_semi, joystick_static];
+            var s = function (sel) { return document.querySelector(sel); };
+            var sId = function (sel) { return document.getElementById(sel); };
+            var removeClass = function (el, clss) {
+                el.className = el.className.replace(new RegExp('\\b' + clss + ' ?\\b', 'g'), '');
+            }
+            var joysticks = {
+                dynamic: {
+                    zone: s('.zone.dynamic'),
+                    color: 'blue'
+                },
+                semi: {
+                    zone: s('.zone.semi'),
+                    mode: 'semi',
+                    catchDistance: 150,
+                    color: 'white'
+                },
+                static: {
+                    zone: s('.zone.static'),
+                    mode: 'static',
+                    position: {left: '50%', top: '50%'},
+                    color: 'red'
+                }
+            };
+            var joystick;
 
             // Get debug elements and map them
-            var elDebug = document.getElementById('debug');
+            var elDebug = sId('debug');
             var elDump = elDebug.querySelector('.dump');
             var els = {
                 position: {
@@ -149,22 +223,41 @@
                 }
             };
 
-            joysticks.forEach(function (joystick) {
-                joystick.on('start end', function(evt, data) {
+            sId('buttons').onclick = createNipple;
+            createNipple('dynamic');
+
+            function bindNipple () {
+                joystick.on('start end', function (evt, data) {
                     dump(evt.type);
                     debug(data);
-                }).on('move', function(evt, data) {
+                }).on('move', function (evt, data) {
                     debug(data);
                 }).on('dir:up plain:up dir:left plain:left dir:down' +
                     'plain:down dir:right plain:right',
-                    function(evt, data) {
+                    function (evt, data) {
                         dump(evt.type);
                     }
                 );
-            });
+            }
+
+            function createNipple (evt) {
+                var type = typeof evt === 'string' ?
+                    evt : evt.target.getAttribute('data-type');
+                if (joystick) {
+                    joystick.destroy();
+                }
+                removeClass(s('.zone.active'), 'active');
+                removeClass(s('.button.active'), 'active');
+                removeClass(s('.highlight.active'), 'active');
+                s('.highlight.' + type).className += ' active';
+                s('.button.' + type).className += ' active';
+                s('.zone.' + type).className += ' active';
+                joystick = nipplejs.create(joysticks[type]);
+                bindNipple();
+            }
 
             // Print data into elements
-            function debug(obj) {
+            function debug (obj) {
                 function parseObj(sub, el) {
                     for (var i in sub) {
                         if (typeof sub[i] === 'object' && el) {
@@ -174,7 +267,7 @@
                         }
                     }
                 }
-                setTimeout(function() {
+                setTimeout(function () {
                     parseObj(obj, els);
                 }, 0);
             }
@@ -182,8 +275,8 @@
             var nbEvents = 0;
 
             // Dump data
-            function dump(evt) {
-                setTimeout(function() {
+            function dump (evt) {
+                setTimeout(function () {
                     if (elDump.children.length > 4) {
                         elDump.removeChild(elDump.firstChild);
                     }
