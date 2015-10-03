@@ -34,8 +34,8 @@ define(['nipplejs'], function (nipplejs) {
 
 ```html
 // Global
-<script type="text/javascript" src="./dist/nipplejs.min.js"></script>
-<script type="text/javascript">
+<script src="./dist/nipplejs.min.js"></script>
+<script>
     var manager = nipplejs.create(options);
 </script>
 ```
@@ -57,7 +57,8 @@ var options = {
     position: Object,               // preset position for 'static' mode
     mode: String,                   // 'dynamic', 'static' or 'semi'
     restOpacity: Number,            // opacity when not 'dynamic' and rested
-    catchDistance: Number           // distance to recycle previous joystick in 'semi' mode
+    catchDistance: Number           // distance to recycle previous joystick in
+                                    // 'semi' mode
 };
 ```
 
