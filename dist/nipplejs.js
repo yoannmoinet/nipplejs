@@ -178,9 +178,7 @@ u.extend = function (objA, objB) {
 ///   SUPER CLASS   ///
 ///////////////////////
 ///
-var Super = function () {
-    this.handlers = {};
-};
+var Super = function () {};
 
 // Basic event system.
 Super.prototype.on = function (arg, cb) {
@@ -229,10 +227,13 @@ Super.prototype.trigger = function (arg, data) {
 ///   THE NIPPLE    ///
 ///////////////////////
 
-var Nipple = function (manager, options) {
+Nipple.prototype = new Super();
+Nipple.constructor = Nipple;
+
+function Nipple (manager, options) {
+    this.handlers = {};
     this.identifier = options.identifier;
     this.position = options.position;
-    this.backPosition = options.backPosition;
     this.frontPosition = options.frontPosition;
     this.manager = manager;
     this.config(options);
@@ -251,7 +252,6 @@ var Nipple = function (manager, options) {
         computeDirection: this.computeDirection.bind(this),
         trigger: this.trigger.bind(this),
         position: this.position,
-        backPosition: this.backPosition,
         frontPosition: this.frontPosition,
         ui: this.ui,
         identifier: this.identifier,
@@ -260,8 +260,6 @@ var Nipple = function (manager, options) {
 
     return this.toReturn;
 };
-
-Nipple.prototype = new Super();
 
 // Configure Nipple instance.
 Nipple.prototype.config = function (options) {
@@ -609,9 +607,12 @@ Nipple.prototype.computeDirection = function (obj) {
 ///////////////////////
 ///     MANAGER     ///
 ///////////////////////
+Manager.prototype = new Super();
+Manager.constructor = Manager;
 
-var Manager = function (options) {
+function Manager (options) {
     var self = this;
+    self.handlers = {};
     self.config(options);
     self.box = this.options.zone.getBoundingClientRect();
     self.nipples = [];
@@ -656,9 +657,6 @@ var Manager = function (options) {
     return self.nipples;
 };
 
-// Extend Super.
-Manager.prototype = new Super();
-
 // Configure Manager.
 Manager.prototype.config = function (options) {
     this.options = {};
@@ -699,10 +697,10 @@ Manager.prototype.config = function (options) {
 // Nipple Factory
 Manager.prototype.createNipple = function (position, identifier) {
     var scroll = u.getScroll();
-    var backPosition = {};
+    var toPutOn = {};
 
     if (position.x && position.y) {
-        backPosition = {
+        toPutOn = {
             x: position.x -
                 (scroll.x + this.box.left),
             y: position.y -
@@ -728,7 +726,7 @@ Manager.prototype.createNipple = function (position, identifier) {
         var dumbBox = dumb.getBoundingClientRect();
         this.options.zone.removeChild(dumb);
 
-        backPosition = position;
+        toPutOn = position;
         position = {
             x: dumbBox.left + scroll.x,
             y: dumbBox.top + scroll.y
@@ -750,12 +748,11 @@ Manager.prototype.createNipple = function (position, identifier) {
         mode: this.options.mode,
         identifier: identifier,
         position: position,
-        backPosition: backPosition,
         frontPosition: frontPosition
     });
 
     if (!this.nippleOptions.dataOnly) {
-        u.applyPosition(nipple.ui.el, nipple.backPosition);
+        u.applyPosition(nipple.ui.el, toPutOn);
         u.applyPosition(nipple.ui.front, nipple.frontPosition);
     }
 
