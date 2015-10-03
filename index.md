@@ -34,8 +34,8 @@ define(['nipplejs'], function (nipplejs) {
 
 ```html
 // Global
-<script type="text/javascript" src="./dist/nipplejs.min.js"></script>
-<script type="text/javascript">
+<script src="./dist/nipplejs.min.js"></script>
+<script>
     var manager = nipplejs.create(options);
 </script>
 ```
@@ -57,7 +57,8 @@ var options = {
     position: Object,               // preset position for 'static' mode
     mode: String,                   // 'dynamic', 'static' or 'semi'
     restOpacity: Number,            // opacity when not 'dynamic' and rested
-    catchDistance: Number           // distance to recycle previous joystick in 'semi' mode
+    catchDistance: Number           // distance to recycle previous joystick in
+                                    // 'semi' mode
 };
 ```
 
@@ -255,10 +256,6 @@ Each joystick has the following signature :
         x: Number,
         y: Number
     },
-    backPosition: {         // position of the back part
-        x: Number,
-        y: Number
-    },
     frontPosition: {        // position of the front part
         x: Number,
         y: Number
@@ -335,10 +332,6 @@ The absolute position of the center of the joystick.
 ### `joystick.frontPosition`
 
 The absolute position of the back part of the joystick's ui.
-
-### `joystick.backPosition`
-
-The absolute position of the front part of the joystick's ui.
 
 ### `joystick.ui`
 
