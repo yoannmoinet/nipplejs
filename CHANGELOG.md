@@ -1,6 +1,16 @@
-<a name="0.5.2"></a>
-## [0.5.2](https://github.com/yoannmoinet/nipplejs/compare/v0.5.2...v0.5.2) (2015-10-04)
+<a name="0.5.3"></a>
+## [0.5.3](https://github.com/yoannmoinet/nipplejs/compare/v0.5.3...v0.5.3) (2015-10-04)
 
+
+
+
+<a name="0.5.3"></a>
+## [0.5.3](https://github.com/yoannmoinet/nipplejs/compare/v0.5.2...v0.5.3) (2015-10-04)
+
+
+### Bug Fixes
+
+* **manager:** add back pressure variable... oups ([a46982f](https://github.com/yoannmoinet/nipplejs/commit/a46982f))
 
 
 
