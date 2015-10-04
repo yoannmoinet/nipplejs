@@ -56,7 +56,7 @@ u.trigger = function (el, type, data) {
 
 u.prepareEvent = function (evt) {
     evt.preventDefault();
-    return isTouch ? evt.changedTouches : evt;
+    return evt.type.match(/^touch/) ? evt.changedTouches : evt;
 };
 
 u.getScroll = function () {
