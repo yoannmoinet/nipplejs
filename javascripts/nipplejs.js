@@ -788,6 +788,11 @@ Manager.prototype.unbindEvt = function (el, type) {
 
 Manager.prototype.onstart = function (evt) {
     evt = u.prepareEvent(evt);
+
+    if (!evt) {
+        return false;
+    }
+
     this.box = this.options.zone.getBoundingClientRect();
     this.scroll = u.getScroll();
 
@@ -855,6 +860,11 @@ Manager.prototype.processOnStart = function (evt) {
 
 Manager.prototype.onmove = function (evt) {
     evt = u.prepareEvent(evt);
+
+    if (!evt) {
+        return false;
+    }
+
     var toSends = [];
 
     if (evt.length && this.options.multitouch) {
@@ -933,6 +943,10 @@ Manager.prototype.processOnMove = function (evt) {
 
 Manager.prototype.onend = function (evt) {
     evt = u.prepareEvent(evt);
+
+    if (!evt) {
+        return false;
+    }
 
     if (evt.length && this.options.multitouch) {
         for (var i = 0, max = evt.length; i < max; i += 1) {
