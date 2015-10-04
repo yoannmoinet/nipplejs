@@ -840,7 +840,7 @@ Manager.prototype.processOnStart = function (evt) {
     var identifier = (evt.identifier !== undefined ?
         evt.identifier :
         evt.pointerId) || 0;
-
+    var pressure = evt.force || evt.pressure || evt.webkitForce || 0;
     var nipple = this.nipples.get(identifier);
 
     var position = {
