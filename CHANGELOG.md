@@ -1,6 +1,21 @@
-<a name="0.5.1"></a>
-## [0.5.1](https://github.com/yoannmoinet/nipplejs/compare/v0.5.1...v0.5.1) (2015-10-03)
+<a name="0.5.2"></a>
+## [0.5.2](https://github.com/yoannmoinet/nipplejs/compare/v0.5.2...v0.5.2) (2015-10-04)
 
+
+
+
+<a name="0.5.2"></a>
+## [0.5.2](https://github.com/yoannmoinet/nipplejs/compare/v0.5.1...v0.5.2) (2015-10-04)
+
+
+### Bug Fixes
+
+* **manager:** correctly unbind all events when destroying manager ([e3f96ef](https://github.com/yoannmoinet/nipplejs/commit/e3f96ef))
+* **utils:** handle touch based on their event's type ([406a7b2](https://github.com/yoannmoinet/nipplejs/commit/406a7b2))
+
+### Features
+
+* **manager:** better pressure management cross-plateform ([d867812](https://github.com/yoannmoinet/nipplejs/commit/d867812))
 
 
 
