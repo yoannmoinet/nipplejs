@@ -98,7 +98,7 @@ u.trigger = function (el, type, data) {
 
 u.prepareEvent = function (evt) {
     evt.preventDefault();
-    return isTouch ? evt.changedTouches : evt;
+    return evt.type.match(/^touch/) ? evt.changedTouches : evt;
 };
 
 u.getScroll = function () {
@@ -613,6 +613,7 @@ Manager.constructor = Manager;
 function Manager (options) {
     var self = this;
     self.handlers = {};
+    self.pressureIntervals = {};
     self.config(options);
     self.box = this.options.zone.getBoundingClientRect();
     self.nipples = [];
@@ -781,6 +782,12 @@ Manager.prototype.bindEvt = function (el, type) {
 // Unbind internal events for the Manager
 Manager.prototype.unbindEvt = function (el, type) {
     u.unbindEvt(el, toBind[type], handlers[type]);
+
+    if (secondBind[type]) {
+        // Support for both touch and mouse at the same time.
+        u.unbindEvt(el, secondBind[type], handlers[type]);
+    }
+
     handlers[type] = undefined;
 
     return this;
@@ -813,6 +820,22 @@ Manager.prototype.onstart = function (evt) {
     return false;
 };
 
+Manager.prototype.pressureFn = function (touch, nipple, identifier) {
+    var previousPressure = 0;
+    clearInterval(this.pressureIntervals[identifier]);
+    // Create an interval that will read the pressure every 100ms
+    this.pressureIntervals[identifier] = setInterval(function () {
+        var pressure = touch.force || touch.pressure ||
+            touch.webkitForce || 0;
+        if (pressure !== previousPressure) {
+            nipple.trigger('pressure', pressure);
+            this.trigger('pressure ' +
+                nipple.identifier + ':pressure', pressure);
+            previousPressure = pressure;
+        }
+    }.bind(this), 100);
+};
+
 Manager.prototype.processOnStart = function (evt) {
     var identifier = (evt.identifier !== undefined ?
         evt.identifier :
@@ -828,6 +851,9 @@ Manager.prototype.processOnStart = function (evt) {
     if (nipple) {
         if (this.options.mode === 'static') {
             nipple.show();
+            if (pressure > 0) {
+                this.pressureFn(evt, nipple, identifier);
+            }
             // We're not 'dynamic' so we process the first touch as a move.
             this.processOnMove(evt);
         }
@@ -836,6 +862,9 @@ Manager.prototype.processOnStart = function (evt) {
             var distance = u.distance(position, nipple.position);
             if (distance <= this.options.catchDistance) {
                 nipple.show();
+                if (pressure > 0) {
+                    this.pressureFn(evt, nipple, identifier);
+                }
                 this.processOnMove(evt);
             } else {
                 nipple.destroy();
@@ -846,6 +875,9 @@ Manager.prototype.processOnStart = function (evt) {
         nipple = this.createNipple(position, identifier);
         this.trigger('added ' + nipple.identifier + ':added', nipple);
         nipple.show();
+        if (pressure > 0) {
+            this.pressureFn(evt, nipple, identifier);
+        }
     }
 
     nipple.trigger('start', nipple);
@@ -974,6 +1006,9 @@ Manager.prototype.processOnEnd = function (evt) {
         });
     }
 
+    // Clear the pressure interval reader
+    clearInterval(self.pressureIntervals[identifier]);
+
     nipple.trigger('end', nipple);
     self.trigger('end ' + identifier + ':end', nipple);
 
@@ -998,6 +1033,11 @@ Manager.prototype.destroy = function () {
     this.nipples.forEach(function(nipple) {
         nipple.destroy();
     });
+    for (var i in this.pressureIntervals) {
+        if (this.pressureIntervals.hasOwnProperty(i)) {
+            clearInterval(this.pressureIntervals[i]);
+        }
+    }
     this.off();
 };
 return {
