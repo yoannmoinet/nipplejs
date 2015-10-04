@@ -176,6 +176,12 @@ Manager.prototype.bindEvt = function (el, type) {
 // Unbind internal events for the Manager
 Manager.prototype.unbindEvt = function (el, type) {
     u.unbindEvt(el, toBind[type], handlers[type]);
+
+    if (secondBind[type]) {
+        // Support for both touch and mouse at the same time.
+        u.unbindEvt(el, secondBind[type], handlers[type]);
+    }
+
     handlers[type] = undefined;
 
     return this;
