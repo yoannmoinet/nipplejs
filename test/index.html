@@ -238,7 +238,9 @@
                     function (evt, data) {
                         dump(evt.type);
                     }
-                );
+                ).on('pressure', function (evt, data) {
+                    debug({pressure: data});
+                });
             }
 
             function createNipple (evt) {

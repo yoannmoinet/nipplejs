@@ -491,9 +491,17 @@ Won't be trigger in a `dataOnly` configuration.
 
 #### `destroyed`
 
-Is trigger at the end of destroy.
+Is triggered at the end of destroy.
 
 Will pass the instance alongside the event.
+
+#### `pressure`
+
+> MBP's [**Force Touch**](http://www.apple.com/macbook-pro/features-retina/#interact), iOS's [**3D Touch**](http://www.apple.com/iphone-6s/3d-touch/), Microsoft's [**pressure**](https://msdn.microsoft.com/en-us/library/hh772360%28v=vs.85%29.aspx) or MDN's [**force**](https://developer.mozilla.org/en-US/docs/Web/API/Touch/force)
+
+Is triggered when the pressure on the joystick is changed.
+
+The value, between 0 and 1, is sent back alongside the event.
 
 ----
 ## Contributing
