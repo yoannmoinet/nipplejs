@@ -322,10 +322,7 @@ Manager.prototype.processOnMove = function (evt) {
         pos = u.findCoord(nipple.position, dist, angle);
     }
 
-    nipple.frontPosition = {
-        x: pos.x - nipple.position.x,
-        y: pos.y - nipple.position.y
-    };
+    nipple.frontPosition = u.diff(pos, nipple.position);
 
     if (!this.nippleOptions.dataOnly) {
         u.applyPosition(nipple.ui.front, nipple.frontPosition);
