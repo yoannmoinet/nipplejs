@@ -64,6 +64,7 @@ Manager.prototype.config = function (options) {
     this.options.mode = 'dynamic'; //static, semi;
     this.options.position = {top: 0, left: 0};
     this.options.catchDistance = 200;
+    this.options.follow = true;
     this.nippleOptions.size = 100;
     this.nippleOptions.threshold = 0.1;
     this.nippleOptions.color = 'white';
@@ -273,7 +274,7 @@ Manager.prototype.processOnStart = function (evt) {
             this.pressureFn(evt, nipple, identifier);
         }
     }
-
+    nipple.startPosition = position;
     nipple.trigger('start', nipple);
     this.trigger('start ' + nipple.identifier + ':start', nipple);
     return nipple;
@@ -312,20 +313,29 @@ Manager.prototype.processOnMove = function (evt) {
         y: evt.pageY
     };
 
+    var posBack;
     var dist = u.distance(pos, nipple.position);
     var angle = u.angle(pos, nipple.position);
     var rAngle = u.radians(angle);
     var force = dist / size;
 
     if (dist > size) {
-        dist = size;
-        pos = u.findCoord(nipple.position, dist, angle);
+        if (!this.options.follow) {
+            dist = size;
+            pos = u.findCoord(nipple.position, dist, angle);
+        } else if (!this.nippleOptions.dataOnly) {
+            posBack = u.findCoord(nipple.position, (dist - size), angle);
+        }
     }
 
     nipple.frontPosition = u.diff(pos, nipple.position);
 
     if (!this.nippleOptions.dataOnly) {
         u.applyPosition(nipple.ui.front, nipple.frontPosition);
+        if (posBack) {
+            u.applyPosition(nipple.ui.el, posBack);
+            nipple.position = posBack;
+        }
     }
 
     var toSend = {
