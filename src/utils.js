@@ -25,6 +25,13 @@ u.findCoord = function(p, d, a) {
     return b;
 };
 
+u.diff = function (a, b) {
+    return {
+        x: a.x - b.x,
+        y: a.y - b.y
+    };
+};
+
 u.radians = function(a) {
     return a * (Math.PI / 180);
 };
