@@ -15,7 +15,9 @@
   "main": "./dist/nipplejs.js",
   "scripts": {
     "postversion": "npm run bowerSync && npm run changelog",
-    "build": "npm run concat && npm run umd && npm run uglify",
+    "buildWatch": "npm run concat && npm run umd",
+    "postbuildWatch": "npm run postBuild && node ./bin/copyToTest.js",
+    "build": "npm run buildWatch && npm run uglify",
     "prebuild": "npm run format && npm run lint",
     "postbuild": "node ./bin/clean.js",
     "pretest": "npm run build",
@@ -26,7 +28,8 @@
     "changelog": "node ./bin/changelog.js",
     "bowerSync": "node ./bin/bowerSync.js",
     "uglify": "uglifyjs ./dist/nipplejs.js -o ./dist/nipplejs.min.js -c -m",
-    "watch": "watch \"npm test\" src test",
+    "watch": "watch \"npm run buildWatch\" src",
+    "server": "static test",
     "copyGh": "node ./bin/copyToGhPages.js",
     "concat": "concat-cli -f ./src/start.js ./src/utils.js ./src/super.js ./src/nipple.js ./src/manager.js ./src/end.js -o ./nipplejs.temp.js"
   },
@@ -38,6 +41,7 @@
     "expect.js": "^0.3.1",
     "jscs": "^2.1.0",
     "mocha": "^2.2.5",
+    "node-static": "^0.7.7",
     "uglify-js": "^2.4.24",
     "umd": "^3.0.1",
     "watch": "^0.16.0"
