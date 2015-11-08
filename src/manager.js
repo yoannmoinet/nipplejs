@@ -6,6 +6,8 @@ Manager.constructor = Manager;
 
 function Manager (options) {
     var self = this;
+    self.ids = {};
+    self.index = 0;
     self.handlers = {};
     self.pressureIntervals = {};
     self.config(options);
@@ -155,6 +157,28 @@ Manager.prototype.createNipple = function (position, identifier) {
     return nipple;
 };
 
+Manager.prototype.getIdentifier = function (evt) {
+    var id = (evt.identifier !== undefined ?
+        evt.identifier :
+        evt.pointerId) || 0;
+
+    if (this.ids[id] === undefined) {
+        this.ids[id] = this.index;
+    }
+    this.index += 1;
+    return this.ids[id];
+};
+
+Manager.prototype.removeIdentifier = function (identifier) {
+    for (var id in this.ids) {
+        if (this.ids[id] === identifier) {
+            delete this.ids[id];
+            break;
+        }
+    }
+    this.index = Object.keys(this.ids).length;
+};
+
 // Bind internal events for the Manager.
 Manager.prototype.bindEvt = function (el, type) {
     var self = this;
@@ -231,9 +255,7 @@ Manager.prototype.pressureFn = function (touch, nipple, identifier) {
 };
 
 Manager.prototype.processOnStart = function (evt) {
-    var identifier = (evt.identifier !== undefined ?
-        evt.identifier :
-        evt.pointerId) || 0;
+    var identifier = this.getIdentifier(evt);
     var pressure = evt.force || evt.pressure || evt.webkitForce || 0;
     var nipple = this.nipples.get(identifier);
 
@@ -295,9 +317,7 @@ Manager.prototype.onmove = function (evt) {
 };
 
 Manager.prototype.processOnMove = function (evt) {
-    var identifier = (evt.identifier !== undefined ?
-        evt.identifier :
-        evt.pointerId) || 0;
+    var identifier = this.getIdentifier(evt);
     var nipple = this.nipples.get(identifier);
 
     if (!nipple) {
@@ -378,11 +398,10 @@ Manager.prototype.onend = function (evt) {
 };
 
 Manager.prototype.processOnEnd = function (evt) {
-    var identifier = (evt.identifier !== undefined ?
-        evt.identifier :
-        evt.pointerId) || 0;
+    var identifier = this.getIdentifier(evt);
     var self = this;
     var nipple = self.nipples.get(identifier);
+    self.removeIdentifier(identifier);
 
     if (!nipple) {
         console.error('END: Couldn\'t find the nipple n°' + identifier + '.');
