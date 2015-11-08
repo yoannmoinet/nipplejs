@@ -1,6 +1,17 @@
-<a name="0.5.3"></a>
-## [0.5.3](https://github.com/yoannmoinet/nipplejs/compare/v0.5.3...v0.5.3) (2015-10-04)
+<a name="0.5.4"></a>
+## [0.5.4](https://github.com/yoannmoinet/nipplejs/compare/v0.5.4...v0.5.4) (2015-11-08)
 
+
+
+
+<a name="0.5.4"></a>
+## [0.5.4](https://github.com/yoannmoinet/nipplejs/compare/v0.5.3...v0.5.4) (2015-11-08)
+
+
+### Bug Fixes
+
+* **manager:** better handle identifiers ([54b3cff](https://github.com/yoannmoinet/nipplejs/commit/54b3cff)), closes [#16](https://github.com/yoannmoinet/nipplejs/issues/16)
+* **nipple:** use `document.body.contains` for IE11 doesn't shortcut ([6e5b80a](https://github.com/yoannmoinet/nipplejs/commit/6e5b80a)), closes [#17](https://github.com/yoannmoinet/nipplejs/issues/17)
 
 
 
