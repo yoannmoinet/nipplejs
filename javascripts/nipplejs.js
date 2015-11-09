@@ -668,7 +668,7 @@ Manager.prototype.config = function (options) {
     // Defaults
     this.options.zone = document.body;
     this.options.multitouch = false;
-    this.options.maxNumberOfNipples = 1;
+    this.options.maxNumberOfNipples = 10;
     this.options.mode = 'dynamic'; //static, semi;
     this.options.position = {top: 0, left: 0};
     this.options.catchDistance = 200;
@@ -829,12 +829,13 @@ Manager.prototype.onstart = function (evt) {
         for (var i = 0, max = evt.length; i < max; i += 1) {
             this.processOnStart(evt[i]);
         }
-    // if we don't already have a nipple in place.
-    // we process a new one
     } else if (this.nipples.length === 0 || this.options.mode !== 'dynamic') {
+        // if we don't already have a nipple in place.
+        // we process a new one
         this.processOnStart(evt[0] || evt);
     }
 
+    // and we bind the dom
     if (!this.started) {
         this.bindEvt(document, 'move')
             .bindEvt(document, 'end');
@@ -861,49 +862,51 @@ Manager.prototype.pressureFn = function (touch, nipple, identifier) {
 };
 
 Manager.prototype.processOnStart = function (evt) {
-    var identifier = this.getIdentifier(evt);
+    var self = this;
+    var identifier = self.getIdentifier(evt);
     var pressure = evt.force || evt.pressure || evt.webkitForce || 0;
-    var nipple = this.nipples.get(identifier);
+    var nipple = self.nipples.get(identifier);
 
     var position = {
         x: evt.pageX,
         y: evt.pageY
     };
 
-    if (nipple) {
-        if (this.options.mode === 'static') {
-            nipple.show();
-            if (pressure > 0) {
-                this.pressureFn(evt, nipple, identifier);
-            }
-            // We're not 'dynamic' so we process the first touch as a move.
-            this.processOnMove(evt);
-        }
-
-        if (this.options.mode === 'semi') {
-            var distance = u.distance(position, nipple.position);
-            if (distance <= this.options.catchDistance) {
-                nipple.show();
-                if (pressure > 0) {
-                    this.pressureFn(evt, nipple, identifier);
-                }
-                this.processOnMove(evt);
-            } else {
-                nipple.destroy();
-                this.processOnStart(evt);
-            }
-        }
-    } else {
-        nipple = this.createNipple(position, identifier);
-        this.trigger('added ' + nipple.identifier + ':added', nipple);
-        nipple.show();
+    var process = function (nip) {
+        nip.show();
         if (pressure > 0) {
-            this.pressureFn(evt, nipple, identifier);
+            self.pressureFn(evt, nip, nip.identifier);
         }
+        self.processOnMove(evt);
+    };
+
+    console.log('Start It ? ', nipple ? true : false, identifier, self.ids);
+
+    // If we don't have a nipple and we should.
+    if (!nipple && (!self.nipples.length || self.options.multitouch)) {
+        nipple = self.createNipple(position, identifier);
+        self.trigger('added ' + nipple.identifier + ':added', nipple);
     }
 
-    nipple.trigger('start', nipple);
-    this.trigger('start ' + nipple.identifier + ':start', nipple);
+    if (nipple) {
+        if (self.options.mode !== 'semi') {
+            process(nipple);
+        } else {
+            // In semi we check the distance of the touch
+            // to decide if we have to reset the nipple
+            var distance = u.distance(position, nipple.position);
+            if (distance <= self.options.catchDistance) {
+                process(nipple);
+            } else {
+                nipple.destroy();
+                self.processOnStart(evt);
+            }
+        }
+
+        nipple.trigger('start', nipple);
+        self.trigger('start ' + nipple.identifier + ':start', nipple);
+    }
+
     return nipple;
 };
 
@@ -927,8 +930,6 @@ Manager.prototype.processOnMove = function (evt) {
     var nipple = this.nipples.get(identifier);
 
     if (!nipple) {
-        console.error('MOVE: Couldn\'t find the nipple n°' + identifier + '.');
-        console.error(this.nipples);
         return;
     }
 
@@ -994,12 +995,6 @@ Manager.prototype.onend = function (evt) {
         this.processOnEnd(evt[0] || evt);
     }
 
-    if (!this.nipples.length || this.options.mode !== 'dynamic') {
-        this.unbindEvt(document, 'move')
-            .unbindEvt(document, 'end');
-        this.started = false;
-    }
-
     return false;
 };
 
@@ -1010,8 +1005,6 @@ Manager.prototype.processOnEnd = function (evt) {
     self.removeIdentifier(identifier);
 
     if (!nipple) {
-        console.error('END: Couldn\'t find the nipple n°' + identifier + '.');
-        console.error(self.nipples);
         return;
     }
 
@@ -1033,6 +1026,12 @@ Manager.prototype.processOnEnd = function (evt) {
 
     if (this.options.mode === 'dynamic') {
         this.nipples.splice(this.nipples.indexOf(nipple), 1);
+    }
+
+    if (!this.nipples.length || this.options.mode !== 'dynamic') {
+        this.unbindEvt(document, 'move')
+            .unbindEvt(document, 'end');
+        this.started = false;
     }
 };
 
