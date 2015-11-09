@@ -324,8 +324,6 @@ Manager.prototype.processOnMove = function (evt) {
     var nipple = this.nipples.get(identifier);
 
     if (!nipple) {
-        console.error('MOVE: Couldn\'t find the nipple n°' + identifier + '.');
-        console.error(this.nipples);
         return;
     }
 
@@ -401,8 +399,6 @@ Manager.prototype.processOnEnd = function (evt) {
     self.removeIdentifier(identifier);
 
     if (!nipple) {
-        console.error('END: Couldn\'t find the nipple n°' + identifier + '.');
-        console.error(self.nipples);
         return;
     }
 
