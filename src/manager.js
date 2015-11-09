@@ -255,49 +255,51 @@ Manager.prototype.pressureFn = function (touch, nipple, identifier) {
 };
 
 Manager.prototype.processOnStart = function (evt) {
-    var identifier = this.getIdentifier(evt);
+    var self = this;
+    var identifier = self.getIdentifier(evt);
     var pressure = evt.force || evt.pressure || evt.webkitForce || 0;
-    var nipple = this.nipples.get(identifier);
+    var nipple = self.nipples.get(identifier);
 
     var position = {
         x: evt.pageX,
         y: evt.pageY
     };
 
-    if (nipple) {
-        if (this.options.mode === 'static') {
-            nipple.show();
-            if (pressure > 0) {
-                this.pressureFn(evt, nipple, identifier);
-            }
-            // We're not 'dynamic' so we process the first touch as a move.
-            this.processOnMove(evt);
-        }
-
-        if (this.options.mode === 'semi') {
-            var distance = u.distance(position, nipple.position);
-            if (distance <= this.options.catchDistance) {
-                nipple.show();
-                if (pressure > 0) {
-                    this.pressureFn(evt, nipple, identifier);
-                }
-                this.processOnMove(evt);
-            } else {
-                nipple.destroy();
-                this.processOnStart(evt);
-            }
-        }
-    } else {
-        nipple = this.createNipple(position, identifier);
-        this.trigger('added ' + nipple.identifier + ':added', nipple);
-        nipple.show();
+    var process = function (nip) {
+        nip.show();
         if (pressure > 0) {
-            this.pressureFn(evt, nipple, identifier);
+            self.pressureFn(evt, nip, nip.identifier);
         }
+        self.processOnMove(evt);
+    };
+
+    console.log('Start It ? ', nipple ? true : false, identifier, self.ids);
+
+    // If we don't have a nipple and we should.
+    if (!nipple && (!self.nipples.length || self.options.multitouch)) {
+        nipple = self.createNipple(position, identifier);
+        self.trigger('added ' + nipple.identifier + ':added', nipple);
     }
 
-    nipple.trigger('start', nipple);
-    this.trigger('start ' + nipple.identifier + ':start', nipple);
+    if (nipple) {
+        if (self.options.mode !== 'semi') {
+            process(nipple);
+        } else {
+            // In semi we check the distance of the touch
+            // to decide if we have to reset the nipple
+            var distance = u.distance(position, nipple.position);
+            if (distance <= self.options.catchDistance) {
+                process(nipple);
+            } else {
+                nipple.destroy();
+                self.processOnStart(evt);
+            }
+        }
+
+        nipple.trigger('start', nipple);
+        self.trigger('start ' + nipple.identifier + ':start', nipple);
+    }
+
     return nipple;
 };
 
