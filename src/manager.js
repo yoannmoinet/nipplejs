@@ -62,7 +62,7 @@ Manager.prototype.config = function (options) {
     // Defaults
     this.options.zone = document.body;
     this.options.multitouch = false;
-    this.options.maxNumberOfNipples = 1;
+    this.options.maxNumberOfNipples = 10;
     this.options.mode = 'dynamic'; //static, semi;
     this.options.position = {top: 0, left: 0};
     this.options.catchDistance = 200;
