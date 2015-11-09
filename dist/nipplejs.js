@@ -880,8 +880,6 @@ Manager.prototype.processOnStart = function (evt) {
         self.processOnMove(evt);
     };
 
-    console.log('Start It ? ', nipple ? true : false, identifier, self.ids);
-
     // If we don't have a nipple and we should.
     if (!nipple && (!self.nipples.length || self.options.multitouch)) {
         nipple = self.createNipple(position, identifier);
