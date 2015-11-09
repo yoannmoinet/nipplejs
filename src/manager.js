@@ -223,12 +223,13 @@ Manager.prototype.onstart = function (evt) {
         for (var i = 0, max = evt.length; i < max; i += 1) {
             this.processOnStart(evt[i]);
         }
-    // if we don't already have a nipple in place.
-    // we process a new one
     } else if (this.nipples.length === 0 || this.options.mode !== 'dynamic') {
+        // if we don't already have a nipple in place.
+        // we process a new one
         this.processOnStart(evt[0] || evt);
     }
 
+    // and we bind the dom
     if (!this.started) {
         this.bindEvt(document, 'move')
             .bindEvt(document, 'end');
