@@ -388,12 +388,6 @@ Manager.prototype.onend = function (evt) {
         this.processOnEnd(evt[0] || evt);
     }
 
-    if (!this.nipples.length || this.options.mode !== 'dynamic') {
-        this.unbindEvt(document, 'move')
-            .unbindEvt(document, 'end');
-        this.started = false;
-    }
-
     return false;
 };
 
@@ -427,6 +421,12 @@ Manager.prototype.processOnEnd = function (evt) {
 
     if (this.options.mode === 'dynamic') {
         this.nipples.splice(this.nipples.indexOf(nipple), 1);
+    }
+
+    if (!this.nipples.length || this.options.mode !== 'dynamic') {
+        this.unbindEvt(document, 'move')
+            .unbindEvt(document, 'end');
+        this.started = false;
     }
 };
 
