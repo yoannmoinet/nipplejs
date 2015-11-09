@@ -1,6 +1,18 @@
-<a name="0.5.4"></a>
-## [0.5.4](https://github.com/yoannmoinet/nipplejs/compare/v0.5.4...v0.5.4) (2015-11-08)
+<a name="0.5.5"></a>
+## [0.5.5](https://github.com/yoannmoinet/nipplejs/compare/v0.5.5...v0.5.5) (2015-11-09)
 
+
+
+
+<a name="0.5.5"></a>
+## [0.5.5](https://github.com/yoannmoinet/nipplejs/compare/v0.5.4...v0.5.5) (2015-11-09)
+
+
+### Bug Fixes
+
+* **manager:** allow multitouch to be more than 1 ([7569536](https://github.com/yoannmoinet/nipplejs/commit/7569536))
+* **manager:** clean the start process, no duplicate ([7e30551](https://github.com/yoannmoinet/nipplejs/commit/7e30551))
+* **manager:** remove handler only if last touch ([1f03064](https://github.com/yoannmoinet/nipplejs/commit/1f03064))
 
 
 
