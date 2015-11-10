@@ -2,7 +2,10 @@
 ///   SUPER CLASS   ///
 ///////////////////////
 ///
-var Super = function () {};
+var Super = function () {
+    var self = this;
+    self._handlers_ = {};
+};
 
 // Basic event system.
 Super.prototype.on = function (arg, cb) {
@@ -12,8 +15,8 @@ Super.prototype.on = function (arg, cb) {
 
     for (var i = 0; i < types.length; i += 1) {
         type = types[i];
-        self.handlers[type] = self.handlers[type] || [];
-        self.handlers[type].push(cb);
+        self._handlers_[type] = self._handlers_[type] || [];
+        self._handlers_[type].push(cb);
     }
     return self;
 };
@@ -21,11 +24,12 @@ Super.prototype.on = function (arg, cb) {
 Super.prototype.off = function (type, cb) {
     var self = this;
     if (type === undefined) {
-        self.handlers = {};
+        self._handlers_ = {};
     } else if (cb === undefined) {
-        self.handlers[type] = null;
-    } else if (self.handlers[type] && self.handlers[type].indexOf(cb) >= 0) {
-        self.handlers[type].splice(self.handlers[type].indexOf(cb), 1);
+        self._handlers_[type] = null;
+    } else if (self._handlers_[type] &&
+            self._handlers_[type].indexOf(cb) >= 0) {
+        self._handlers_[type].splice(self._handlers_[type].indexOf(cb), 1);
     }
     return self;
 };
@@ -37,8 +41,8 @@ Super.prototype.trigger = function (arg, data) {
 
     for (var i = 0; i < types.length; i += 1) {
         type = types[i];
-        if (self.handlers[type] && self.handlers[type].length) {
-            self.handlers[type].forEach(function (handler) {
+        if (self._handlers_[type] && self._handlers_[type].length) {
+            self._handlers_[type].forEach(function (handler) {
                 handler.call(self, {
                     type: type,
                     target: self

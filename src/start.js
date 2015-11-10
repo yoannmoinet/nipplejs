@@ -26,7 +26,6 @@ var events = {
         end: 'MSPointerUp'
     }
 };
-var handlers = {};
 var toBind;
 var secondBind = {};
 if (isPointer) {

@@ -8,7 +8,6 @@ function Manager (options) {
     var self = this;
     self.ids = {};
     self.index = 0;
-    self.handlers = {};
     self.pressureIntervals = {};
     self.config(options);
     self.box = this.options.zone.getBoundingClientRect();

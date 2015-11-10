@@ -6,7 +6,6 @@ Nipple.prototype = new Super();
 Nipple.constructor = Nipple;
 
 function Nipple (manager, options) {
-    this.handlers = {};
     this.identifier = options.identifier;
     this.position = options.position;
     this.frontPosition = options.frontPosition;
