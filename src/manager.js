@@ -8,6 +8,7 @@ function Manager (options) {
     var self = this;
     self.ids = {};
     self.index = 0;
+    self.domHandlers = {};
     self.pressureIntervals = {};
     self.config(options);
     self.box = this.options.zone.getBoundingClientRect();
@@ -182,15 +183,15 @@ Manager.prototype.removeIdentifier = function (identifier) {
 Manager.prototype.bindEvt = function (el, type) {
     var self = this;
 
-    handlers[type] = function () {
+    self.domHandlers[type] = function () {
         self['on' + type].apply(self, arguments);
     };
 
-    u.bindEvt(el, toBind[type], handlers[type]);
+    u.bindEvt(el, toBind[type], self.domHandlers[type]);
 
     if (secondBind[type]) {
         // Support for both touch and mouse at the same time.
-        u.bindEvt(el, secondBind[type], handlers[type]);
+        u.bindEvt(el, secondBind[type], self.domHandlers[type]);
     }
 
     return self;
@@ -198,14 +199,16 @@ Manager.prototype.bindEvt = function (el, type) {
 
 // Unbind internal events for the Manager
 Manager.prototype.unbindEvt = function (el, type) {
-    u.unbindEvt(el, toBind[type], handlers[type]);
+    var self = this;
+
+    u.unbindEvt(el, toBind[type], self.domHandlers[type]);
 
     if (secondBind[type]) {
         // Support for both touch and mouse at the same time.
-        u.unbindEvt(el, secondBind[type], handlers[type]);
+        u.unbindEvt(el, secondBind[type], self.domHandlers[type]);
     }
 
-    handlers[type] = undefined;
+    delete self.domHandlers[type];
 
     return this;
 };
