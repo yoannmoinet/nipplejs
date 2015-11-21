@@ -1,6 +1,8 @@
 ![alt tag](./test/nipplejs.png)
 > A virtual joystick for touch capable interfaces
 
+[![NPM](https://nodei.co/npm-dl/nipplejs.png?months=3)](https://npmjs.org/package/nipplejs)
+
 ## Install
 
 ```bash
