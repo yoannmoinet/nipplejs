@@ -36,7 +36,7 @@ function Nipple (collection, options) {
     this.buildEl()
         .stylize();
 
-    this.toReturn = {
+    this.instance = {
         el: this.ui.el,
         on: this.on.bind(this),
         off: this.off.bind(this),
@@ -55,7 +55,7 @@ function Nipple (collection, options) {
         options: this.options
     };
 
-    return this.toReturn;
+    return this.instance;
 };
 
 // Build the dom element of the Nipple instance.
@@ -193,7 +193,7 @@ Nipple.prototype.show = function (cb) {
     }, 0);
 
     self.showTimeout = setTimeout(function () {
-        self.trigger('shown', self.toReturn);
+        self.trigger('shown', self.instance);
         if (typeof cb === 'function') {
             cb.call(this);
         }
@@ -224,7 +224,7 @@ Nipple.prototype.hide = function (cb) {
                 cb.call(self);
             }
 
-            self.trigger('hidden', self.toReturn);
+            self.trigger('hidden', self.instance);
         },
         self.options.fadeTime
     );
@@ -270,7 +270,7 @@ Nipple.prototype.restCallback = function () {
     var transitStyle = {};
     transitStyle.front = u.getTransitionStyle('transition', 'none', '');
     self.applyStyles(transitStyle);
-    self.trigger('rested', self.toReturn);
+    self.trigger('rested', self.instance);
 };
 
 Nipple.prototype.computeDirection = function (obj) {
