@@ -5,11 +5,11 @@
 Nipple.prototype = new Super();
 Nipple.constructor = Nipple;
 
-function Nipple (manager, options) {
+function Nipple (collection, options) {
     this.identifier = options.identifier;
     this.position = options.position;
     this.frontPosition = options.frontPosition;
-    this.manager = manager;
+    this.collection = collection;
     this.config(options);
     this.buildEl()
         .stylize();

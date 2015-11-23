@@ -32,7 +32,7 @@
     "watch": "watch \"npm run buildWatch\" src",
     "server": "static test",
     "copyGh": "node ./bin/copyToGhPages.js",
-    "concat": "concat-cli -f ./src/start.js ./src/utils.js ./src/super.js ./src/nipple.js ./src/manager.js ./src/end.js -o ./nipplejs.temp.js"
+    "concat": "concat-cli -f ./src/start.js ./src/utils.js ./src/super.js ./src/nipple.js ./src/collection.js ./src/manager.js ./src/end.js -o ./nipplejs.temp.js"
   },
   "dependencies": {},
   "devDependencies": {

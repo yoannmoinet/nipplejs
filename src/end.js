@@ -1,5 +1,7 @@
+var manager = new Manager();
 return {
     create: function (options) {
-        return new Manager(options);
-    }
+        return manager.create(options);
+    },
+    manager: manager
 };
