@@ -167,9 +167,9 @@ Nipple.prototype.destroy = function () {
     clearTimeout(this.removeTimeout);
     clearTimeout(this.showTimeout);
     clearTimeout(this.restTimeout);
-    this.off();
+    this.trigger('destroyed', this.instance);
     this.removeFromDom();
-    this.trigger('destroyed', this.toReturn);
+    this.off();
 };
 
 // Fade in the Nipple instance.
