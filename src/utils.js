@@ -131,4 +131,5 @@ u.extend = function (objA, objB) {
             objA[i] = objB[i];
         }
     }
+    return objA;
 };
