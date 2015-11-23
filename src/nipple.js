@@ -4,6 +4,7 @@
 
 Nipple.prototype = new Super();
 Nipple.constructor = Nipple;
+Nipple.id = 0;
 
 function Nipple (collection, options) {
     this.identifier = options.identifier;
@@ -29,6 +30,9 @@ function Nipple (collection, options) {
     if (this.options.mode === 'dynamic') {
         this.options.restOpacity = 0;
     }
+
+    this.id = Nipple.id;
+    Nipple.id += 1;
     this.buildEl()
         .stylize();
 
@@ -47,6 +51,7 @@ function Nipple (collection, options) {
         frontPosition: this.frontPosition,
         ui: this.ui,
         identifier: this.identifier,
+        id: this.id,
         options: this.options
     };
 
@@ -63,11 +68,12 @@ Nipple.prototype.buildEl = function (options) {
     this.ui.back = document.createElement('div');
     this.ui.front = document.createElement('div');
 
-    this.ui.el.className = 'nipple';
+    this.ui.el.className = 'nipple collection_' + this.collection.id;
     this.ui.back.className = 'back';
     this.ui.front.className = 'front';
 
-    this.ui.el.setAttribute('id', 'nipple_' + this.identifier);
+    this.ui.el.setAttribute('id', 'nipple_' + this.collection.id +
+        '_' + this.id);
 
     this.ui.el.appendChild(this.ui.back);
     this.ui.el.appendChild(this.ui.front);
