@@ -149,7 +149,7 @@ Nipple.prototype.addToDom = function () {
     if (this.options.dataOnly || document.body.contains(this.ui.el)) {
         return;
     }
-    this.manager.options.zone.appendChild(this.ui.el);
+    this.options.zone.appendChild(this.ui.el);
     return this;
 };
 
@@ -158,7 +158,7 @@ Nipple.prototype.removeFromDom = function () {
     if (this.options.dataOnly || !document.body.contains(this.ui.el)) {
         return;
     }
-    this.manager.options.zone.removeChild(this.ui.el);
+    this.options.zone.removeChild(this.ui.el);
     return this;
 };
 
