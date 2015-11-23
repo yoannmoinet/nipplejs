@@ -146,3 +146,14 @@ u.safeExtend = function (objA, objB) {
     }
     return obj;
 };
+
+// Map for array or unique item.
+u.map = function (ar, fn) {
+    if (ar.length) {
+        for (var i = 0, max = ar.length; i < max; i += 1) {
+            fn(ar[i]);
+        }
+    } else {
+        fn(ar);
+    }
+};
