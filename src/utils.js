@@ -133,3 +133,16 @@ u.extend = function (objA, objB) {
     }
     return objA;
 };
+
+// Overwrite only what's already present
+u.safeExtend = function (objA, objB) {
+    var obj = {};
+    for (var i in objA) {
+        if (objA.hasOwnProperty(i) && objB.hasOwnProperty(i)) {
+            obj[i] = objB[i];
+        } else if (objA.hasOwnProperty(i)) {
+            obj[i] = objA[i];
+        }
+    }
+    return obj;
+};
