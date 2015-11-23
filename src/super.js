@@ -52,3 +52,52 @@ Super.prototype.trigger = function (arg, data) {
         }
     }
 };
+
+// Configuration
+Super.prototype.config = function (options) {
+    var self = this;
+    self.options = self.defaults || {};
+    if (options) {
+        self.options = u.safeExtend(self.options, options);
+    }
+};
+
+// Bind internal events.
+Super.prototype.bindEvt = function (el, type) {
+    var self = this;
+    self._domHandlers_ = self._domHandlers_ || {};
+
+    self._domHandlers_[type] = function () {
+        if (typeof self['on' + type] === 'function') {
+            self['on' + type].apply(self, arguments);
+        } else {
+            console.warn('[WARNING] : Missing "on' + type + '" handler.');
+        }
+    };
+
+    u.bindEvt(el, toBind[type], self._domHandlers_[type]);
+
+    if (secondBind[type]) {
+        // Support for both touch and mouse at the same time.
+        u.bindEvt(el, secondBind[type], self._domHandlers_[type]);
+    }
+
+    return self;
+};
+
+// Unbind dom events.
+Super.prototype.unbindEvt = function (el, type) {
+    var self = this;
+    self._domHandlers_ = self._domHandlers_ || {};
+
+    u.unbindEvt(el, toBind[type], self._domHandlers_[type]);
+
+    if (secondBind[type]) {
+        // Support for both touch and mouse at the same time.
+        u.unbindEvt(el, secondBind[type], self._domHandlers_[type]);
+    }
+
+    delete self._domHandlers_[type];
+
+    return this;
+};

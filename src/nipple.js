@@ -10,7 +10,25 @@ function Nipple (collection, options) {
     this.position = options.position;
     this.frontPosition = options.frontPosition;
     this.collection = collection;
+
+    // Defaults
+    this.defaults = {
+        size: 100,
+        threshold: 0.1,
+        color: 'white',
+        fadeTime: 250,
+        dataOnly: false,
+        restOpacity: 0.5,
+        mode: 'dynamic',
+        zone: document.body
+    };
+
     this.config(options);
+
+    // Overwrites
+    if (this.options.mode === 'dynamic') {
+        this.options.restOpacity = 0;
+    }
     this.buildEl()
         .stylize();
 
@@ -33,33 +51,6 @@ function Nipple (collection, options) {
     };
 
     return this.toReturn;
-};
-
-// Configure Nipple instance.
-Nipple.prototype.config = function (options) {
-    this.options = {};
-
-    // Defaults
-    this.options.size = 100;
-    this.options.threshold = 0.1;
-    this.options.color = 'white';
-    this.options.fadeTime = 250;
-    this.options.dataOnly = false;
-    this.options.restOpacity = 0.5;
-    this.options.mode = 'dynamic';
-
-    // Overwrites
-    for (var i in options) {
-        if (this.options.hasOwnProperty(i)) {
-            this.options[i] = options[i];
-        }
-    }
-
-    if (this.options.mode === 'dynamic') {
-        this.options.restOpacity = 0;
-    }
-
-    return this;
 };
 
 // Build the dom element of the Nipple instance.
