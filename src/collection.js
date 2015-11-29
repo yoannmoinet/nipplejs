@@ -320,6 +320,9 @@ Collection.prototype.processOnMove = function (evt) {
     var nipple = self.nipples.get(identifier);
 
     if (!nipple) {
+        // This is here just for safety.
+        // It shouldn't happen.
+        self.manager.removeIdentifier(identifier);
         return;
     }
 
