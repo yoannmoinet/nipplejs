@@ -174,19 +174,18 @@ Your manager has the following signature :
     off: Function,                      // un-handle internal event
     get: Function,                      // get a specific joystick
     destroy: Function,                  // destroy everything
+    ids: Array                          // array of assigned ids
+    id: Number                          // id of the manager
     options: {
         zone: Element,                  // reactive zone
         multitouch: Boolean,
         maxNumberOfNipples: Number,
         mode: String,
         position: Object,
-        catchDistance: Number
-    },
-    nippleOptions: {
+        catchDistance: Number,
         size: Number,
         threshold: Number,
         color: String,
-        mode: String,
         fadeTime: Number,
         dataOnly: Boolean,
         restOpacity: Number
@@ -235,6 +234,14 @@ Gently remove all nipples from the DOM and unbind all events.
 ```javascript
 manager.destroy();
 ```
+
+#### `manager.ids`
+
+The array of nipples' ids under this manager.
+
+#### `manager.id`
+
+The incremented id of this manager.
 
 ### nipple instance (joystick)
 
