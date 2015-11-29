@@ -248,9 +248,6 @@ Collection.prototype.processOnStart = function (evt) {
         y: evt.pageY
     };
     var nipple = self.getOrCreate(identifier, position);
-    console.log('START\nid: ', self.id, '\nidentifier: ', identifier,
-        '\nnipple: ', nipple ? nipple.id : false,
-        '\nids: ', self.manager.ids);
     var process = function (nip) {
         nip.show();
         if (pressure > 0) {
@@ -430,9 +427,6 @@ Collection.prototype.processOnEnd = function (evt) {
         self.nipples.splice(self.nipples.indexOf(nipple), 1);
     }
 
-    console.log('END\nid: ', self.id, '\nidentifier: ', identifier,
-        '\nnipple: ', nipple ? nipple.id : false,
-        '\nids: ', self.manager.ids);
     // We unbind move and end.
     self.manager.unbindDocument();
 };
