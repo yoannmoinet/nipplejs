@@ -1,6 +1,34 @@
-<a name="0.5.6"></a>
-## [0.5.6](https://github.com/yoannmoinet/nipplejs/compare/v0.5.6...v0.5.6) (2015-11-09)
+<a name="0.6.0"></a>
+# [0.6.0](https://github.com/yoannmoinet/nipplejs/compare/v0.6.0...v0.6.0) (2015-11-29)
 
+
+
+
+<a name="0.6.0"></a>
+# [0.6.0](https://github.com/yoannmoinet/nipplejs/compare/v0.5.6...v0.6.0) (2015-11-29)
+
+
+### Bug Fixes
+
+* **nipple:** call off() after triggering ([bf8e5c3](https://github.com/yoannmoinet/nipplejs/commit/bf8e5c3))
+* **nipple:** only trigger itself, not its manager ([6b39786](https://github.com/yoannmoinet/nipplejs/commit/6b39786))
+* **super:** move internal declarations where needed ([a4c79c2](https://github.com/yoannmoinet/nipplejs/commit/a4c79c2))
+* **utils:** return object on u.extend ([9197c00](https://github.com/yoannmoinet/nipplejs/commit/9197c00))
+* clean identifier if not found in any collection ([3496395](https://github.com/yoannmoinet/nipplejs/commit/3496395))
+* handle scrolling offset by resetting zone's box ([6ccd0b5](https://github.com/yoannmoinet/nipplejs/commit/6ccd0b5))
+* remove useless injections ([a0b1d7e](https://github.com/yoannmoinet/nipplejs/commit/a0b1d7e))
+* return the found nipple in `get()` ([439aa69](https://github.com/yoannmoinet/nipplejs/commit/439aa69))
+* unbind document when collection is manually destroyed ([6e66b62](https://github.com/yoannmoinet/nipplejs/commit/6e66b62))
+
+### Features
+
+* **nipple:** add an incremental id to absolutely differentiate each ([598a5eb](https://github.com/yoannmoinet/nipplejs/commit/598a5eb))
+* **utils:** add u.map to execute fn in array or single element ([515aa5d](https://github.com/yoannmoinet/nipplejs/commit/515aa5d))
+* **utils:** add u.safeExtend to only replace existent attributes ([5212ffe](https://github.com/yoannmoinet/nipplejs/commit/5212ffe))
+
+### Performance Improvements
+
+* safety clean if nipple isn't found in collection ([ca20985](https://github.com/yoannmoinet/nipplejs/commit/ca20985))
 
 
 
