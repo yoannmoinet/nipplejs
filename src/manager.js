@@ -157,16 +157,25 @@ Manager.prototype.onend = function (evt) {
 
 Manager.prototype.onAny = function (which, evt) {
     var self = this;
+    var id;
     var processFn = 'processOn' + which.charAt(0).toUpperCase() +
         which.slice(1);
     evt = u.prepareEvent(evt);
-    var processColl = function (e, coll) {
-        if (coll.ids.indexOf(self.getIdentifier(e)) >= 0) {
+    var processColl = function (e, id, coll) {
+        if (coll.ids.indexOf(id) >= 0) {
             coll[processFn](e);
+            // Mark the event to avoid cleaning it later.
+            e._found_ = true;
         }
     };
     var processEvt = function (e) {
-        u.map(self.collections, processColl.bind(null, e));
+        id = self.getIdentifier(e);
+        u.map(self.collections, processColl.bind(null, e, id));
+        // If the event isn't handled by any collection,
+        // we need to clean its identifier.
+        if (!e._found_) {
+            self.removeIdentifier(id);
+        }
     };
 
     u.map(evt, processEvt);
