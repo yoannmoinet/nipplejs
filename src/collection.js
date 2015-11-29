@@ -44,8 +44,7 @@ function Collection (manager, options) {
         self.options.maxNumberOfNipples = 1;
     }
 
-    self.box = self.options.zone.getBoundingClientRect();
-
+    self.updateBox();
     self.prepareNipples();
     self.bindings();
     self.begin();
@@ -173,6 +172,11 @@ Collection.prototype.createNipple = function (position, identifier) {
     return nipple;
 };
 
+Collection.prototype.updateBox = function () {
+    var self = this;
+    self.box = self.options.zone.getBoundingClientRect();
+};
+
 Collection.prototype.bindNipple = function (nipple) {
     var self = this;
     var type;
@@ -213,6 +217,9 @@ Collection.prototype.onstart = function (evt) {
     var self = this;
     var opts = self.options;
     evt = u.prepareEvent(evt);
+
+    // Update the box position
+    self.updateBox();
 
     var process = function (touch) {
         // If we can create new nipples
