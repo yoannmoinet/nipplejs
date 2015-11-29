@@ -1,7 +1,9 @@
-describe('nipplejs', function () {
-    var expect = require('expect.js');
+var nodemon = require('nodemon');
 
-    it('should have tests', function () {
-        expect(1).to.eql(1);
+nodemon({
+    exec: 'npm start'
+}).on('start', function () {
+    nodemon({
+        exec: '\.\\node_modules\\.bin\\casperjs test test/nipplejs.casper.js'
     });
 });
