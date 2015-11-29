@@ -446,6 +446,8 @@ Collection.prototype.onDestroyed = function(evt, nipple) {
     if (self.idles.indexOf(nipple) >= 0) {
         self.idles.splice(self.idles.indexOf(nipple), 1);
     }
+    // We unbind move and end.
+    self.manager.unbindDocument();
 };
 
 // Cleanly destroy the manager
@@ -467,6 +469,8 @@ Collection.prototype.destroy = function () {
 
     // Notify the manager passing the instance
     self.trigger('destroyed', self.nipples);
+    // We unbind move and end.
+    self.manager.unbindDocument();
     // Unbind everything.
     self.off();
 };
