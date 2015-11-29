@@ -64,17 +64,11 @@ Manager.prototype.create = function (options) {
 // Collection Factory
 Manager.prototype.createCollection = function (options) {
     var self = this;
-    // Inject manager controlled functions
-    options.getIdentifier = self.getIdentifier.bind(self);
-    options.removeIdentifier = self.removeIdentifier.bind(self);
-    options.bindDocument = self.bindDocument.bind(self);
-    options.unbindDocument = self.unbindDocument.bind(self);
-
     var collection = new Collection(self, options);
 
     self.bindCollection(collection);
-
     self.collections.push(collection);
+
     return collection;
 };
 

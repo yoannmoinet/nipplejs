@@ -30,11 +30,7 @@ function Collection (manager, options) {
         color: 'white',
         fadeTime: 250,
         dataOnly: false,
-        restOpacity: 0.5,
-        getIdentifier: '',
-        removeIdentifier: '',
-        bindDocument: '',
-        unbindDocument: ''
+        restOpacity: 0.5
     };
 
     self.config(options);
@@ -230,7 +226,7 @@ Collection.prototype.onstart = function (evt) {
 
     // We ask upstream to bind the document
     // on 'move' and 'end'
-    opts.bindDocument();
+    self.manager.bindDocument();
     return false;
 };
 
@@ -238,7 +234,7 @@ Collection.prototype.processOnStart = function (evt) {
     var self = this;
     var opts = self.options;
     var indexInIdles;
-    var identifier = opts.getIdentifier(evt);
+    var identifier = self.manager.getIdentifier(evt);
     var pressure = evt.force || evt.pressure || evt.webkitForce || 0;
     var position = {
         x: evt.pageX,
@@ -316,7 +312,7 @@ Collection.prototype.getOrCreate = function (identifier, position) {
 Collection.prototype.processOnMove = function (evt) {
     var self = this;
     var opts = self.options;
-    var identifier = opts.getIdentifier(evt);
+    var identifier = self.manager.getIdentifier(evt);
     var nipple = self.nipples.get(identifier);
 
     if (!nipple) {
@@ -381,9 +377,9 @@ Collection.prototype.processOnMove = function (evt) {
 Collection.prototype.processOnEnd = function (evt) {
     var self = this;
     var opts = self.options;
-    var identifier = opts.getIdentifier(evt);
+    var identifier = self.manager.getIdentifier(evt);
     var nipple = self.nipples.get(identifier);
-    opts.removeIdentifier(identifier);
+    self.manager.removeIdentifier(identifier);
 
     if (!nipple) {
         return;
@@ -430,7 +426,8 @@ Collection.prototype.processOnEnd = function (evt) {
     console.log('END\nid: ', self.id, '\nidentifier: ', identifier,
         '\nnipple: ', nipple ? nipple.id : false,
         '\nids: ', self.manager.ids);
-    self.options.unbindDocument();
+    // We unbind move and end.
+    self.manager.unbindDocument();
 };
 
 // Remove destroyed nipple from the lists
