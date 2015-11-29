@@ -12,7 +12,6 @@ var showClientLog = false;
 */
 
 casper.options.viewportSize = {width: 1100, height: 900};
-casper.options.clientScripts.unshift('./test/shimBind.js');
 casper.options.logLevel = 'debug';
 
 /*
