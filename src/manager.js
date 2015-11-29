@@ -54,6 +54,7 @@ Manager.prototype.prepareCollections = function () {
             }
             return true;
         });
+        return nipple;
     };
 };
 
