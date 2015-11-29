@@ -1,7 +1,7 @@
-var manager = new Manager();
+var factory = new Manager();
 return {
     create: function (options) {
-        return manager.create(options);
+        return factory.create(options);
     },
-    manager: manager
+    factory: factory
 };
