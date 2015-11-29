@@ -3,6 +3,7 @@
     <head>
         <meta charset="utf-8">
         <title>NippleJS</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
         <link rel="stylesheet" href="http://yoannmoinet.github.io/nipplejs/stylesheets/styles.css" media="screen" title="no title" charset="utf-8">
         <link rel="stylesheet" href="http://yoannmoinet.github.io/nipplejs/stylesheets/github-light.css" media="screen" title="no title" charset="utf-8">
         <style>
@@ -234,7 +235,7 @@
                     debug(data);
                 }).on('move', function (evt, data) {
                     debug(data);
-                }).on('dir:up plain:up dir:left plain:left dir:down' +
+                }).on('dir:up plain:up dir:left plain:left dir:down ' +
                     'plain:down dir:right plain:right',
                     function (evt, data) {
                         dump(evt.type);

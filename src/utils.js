@@ -131,4 +131,29 @@ u.extend = function (objA, objB) {
             objA[i] = objB[i];
         }
     }
+    return objA;
+};
+
+// Overwrite only what's already present
+u.safeExtend = function (objA, objB) {
+    var obj = {};
+    for (var i in objA) {
+        if (objA.hasOwnProperty(i) && objB.hasOwnProperty(i)) {
+            obj[i] = objB[i];
+        } else if (objA.hasOwnProperty(i)) {
+            obj[i] = objA[i];
+        }
+    }
+    return obj;
+};
+
+// Map for array or unique item.
+u.map = function (ar, fn) {
+    if (ar.length) {
+        for (var i = 0, max = ar.length; i < max; i += 1) {
+            fn(ar[i]);
+        }
+    } else {
+        fn(ar);
+    }
 };

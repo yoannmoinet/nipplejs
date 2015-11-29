@@ -9,23 +9,27 @@ Super.prototype.on = function (arg, cb) {
     var self = this;
     var types = arg.split(/[ ,]+/g);
     var type;
+    self._handlers_ = self._handlers_ || {};
 
     for (var i = 0; i < types.length; i += 1) {
         type = types[i];
-        self.handlers[type] = self.handlers[type] || [];
-        self.handlers[type].push(cb);
+        self._handlers_[type] = self._handlers_[type] || [];
+        self._handlers_[type].push(cb);
     }
     return self;
 };
 
 Super.prototype.off = function (type, cb) {
     var self = this;
+    self._handlers_ = self._handlers_ || {};
+
     if (type === undefined) {
-        self.handlers = {};
+        self._handlers_ = {};
     } else if (cb === undefined) {
-        self.handlers[type] = null;
-    } else if (self.handlers[type] && self.handlers[type].indexOf(cb) >= 0) {
-        self.handlers[type].splice(self.handlers[type].indexOf(cb), 1);
+        self._handlers_[type] = null;
+    } else if (self._handlers_[type] &&
+            self._handlers_[type].indexOf(cb) >= 0) {
+        self._handlers_[type].splice(self._handlers_[type].indexOf(cb), 1);
     }
     return self;
 };
@@ -34,11 +38,12 @@ Super.prototype.trigger = function (arg, data) {
     var self = this;
     var types = arg.split(/[ ,]+/g);
     var type;
+    self._handlers_ = self._handlers_ || {};
 
     for (var i = 0; i < types.length; i += 1) {
         type = types[i];
-        if (self.handlers[type] && self.handlers[type].length) {
-            self.handlers[type].forEach(function (handler) {
+        if (self._handlers_[type] && self._handlers_[type].length) {
+            self._handlers_[type].forEach(function (handler) {
                 handler.call(self, {
                     type: type,
                     target: self
@@ -46,4 +51,53 @@ Super.prototype.trigger = function (arg, data) {
             });
         }
     }
+};
+
+// Configuration
+Super.prototype.config = function (options) {
+    var self = this;
+    self.options = self.defaults || {};
+    if (options) {
+        self.options = u.safeExtend(self.options, options);
+    }
+};
+
+// Bind internal events.
+Super.prototype.bindEvt = function (el, type) {
+    var self = this;
+    self._domHandlers_ = self._domHandlers_ || {};
+
+    self._domHandlers_[type] = function () {
+        if (typeof self['on' + type] === 'function') {
+            self['on' + type].apply(self, arguments);
+        } else {
+            console.warn('[WARNING] : Missing "on' + type + '" handler.');
+        }
+    };
+
+    u.bindEvt(el, toBind[type], self._domHandlers_[type]);
+
+    if (secondBind[type]) {
+        // Support for both touch and mouse at the same time.
+        u.bindEvt(el, secondBind[type], self._domHandlers_[type]);
+    }
+
+    return self;
+};
+
+// Unbind dom events.
+Super.prototype.unbindEvt = function (el, type) {
+    var self = this;
+    self._domHandlers_ = self._domHandlers_ || {};
+
+    u.unbindEvt(el, toBind[type], self._domHandlers_[type]);
+
+    if (secondBind[type]) {
+        // Support for both touch and mouse at the same time.
+        u.unbindEvt(el, secondBind[type], self._domHandlers_[type]);
+    }
+
+    delete self._domHandlers_[type];
+
+    return this;
 };

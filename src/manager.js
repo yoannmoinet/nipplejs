@@ -8,31 +8,10 @@ function Manager (options) {
     var self = this;
     self.ids = {};
     self.index = 0;
-    self.handlers = {};
-    self.pressureIntervals = {};
+    self.collections = [];
+
     self.config(options);
-    self.box = this.options.zone.getBoundingClientRect();
-    self.nipples = [];
-    self.bindEvt(self.options.zone, 'start');
-    self.on('destroyed', this.ondestroyed);
-
-    self.nipples.on = self.on.bind(self);
-    self.nipples.off = self.off.bind(self);
-    self.nipples.options = self.options;
-    self.nipples.nippleOptions = self.nippleOptions;
-    self.nipples.destroy = self.destroy.bind(self);
-    self.nipples.get = function (id) {
-        for (var i = 0, max = self.nipples.length; i < max; i += 1) {
-            if (self.nipples[i].identifier === id) {
-                return self.nipples[i];
-            }
-        }
-    };
-
-    if (self.options.mode === 'static') {
-        var nipple = this.createNipple(this.options.position, 0);
-        nipple.add();
-    }
+    self.prepareCollections();
 
     // Listen for resize, to reposition every joysticks
     var resizeTimer;
@@ -41,131 +20,117 @@ function Manager (options) {
         resizeTimer = setTimeout(function () {
             var pos;
             var scroll = u.getScroll();
-            self.nipples.forEach(function (nipple) {
-                pos = nipple.el.getBoundingClientRect();
-                nipple.position = {
-                    x: scroll.x + pos.left,
-                    y: scroll.y + pos.top
-                };
+            self.collections.forEach(function (collection) {
+                collection.forEach(function (nipple) {
+                    pos = nipple.el.getBoundingClientRect();
+                    nipple.position = {
+                        x: scroll.x + pos.left,
+                        y: scroll.y + pos.top
+                    };
+                });
             });
         }, 100);
     };
 
-    return self.nipples;
+    return self.collections;
 };
 
-// Configure Manager.
-Manager.prototype.config = function (options) {
-    this.options = {};
-    this.nippleOptions = {};
-
-    // Defaults
-    this.options.zone = document.body;
-    this.options.multitouch = false;
-    this.options.maxNumberOfNipples = 10;
-    this.options.mode = 'dynamic'; //static, semi;
-    this.options.position = {top: 0, left: 0};
-    this.options.catchDistance = 200;
-    this.nippleOptions.size = 100;
-    this.nippleOptions.threshold = 0.1;
-    this.nippleOptions.color = 'white';
-    this.nippleOptions.fadeTime = 250;
-    this.nippleOptions.dataOnly = false;
-    this.nippleOptions.restOpacity = 0.5;
-    this.nippleOptions.mode = this.options.mode;
-
-    // Overwrites
-    for (var i in options) {
-        if (this.options.hasOwnProperty(i)) {
-            this.options[i] = options[i];
-        } else if (this.nippleOptions.hasOwnProperty(i)) {
-            this.nippleOptions[i] = options[i];
-        }
-    }
-
-    if (this.options.mode === 'static' || this.options.mode === 'semi') {
-        this.options.multitouch = false;
-        this.options.maxNumberOfNipples = 1;
-    }
-
-    return this;
+Manager.prototype.prepareCollections = function () {
+    var self = this;
+    // Public API Preparation.
+    self.collections.create = self.create.bind(self);
+    // Listen to anything
+    self.collections.on = self.on.bind(self);
+    // Unbind general events
+    self.collections.off = self.off.bind(self);
+    // Destroy everything
+    self.collections.destroy = self.destroy.bind(self);
+    // Get any nipple
+    self.collections.get = function (id) {
+        var nipple;
+        self.collections.every(function (collection) {
+            if (nipple = collection.get(id)) {
+                return false;
+            }
+            return true;
+        });
+        return nipple;
+    };
 };
 
-// Nipple Factory
-Manager.prototype.createNipple = function (position, identifier) {
-    var scroll = u.getScroll();
-    var toPutOn = {};
+Manager.prototype.create = function (options) {
+    return this.createCollection(options);
+};
 
-    if (position.x && position.y) {
-        toPutOn = {
-            x: position.x -
-                (scroll.x + this.box.left),
-            y: position.y -
-                (scroll.y + this.box.top)
-        };
-    } else if (
-            position.top ||
-            position.right ||
-            position.bottom ||
-            position.left
-        ) {
+// Collection Factory
+Manager.prototype.createCollection = function (options) {
+    var self = this;
+    var collection = new Collection(self, options);
 
-        // We need to compute the position X / Y of the joystick.
-        var dumb = document.createElement('DIV');
-        dumb.style.display = 'hidden';
-        dumb.style.top = position.top;
-        dumb.style.right = position.right;
-        dumb.style.bottom = position.bottom;
-        dumb.style.left = position.left;
-        dumb.style.position = 'absolute';
+    self.bindCollection(collection);
+    self.collections.push(collection);
 
-        this.options.zone.appendChild(dumb);
-        var dumbBox = dumb.getBoundingClientRect();
-        this.options.zone.removeChild(dumb);
+    return collection;
+};
 
-        toPutOn = position;
-        position = {
-            x: dumbBox.left + scroll.x,
-            y: dumbBox.top + scroll.y
-        };
-    }
-
-    var frontPosition = {
-        x: 0,
-        y: 0
+Manager.prototype.bindCollection = function (collection) {
+    var self = this;
+    var type;
+    // Bubble up identified events.
+    var handler = function (evt, data) {
+        // Identify the event type with the nipple's identifier.
+        type = evt.type + ' ' + evt.target.id + ':' + evt.type;
+        self.trigger(type, data);
     };
 
-    var nipple = new Nipple(this, {
-        color: this.nippleOptions.color,
-        size: this.nippleOptions.size,
-        threshold: this.nippleOptions.threshold,
-        fadeTime: this.nippleOptions.fadeTime,
-        dataOnly: this.nippleOptions.dataOnly,
-        restOpacity: this.nippleOptions.restOpacity,
-        mode: this.options.mode,
-        identifier: identifier,
-        position: position,
-        frontPosition: frontPosition
-    });
+    // When it gets destroyed we clean.
+    collection.on('destroyed', self.onDestroyed.bind(self));
 
-    if (!this.nippleOptions.dataOnly) {
-        u.applyPosition(nipple.ui.el, toPutOn);
-        u.applyPosition(nipple.ui.front, nipple.frontPosition);
+    // Other events that will get bubbled up.
+    collection.on('shown hidden rested dir plain', handler);
+    collection.on('dir:up dir:right dir:down dir:left', handler);
+    collection.on('plain:up plain:right plain:down plain:left', handler);
+};
+
+Manager.prototype.bindDocument = function () {
+    var self = this;
+    // Bind only if not already binded
+    if (!self.binded) {
+        self.bindEvt(document, 'move')
+            .bindEvt(document, 'end');
+        self.binded = true;
     }
+};
 
-    this.nipples.push(nipple);
-    return nipple;
+Manager.prototype.unbindDocument = function (force) {
+    var self = this;
+    // If there are no touch left
+    // unbind the document.
+    if (!Object.keys(self.ids).length || force === true) {
+        self.unbindEvt(document, 'move')
+            .unbindEvt(document, 'end');
+        self.binded = false;
+    }
 };
 
 Manager.prototype.getIdentifier = function (evt) {
-    var id = (evt.identifier !== undefined ?
-        evt.identifier :
-        evt.pointerId) || 0;
+    var id;
+    // If no event, simple increment
+    if (!evt) {
+        id = this.index;
+    } else {
+        // Extract identifier from event object.
+        // Unavailable in mouse events so replaced by 0.
+        id = evt.identifier === undefined ? evt.pointerId : evt.identifier;
+        if (id === undefined) {
+            id = 0;
+        }
+    }
 
     if (this.ids[id] === undefined) {
         this.ids[id] = this.index;
+        this.index += 1;
     }
-    this.index += 1;
     return this.ids[id];
 };
 
@@ -176,277 +141,66 @@ Manager.prototype.removeIdentifier = function (identifier) {
             break;
         }
     }
-    this.index = Object.keys(this.ids).length;
-};
-
-// Bind internal events for the Manager.
-Manager.prototype.bindEvt = function (el, type) {
-    var self = this;
-
-    handlers[type] = function () {
-        self['on' + type].apply(self, arguments);
-    };
-
-    u.bindEvt(el, toBind[type], handlers[type]);
-
-    if (secondBind[type]) {
-        // Support for both touch and mouse at the same time.
-        u.bindEvt(el, secondBind[type], handlers[type]);
-    }
-
-    return self;
-};
-
-// Unbind internal events for the Manager
-Manager.prototype.unbindEvt = function (el, type) {
-    u.unbindEvt(el, toBind[type], handlers[type]);
-
-    if (secondBind[type]) {
-        // Support for both touch and mouse at the same time.
-        u.unbindEvt(el, secondBind[type], handlers[type]);
-    }
-
-    handlers[type] = undefined;
-
-    return this;
-};
-
-Manager.prototype.onstart = function (evt) {
-    evt = u.prepareEvent(evt);
-    this.box = this.options.zone.getBoundingClientRect();
-    this.scroll = u.getScroll();
-
-    // if we have touches and multitouch
-    if (evt.length && this.options.multitouch &&
-        this.nipples.length < this.options.maxNumberOfNipples) {
-
-        for (var i = 0, max = evt.length; i < max; i += 1) {
-            this.processOnStart(evt[i]);
-        }
-    } else if (this.nipples.length === 0 || this.options.mode !== 'dynamic') {
-        // if we don't already have a nipple in place.
-        // we process a new one
-        this.processOnStart(evt[0] || evt);
-    }
-
-    // and we bind the dom
-    if (!this.started) {
-        this.bindEvt(document, 'move')
-            .bindEvt(document, 'end');
-        this.started = true;
-    }
-
-    return false;
-};
-
-Manager.prototype.pressureFn = function (touch, nipple, identifier) {
-    var previousPressure = 0;
-    clearInterval(this.pressureIntervals[identifier]);
-    // Create an interval that will read the pressure every 100ms
-    this.pressureIntervals[identifier] = setInterval(function () {
-        var pressure = touch.force || touch.pressure ||
-            touch.webkitForce || 0;
-        if (pressure !== previousPressure) {
-            nipple.trigger('pressure', pressure);
-            this.trigger('pressure ' +
-                nipple.identifier + ':pressure', pressure);
-            previousPressure = pressure;
-        }
-    }.bind(this), 100);
-};
-
-Manager.prototype.processOnStart = function (evt) {
-    var self = this;
-    var identifier = self.getIdentifier(evt);
-    var pressure = evt.force || evt.pressure || evt.webkitForce || 0;
-    var nipple = self.nipples.get(identifier);
-
-    var position = {
-        x: evt.pageX,
-        y: evt.pageY
-    };
-
-    var process = function (nip) {
-        nip.show();
-        if (pressure > 0) {
-            self.pressureFn(evt, nip, nip.identifier);
-        }
-        self.processOnMove(evt);
-    };
-
-    // If we don't have a nipple and we should.
-    if (!nipple && (!self.nipples.length || self.options.multitouch)) {
-        nipple = self.createNipple(position, identifier);
-        self.trigger('added ' + nipple.identifier + ':added', nipple);
-    }
-
-    if (nipple) {
-        if (self.options.mode !== 'semi') {
-            process(nipple);
-        } else {
-            // In semi we check the distance of the touch
-            // to decide if we have to reset the nipple
-            var distance = u.distance(position, nipple.position);
-            if (distance <= self.options.catchDistance) {
-                process(nipple);
-            } else {
-                nipple.destroy();
-                self.processOnStart(evt);
-            }
-        }
-
-        nipple.trigger('start', nipple);
-        self.trigger('start ' + nipple.identifier + ':start', nipple);
-    }
-
-    return nipple;
 };
 
 Manager.prototype.onmove = function (evt) {
-    evt = u.prepareEvent(evt);
-    var toSends = [];
-
-    if (evt.length && this.options.multitouch) {
-        for (var i = 0, max = evt.length; i < max; i += 1) {
-            toSends.push(this.processOnMove(evt[i]));
-        }
-    } else {
-        toSends.push(this.processOnMove(evt[0] || evt));
-    }
-
+    var self = this;
+    self.onAny('move', evt);
     return false;
-};
-
-Manager.prototype.processOnMove = function (evt) {
-    var identifier = this.getIdentifier(evt);
-    var nipple = this.nipples.get(identifier);
-
-    if (!nipple) {
-        return;
-    }
-
-    var size = nipple.options.size / 2;
-    var pos = {
-        x: evt.pageX,
-        y: evt.pageY
-    };
-
-    var dist = u.distance(pos, nipple.position);
-    var angle = u.angle(pos, nipple.position);
-    var rAngle = u.radians(angle);
-    var force = dist / size;
-
-    if (dist > size) {
-        dist = size;
-        pos = u.findCoord(nipple.position, dist, angle);
-    }
-
-    nipple.frontPosition = {
-        x: pos.x - nipple.position.x,
-        y: pos.y - nipple.position.y
-    };
-
-    if (!this.nippleOptions.dataOnly) {
-        u.applyPosition(nipple.ui.front, nipple.frontPosition);
-    }
-
-    var toSend = {
-        identifier: nipple.identifier,
-        position: pos,
-        force: force,
-        pressure: evt.force || evt.pressure || evt.webkitForce || 0,
-        distance: dist,
-        angle: {
-            radian: rAngle,
-            degree: angle
-        },
-        instance: nipple
-    };
-
-    toSend = nipple.computeDirection(toSend);
-
-    // Offset angles to follow units circle.
-    toSend.angle = {
-        radian: u.radians(180 - angle),
-        degree: 180 - angle
-    };
-
-    nipple.trigger('move', toSend);
-    this.trigger('move ' + identifier + ':move', toSend);
-    return toSend;
 };
 
 Manager.prototype.onend = function (evt) {
-    evt = u.prepareEvent(evt);
-
-    if (evt.length && this.options.multitouch) {
-        for (var i = 0, max = evt.length; i < max; i += 1) {
-            this.processOnEnd(evt[i]);
-        }
-    } else {
-        this.processOnEnd(evt[0] || evt);
-    }
-
+    var self = this;
+    self.onAny('end', evt);
     return false;
 };
 
-Manager.prototype.processOnEnd = function (evt) {
-    var identifier = this.getIdentifier(evt);
+Manager.prototype.onAny = function (which, evt) {
     var self = this;
-    var nipple = self.nipples.get(identifier);
-    self.removeIdentifier(identifier);
+    var id;
+    var processFn = 'processOn' + which.charAt(0).toUpperCase() +
+        which.slice(1);
+    evt = u.prepareEvent(evt);
+    var processColl = function (e, id, coll) {
+        if (coll.ids.indexOf(id) >= 0) {
+            coll[processFn](e);
+            // Mark the event to avoid cleaning it later.
+            e._found_ = true;
+        }
+    };
+    var processEvt = function (e) {
+        id = self.getIdentifier(e);
+        u.map(self.collections, processColl.bind(null, e, id));
+        // If the event isn't handled by any collection,
+        // we need to clean its identifier.
+        if (!e._found_) {
+            self.removeIdentifier(id);
+        }
+    };
 
-    if (!nipple) {
-        return;
-    }
+    u.map(evt, processEvt);
 
-    if (!this.nippleOptions.dataOnly) {
-        nipple.hide(function () {
-            if (self.options.mode === 'dynamic') {
-                nipple.trigger('removed', nipple);
-                self.trigger('removed ' + identifier + ':removed', nipple);
-                nipple.destroy();
-            }
-        });
-    }
-
-    // Clear the pressure interval reader
-    clearInterval(self.pressureIntervals[identifier]);
-
-    nipple.trigger('end', nipple);
-    self.trigger('end ' + identifier + ':end', nipple);
-
-    if (this.options.mode === 'dynamic') {
-        this.nipples.splice(this.nipples.indexOf(nipple), 1);
-    }
-
-    if (!this.nipples.length || this.options.mode !== 'dynamic') {
-        this.unbindEvt(document, 'move')
-            .unbindEvt(document, 'end');
-        this.started = false;
-    }
-};
-
-// Remove destroyed nipple from the list
-Manager.prototype.ondestroyed = function(evt, nipple) {
-    if (this.nipples.indexOf(nipple) < 0) {
-        return false;
-    }
-    this.nipples.splice(this.nipples.indexOf(nipple), 1);
+    return false;
 };
 
 // Cleanly destroy the manager
 Manager.prototype.destroy = function () {
-    this.unbindEvt(this.options.zone, 'start');
-    this.unbindEvt(document, 'move');
-    this.unbindEvt(document, 'end');
-    this.nipples.forEach(function(nipple) {
-        nipple.destroy();
+    var self = this;
+    self.unbindDocument(true);
+    self.ids = {};
+    self.index = 0;
+    self.collections.forEach(function(collection) {
+        collection.destroy();
     });
-    for (var i in this.pressureIntervals) {
-        if (this.pressureIntervals.hasOwnProperty(i)) {
-            clearInterval(this.pressureIntervals[i]);
-        }
+    self.off();
+};
+
+// When a collection gets destroyed
+// we clean behind.
+Manager.prototype.onDestroyed = function (evt, coll) {
+    var self = this;
+    if (self.collections.indexOf(coll) < 0) {
+        return false;
     }
-    this.off();
+    self.collections.splice(self.collections.indexOf(coll), 1);
 };

@@ -4,18 +4,39 @@
 
 Nipple.prototype = new Super();
 Nipple.constructor = Nipple;
+Nipple.id = 0;
 
-function Nipple (manager, options) {
-    this.handlers = {};
+function Nipple (collection, options) {
     this.identifier = options.identifier;
     this.position = options.position;
     this.frontPosition = options.frontPosition;
-    this.manager = manager;
+    this.collection = collection;
+
+    // Defaults
+    this.defaults = {
+        size: 100,
+        threshold: 0.1,
+        color: 'white',
+        fadeTime: 250,
+        dataOnly: false,
+        restOpacity: 0.5,
+        mode: 'dynamic',
+        zone: document.body
+    };
+
     this.config(options);
+
+    // Overwrites
+    if (this.options.mode === 'dynamic') {
+        this.options.restOpacity = 0;
+    }
+
+    this.id = Nipple.id;
+    Nipple.id += 1;
     this.buildEl()
         .stylize();
 
-    this.toReturn = {
+    this.instance = {
         el: this.ui.el,
         on: this.on.bind(this),
         off: this.off.bind(this),
@@ -30,37 +51,11 @@ function Nipple (manager, options) {
         frontPosition: this.frontPosition,
         ui: this.ui,
         identifier: this.identifier,
+        id: this.id,
         options: this.options
     };
 
-    return this.toReturn;
-};
-
-// Configure Nipple instance.
-Nipple.prototype.config = function (options) {
-    this.options = {};
-
-    // Defaults
-    this.options.size = 100;
-    this.options.threshold = 0.1;
-    this.options.color = 'white';
-    this.options.fadeTime = 250;
-    this.options.dataOnly = false;
-    this.options.restOpacity = 0.5;
-    this.options.mode = 'dynamic';
-
-    // Overwrites
-    for (var i in options) {
-        if (this.options.hasOwnProperty(i)) {
-            this.options[i] = options[i];
-        }
-    }
-
-    if (this.options.mode === 'dynamic') {
-        this.options.restOpacity = 0;
-    }
-
-    return this;
+    return this.instance;
 };
 
 // Build the dom element of the Nipple instance.
@@ -73,11 +68,12 @@ Nipple.prototype.buildEl = function (options) {
     this.ui.back = document.createElement('div');
     this.ui.front = document.createElement('div');
 
-    this.ui.el.className = 'nipple';
+    this.ui.el.className = 'nipple collection_' + this.collection.id;
     this.ui.back.className = 'back';
     this.ui.front.className = 'front';
 
-    this.ui.el.setAttribute('id', 'nipple_' + this.identifier);
+    this.ui.el.setAttribute('id', 'nipple_' + this.collection.id +
+        '_' + this.id);
 
     this.ui.el.appendChild(this.ui.back);
     this.ui.el.appendChild(this.ui.front);
@@ -153,7 +149,7 @@ Nipple.prototype.addToDom = function () {
     if (this.options.dataOnly || document.body.contains(this.ui.el)) {
         return;
     }
-    this.manager.options.zone.appendChild(this.ui.el);
+    this.options.zone.appendChild(this.ui.el);
     return this;
 };
 
@@ -162,7 +158,7 @@ Nipple.prototype.removeFromDom = function () {
     if (this.options.dataOnly || !document.body.contains(this.ui.el)) {
         return;
     }
-    this.manager.options.zone.removeChild(this.ui.el);
+    this.options.zone.removeChild(this.ui.el);
     return this;
 };
 
@@ -171,11 +167,9 @@ Nipple.prototype.destroy = function () {
     clearTimeout(this.removeTimeout);
     clearTimeout(this.showTimeout);
     clearTimeout(this.restTimeout);
-    this.off();
+    this.trigger('destroyed', this.instance);
     this.removeFromDom();
-    this.trigger('destroyed', this.toReturn);
-    this.manager.trigger('destroyed ' + this.identifier + ':destroyed',
-        this.toReturn);
+    this.off();
 };
 
 // Fade in the Nipple instance.
@@ -199,9 +193,7 @@ Nipple.prototype.show = function (cb) {
     }, 0);
 
     self.showTimeout = setTimeout(function () {
-        self.trigger('shown', self.toReturn);
-        self.manager.trigger('shown ' + self.identifier + ':shown',
-            self.toReturn);
+        self.trigger('shown', self.instance);
         if (typeof cb === 'function') {
             cb.call(this);
         }
@@ -232,9 +224,7 @@ Nipple.prototype.hide = function (cb) {
                 cb.call(self);
             }
 
-            self.trigger('hidden', self.toReturn);
-            self.manager.trigger('hidden ' + self.identifier + ':hidden',
-                self.toReturn);
+            self.trigger('hidden', self.instance);
         },
         self.options.fadeTime
     );
@@ -280,9 +270,7 @@ Nipple.prototype.restCallback = function () {
     var transitStyle = {};
     transitStyle.front = u.getTransitionStyle('transition', 'none', '');
     self.applyStyles(transitStyle);
-    self.trigger('rested', self.toReturn);
-    self.manager.trigger('rested ' + self.identifier + ':rested',
-        self.toReturn);
+    self.trigger('rested', self.instance);
 };
 
 Nipple.prototype.computeDirection = function (obj) {
@@ -355,26 +343,18 @@ Nipple.prototype.computeDirection = function (obj) {
         if (oldDirection.x !== this.direction.x ||
             oldDirection.y !== this.direction.y) {
             this.trigger('plain', obj);
-            this.manager.trigger('plain ' + this.identifier + ':plain', obj);
         }
 
         if (oldDirection.x !== this.direction.x) {
             this.trigger('plain:' + directionX, obj);
-            this.manager.trigger('plain:' + directionX + ' ' +
-                this.identifier + ':plain:' + directionX, obj);
         }
 
         if (oldDirection.y !== this.direction.y) {
             this.trigger('plain:' + directionY, obj);
-            this.manager.trigger('plain:' + directionY + ' ' +
-                this.identifier + ':plain:' + directionY, obj);
         }
 
         if (oldDirection.angle !== this.direction.angle) {
             this.trigger('dir dir:' + direction, obj);
-            this.manager.trigger('dir dir:' + direction + ' ' +
-                this.identifier + ':dir ' +
-                this.identifier + ':dir:' + direction, obj);
         }
     }
     return obj;
