@@ -1,6 +1,21 @@
-<a name="0.6.0"></a>
-# [0.6.0](https://github.com/yoannmoinet/nipplejs/compare/v0.6.0...v0.6.0) (2015-11-29)
+<a name="0.6.1"></a>
+## [0.6.1](https://github.com/yoannmoinet/nipplejs/compare/v0.6.1...v0.6.1) (2015-12-26)
 
+
+
+
+<a name="0.6.1"></a>
+## [0.6.1](https://github.com/yoannmoinet/nipplejs/compare/v0.6.0...v0.6.1) (2015-12-26)
+
+
+### Bug Fixes
+
+* **collection:** trigger `start` event before any potential direction ([c5441fd](https://github.com/yoannmoinet/nipplejs/commit/c5441fd))
+* **nipple:** fragment control of previous directions ([790fa26](https://github.com/yoannmoinet/nipplejs/commit/790fa26)), closes [#25](https://github.com/yoannmoinet/nipplejs/issues/25)
+
+### Features
+
+* **nipple:** add `resetDirection()` to cancel previous directions ([66f6e3b](https://github.com/yoannmoinet/nipplejs/commit/66f6e3b))
 
 
 
