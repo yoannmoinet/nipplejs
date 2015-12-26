@@ -331,7 +331,8 @@ Nipple.prototype.computeDirection = function (obj) {
                 oldDirection[i] = this.direction[i];
             }
         }
-        var same = true;
+
+        var same = {};
 
         this.direction = {
             x: directionX,
@@ -342,29 +343,29 @@ Nipple.prototype.computeDirection = function (obj) {
         obj.direction = this.direction;
 
         for (var i in oldDirection) {
-            if (oldDirection[i] !== this.direction[i]) {
-                same = false;
+            if (oldDirection[i] === this.direction[i]) {
+                same[i] = true;
             }
         }
 
-        if (same) {
+        // If all 3 directions are the same, we don't trigger anything.
+        if (same.x && same.y && same.angle) {
             return obj;
         }
 
-        if (oldDirection.x !== this.direction.x ||
-            oldDirection.y !== this.direction.y) {
+        if (!same.x || !same.y) {
             this.trigger('plain', obj);
         }
 
-        if (oldDirection.x !== this.direction.x) {
+        if (!same.x) {
             this.trigger('plain:' + directionX, obj);
         }
 
-        if (oldDirection.y !== this.direction.y) {
+        if (!same.y) {
             this.trigger('plain:' + directionY, obj);
         }
 
-        if (oldDirection.angle !== this.direction.angle) {
+        if (!same.angle) {
             this.trigger('dir dir:' + direction, obj);
         }
     }
