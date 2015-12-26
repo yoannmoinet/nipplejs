@@ -407,6 +407,10 @@ Collection.prototype.processOnEnd = function (evt) {
     // Clear the pressure interval reader
     clearInterval(self.pressureIntervals[identifier]);
 
+    // Reset the direciton of the nipple, to be able to trigger a new direction
+    // on start.
+    nipple.resetDirection();
+
     nipple.trigger('end', nipple);
     self.trigger('end ' + identifier + ':end', nipple);
 

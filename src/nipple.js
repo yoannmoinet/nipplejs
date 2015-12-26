@@ -36,6 +36,7 @@ function Nipple (collection, options) {
     this.buildEl()
         .stylize();
 
+    // Nipple's API.
     this.instance = {
         el: this.ui.el,
         on: this.on.bind(this),
@@ -45,6 +46,7 @@ function Nipple (collection, options) {
         add: this.addToDom.bind(this),
         remove: this.removeFromDom.bind(this),
         destroy: this.destroy.bind(this),
+        resetDirection: this.resetDirection.bind(this),
         computeDirection: this.computeDirection.bind(this),
         trigger: this.trigger.bind(this),
         position: this.position,
@@ -271,6 +273,15 @@ Nipple.prototype.restCallback = function () {
     transitStyle.front = u.getTransitionStyle('transition', 'none', '');
     self.applyStyles(transitStyle);
     self.trigger('rested', self.instance);
+};
+
+Nipple.prototype.resetDirection = function () {
+    // Fully rebuild the object to let the iteration possible.
+    this.direction = {
+        x: false,
+        y: false,
+        angle: false
+    };
 };
 
 Nipple.prototype.computeDirection = function (obj) {
