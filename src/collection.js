@@ -249,6 +249,10 @@ Collection.prototype.processOnStart = function (evt) {
     };
     var nipple = self.getOrCreate(identifier, position);
     var process = function (nip) {
+        // Trigger the start.
+        nip.trigger('start', nip);
+        self.trigger('start ' + nip.identifier + ':start', nip);
+
         nip.show();
         if (pressure > 0) {
             self.pressureFn(evt, nip, nip.identifier);
@@ -281,8 +285,6 @@ Collection.prototype.processOnStart = function (evt) {
         }
     }
 
-    nipple.trigger('start', nipple);
-    self.trigger('start ' + nipple.identifier + ':start', nipple);
     return nipple;
 };
 
