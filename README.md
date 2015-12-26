@@ -533,6 +533,7 @@ You can use the available scripts if needed.
 
 - `npm run watch` will run the build each time a change is detected.
 - `npm run prebuild` will test the formatting and the linting of your code.
+- `npm start` will run a static server that will serve the [`test/`](./test) folder on [`localhost:8080`](http://localhost:8080).
 
 #### Build
 Once you're satisfied with your changes, you can also include a build.
