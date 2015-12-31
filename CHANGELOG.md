@@ -1,5 +1,11 @@
-<a name="0.6.1"></a>
-## [0.6.1](https://github.com/yoannmoinet/nipplejs/compare/v0.6.1...v0.6.1) (2015-12-26)
+<a name="0.6.2"></a>
+## [0.6.2](https://github.com/yoannmoinet/nipplejs/compare/v0.6.2...v0.6.2) (2015-12-31)
+
+
+
+
+<a name="0.6.2"></a>
+## [0.6.2](https://github.com/yoannmoinet/nipplejs/compare/v0.6.1...v0.6.2) (2015-12-31)
 
 
 
