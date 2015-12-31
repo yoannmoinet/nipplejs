@@ -339,6 +339,7 @@ function Nipple (collection, options) {
     this.buildEl()
         .stylize();
 
+    // Nipple's API.
     this.instance = {
         el: this.ui.el,
         on: this.on.bind(this),
@@ -348,6 +349,7 @@ function Nipple (collection, options) {
         add: this.addToDom.bind(this),
         remove: this.removeFromDom.bind(this),
         destroy: this.destroy.bind(this),
+        resetDirection: this.resetDirection.bind(this),
         computeDirection: this.computeDirection.bind(this),
         trigger: this.trigger.bind(this),
         position: this.position,
@@ -576,6 +578,15 @@ Nipple.prototype.restCallback = function () {
     self.trigger('rested', self.instance);
 };
 
+Nipple.prototype.resetDirection = function () {
+    // Fully rebuild the object to let the iteration possible.
+    this.direction = {
+        x: false,
+        y: false,
+        angle: false
+    };
+};
+
 Nipple.prototype.computeDirection = function (obj) {
     var rAngle = obj.angle.radian;
     var angle45 = Math.PI / 4;
@@ -623,7 +634,8 @@ Nipple.prototype.computeDirection = function (obj) {
                 oldDirection[i] = this.direction[i];
             }
         }
-        var same = true;
+
+        var same = {};
 
         this.direction = {
             x: directionX,
@@ -634,29 +646,29 @@ Nipple.prototype.computeDirection = function (obj) {
         obj.direction = this.direction;
 
         for (var i in oldDirection) {
-            if (oldDirection[i] !== this.direction[i]) {
-                same = false;
+            if (oldDirection[i] === this.direction[i]) {
+                same[i] = true;
             }
         }
 
-        if (same) {
+        // If all 3 directions are the same, we don't trigger anything.
+        if (same.x && same.y && same.angle) {
             return obj;
         }
 
-        if (oldDirection.x !== this.direction.x ||
-            oldDirection.y !== this.direction.y) {
+        if (!same.x || !same.y) {
             this.trigger('plain', obj);
         }
 
-        if (oldDirection.x !== this.direction.x) {
+        if (!same.x) {
             this.trigger('plain:' + directionX, obj);
         }
 
-        if (oldDirection.y !== this.direction.y) {
+        if (!same.y) {
             this.trigger('plain:' + directionY, obj);
         }
 
-        if (oldDirection.angle !== this.direction.angle) {
+        if (!same.angle) {
             this.trigger('dir dir:' + direction, obj);
         }
     }
@@ -913,6 +925,10 @@ Collection.prototype.processOnStart = function (evt) {
     };
     var nipple = self.getOrCreate(identifier, position);
     var process = function (nip) {
+        // Trigger the start.
+        nip.trigger('start', nip);
+        self.trigger('start ' + nip.identifier + ':start', nip);
+
         nip.show();
         if (pressure > 0) {
             self.pressureFn(evt, nip, nip.identifier);
@@ -945,8 +961,6 @@ Collection.prototype.processOnStart = function (evt) {
         }
     }
 
-    nipple.trigger('start', nipple);
-    self.trigger('start ' + nipple.identifier + ':start', nipple);
     return nipple;
 };
 
@@ -1070,6 +1084,10 @@ Collection.prototype.processOnEnd = function (evt) {
 
     // Clear the pressure interval reader
     clearInterval(self.pressureIntervals[identifier]);
+
+    // Reset the direciton of the nipple, to be able to trigger a new direction
+    // on start.
+    nipple.resetDirection();
 
     nipple.trigger('end', nipple);
     self.trigger('end ' + identifier + ':end', nipple);
