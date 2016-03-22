@@ -1,8 +1,8 @@
 ///////////////////////
 ///   SUPER CLASS   ///
 ///////////////////////
-///
-var Super = function () {};
+
+function Super () {};
 
 // Basic event system.
 Super.prototype.on = function (arg, cb) {

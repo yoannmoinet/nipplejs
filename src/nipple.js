@@ -2,10 +2,6 @@
 ///   THE NIPPLE    ///
 ///////////////////////
 
-Nipple.prototype = new Super();
-Nipple.constructor = Nipple;
-Nipple.id = 0;
-
 function Nipple (collection, options) {
     this.identifier = options.identifier;
     this.position = options.position;
@@ -59,6 +55,10 @@ function Nipple (collection, options) {
 
     return this.instance;
 };
+
+Nipple.prototype = new Super();
+Nipple.constructor = Nipple;
+Nipple.id = 0;
 
 // Build the dom element of the Nipple instance.
 Nipple.prototype.buildEl = function (options) {

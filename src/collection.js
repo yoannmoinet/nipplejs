@@ -1,10 +1,8 @@
+/* global Nipple, Super */
+
 ///////////////////////////
 ///   THE COLLECTION    ///
 ///////////////////////////
-
-Collection.prototype = new Super();
-Collection.constructor = Collection;
-Collection.id = 0;
 
 function Collection (manager, options) {
     var self = this;
@@ -51,6 +49,10 @@ function Collection (manager, options) {
 
     return self.nipples;
 }
+
+Collection.prototype = new Super();
+Collection.constructor = Collection;
+Collection.id = 0;
 
 Collection.prototype.prepareNipples = function () {
     var self = this;
@@ -291,6 +293,8 @@ Collection.prototype.processOnStart = function (evt) {
 Collection.prototype.getOrCreate = function (identifier, position) {
     var self = this;
     var opts = self.options;
+    var nipple;
+
     // If we're in static or semi, we might already have an active.
     if (/(semi|static)/.test(opts.mode)) {
         // Get the active one

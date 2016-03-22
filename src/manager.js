@@ -1,8 +1,8 @@
+/* global u, Super, Collection */
+
 ///////////////////////
 ///     MANAGER     ///
 ///////////////////////
-Manager.prototype = new Super();
-Manager.constructor = Manager;
 
 function Manager (options) {
     var self = this;
@@ -34,6 +34,9 @@ function Manager (options) {
 
     return self.collections;
 };
+
+Manager.prototype = new Super();
+Manager.constructor = Manager;
 
 Manager.prototype.prepareCollections = function () {
     var self = this;
