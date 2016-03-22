@@ -38,7 +38,7 @@
   "devDependencies": {
     "casperjs": "istr/casperjs#feature/phantomjs2",
     "concat-cli": "yoannmoinet/concat-cli",
-    "conventional-changelog": "^0.4.1",
+    "conventional-changelog": "1.1.0",
     "eslint": "^1.1.0",
     "expect.js": "^0.3.1",
     "jscs": "^2.1.0",
