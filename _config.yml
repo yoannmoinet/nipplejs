@@ -1,2 +1,2 @@
-markdown: redcarpet
+markdown: kramdown
 path: //yoannmoinet.github.io/nipplejs
