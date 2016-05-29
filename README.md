@@ -534,7 +534,7 @@ We follow a **4 spaces** rule around here.
 You can use the available scripts if needed.
 
 - `npm run watch` will run the build each time a change is detected.
-- `npm run prebuild` will test the formatting and the linting of your code.
+- `npm run formatAndLint` will test the formatting and the linting of your code.
 - `npm start` will run a static server that will serve the [`test/`](./test) folder on [`localhost:8080`](http://localhost:8080).
 - `npm test` will test using CasperJS, you have to run `npm start` in another window to have a local server available to CasperJS.
 
