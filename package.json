@@ -32,6 +32,7 @@
     "uglify": "uglifyjs ./dist/nipplejs.js -o ./dist/nipplejs.min.js -c -m",
     "watch": "watch \"npm run buildWatch\" src",
     "start": "static test",
+    "toc": "markdown-toc -i README.md",
     "copyGh": "node ./bin/copyToGhPages.js",
     "concat": "concat-cli -f ./src/start.js ./src/utils.js ./src/super.js ./src/nipple.js ./src/collection.js ./src/manager.js ./src/end.js -o ./nipplejs.temp.js"
   },
@@ -43,6 +44,7 @@
     "eslint": "^1.1.0",
     "expect.js": "^0.3.1",
     "jscs": "^2.1.0",
+    "markdown-toc": "^0.12.12",
     "mocha": "^2.2.5",
     "node-static": "^0.7.7",
     "phantomjs": "yoannmoinet/phantomjs#nick-2",
