@@ -14,10 +14,12 @@ bower install nipplejs --save
 ```
 
 ----
+
 ## Demo
 Check out the [demo here](http://yoannmoinet.github.io/nipplejs/#demo).
 
 ----
+
 ## Usage
 
 Import it the way you want into your project :
@@ -45,6 +47,7 @@ define(['nipplejs'], function (nipplejs) {
 **:warning: NB :warning:** Your joystick's container **has** to have its CSS `position` property set, either `absolute`, `relative`, `static`, ....
 
 ----
+
 ## Options
 You can configure your joystick in different ways :
 
@@ -166,6 +169,7 @@ At 200 (px), if you press the zone into a rayon of 200px around the previously d
 it will act as a `static` one.
 
 ----
+
 ## API
 
 ### NippleJS instance (manager)
@@ -357,6 +361,7 @@ The object that store its ui elements
 ```
 
 ----
+
 ## Events
 
 You can listen events both on the manager and all the joysticks.
@@ -515,6 +520,7 @@ Is triggered when the pressure on the joystick is changed.
 The value, between 0 and 1, is sent back alongside the event.
 
 ----
+
 ## Contributing
 Your help is more than welcome, I would be very honored to have you on my side.
 
