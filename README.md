@@ -42,6 +42,8 @@ define(['nipplejs'], function (nipplejs) {
 </script>
 ```
 
+**:warning: NB :warning:** Your joystick's container **has** to have its CSS `position` property set, either `absolute`, `relative`, `static`, ....
+
 ----
 ## Options
 You can configure your joystick in different ways :
