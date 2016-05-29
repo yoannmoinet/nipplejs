@@ -1,2 +1,2 @@
-markdown: kramdown
+markdown: rdiscount
 path: //yoannmoinet.github.io/nipplejs
