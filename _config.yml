@@ -1,2 +1,4 @@
 markdown: kramdown
 path: //yoannmoinet.github.io/nipplejs
+gems:
+  - jemoji
