@@ -15,7 +15,7 @@ function Manager (options) {
 
     // Listen for resize, to reposition every joysticks
     var resizeTimer;
-    window.onresize = function (evt) {
+    u.bindEvt(window, 'resize', function (evt) {
         clearTimeout(resizeTimer);
         resizeTimer = setTimeout(function () {
             var pos;
