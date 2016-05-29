@@ -1,12 +1,16 @@
-<a name="0.6.2"></a>
-## [0.6.2](https://github.com/yoannmoinet/nipplejs/compare/v0.6.2...v0.6.2) (2015-12-31)
+<a name="0.6.3"></a>
+## [0.6.3](https://github.com/yoannmoinet/nipplejs/compare/v0.6.2...v0.6.3) (2016-05-29)
 
+
+### Bug Fixes
+
+* **manager:** add missing closing bracket ([9b99637](https://github.com/yoannmoinet/nipplejs/commit/9b99637))
+* **resize:** listen to resize via event instead of global handler ([14c28f1](https://github.com/yoannmoinet/nipplejs/commit/14c28f1))
 
 
 
 <a name="0.6.2"></a>
 ## [0.6.2](https://github.com/yoannmoinet/nipplejs/compare/v0.6.1...v0.6.2) (2015-12-31)
-
 
 
 
@@ -18,6 +22,7 @@
 
 * **collection:** trigger `start` event before any potential direction ([c5441fd](https://github.com/yoannmoinet/nipplejs/commit/c5441fd))
 * **nipple:** fragment control of previous directions ([790fa26](https://github.com/yoannmoinet/nipplejs/commit/790fa26)), closes [#25](https://github.com/yoannmoinet/nipplejs/issues/25)
+
 
 ### Features
 
@@ -41,11 +46,13 @@
 * return the found nipple in `get()` ([439aa69](https://github.com/yoannmoinet/nipplejs/commit/439aa69))
 * unbind document when collection is manually destroyed ([6e66b62](https://github.com/yoannmoinet/nipplejs/commit/6e66b62))
 
+
 ### Features
 
 * **nipple:** add an incremental id to absolutely differentiate each ([598a5eb](https://github.com/yoannmoinet/nipplejs/commit/598a5eb))
 * **utils:** add u.map to execute fn in array or single element ([515aa5d](https://github.com/yoannmoinet/nipplejs/commit/515aa5d))
 * **utils:** add u.safeExtend to only replace existent attributes ([5212ffe](https://github.com/yoannmoinet/nipplejs/commit/5212ffe))
+
 
 ### Performance Improvements
 
@@ -55,7 +62,6 @@
 
 <a name="0.5.6"></a>
 ## [0.5.6](https://github.com/yoannmoinet/nipplejs/compare/v0.5.5...v0.5.6) (2015-11-09)
-
 
 
 
@@ -101,6 +107,7 @@
 * **manager:** correctly unbind all events when destroying manager ([e3f96ef](https://github.com/yoannmoinet/nipplejs/commit/e3f96ef))
 * **utils:** handle touch based on their event's type ([406a7b2](https://github.com/yoannmoinet/nipplejs/commit/406a7b2))
 
+
 ### Features
 
 * **manager:** better pressure management cross-plateform ([d867812](https://github.com/yoannmoinet/nipplejs/commit/d867812))
@@ -129,6 +136,7 @@
 * **nipple:** control dom presence before add or remove ([7cc1d8c](https://github.com/yoannmoinet/nipplejs/commit/7cc1d8c))
 * **nipple:** return the manager's known object in event triggers ([2deb42c](https://github.com/yoannmoinet/nipplejs/commit/2deb42c))
 * **npm:** add rimraf as a dev dependency ([deb7acc](https://github.com/yoannmoinet/nipplejs/commit/deb7acc)), closes [#12](https://github.com/yoannmoinet/nipplejs/issues/12)
+
 
 ### Features
 
@@ -170,6 +178,7 @@
 ### Bug Fixes
 
 * **manager:** streamline events triggered ([76941ec](https://github.com/yoannmoinet/nipplejs/commit/76941ec))
+
 
 ### Features
 
@@ -226,6 +235,7 @@
 
 * **on:** return self to allow chain ([f068cc9](https://github.com/yoannmoinet/nipplejs/commit/f068cc9))
 
+
 ### Features
 
 * **on:** let listen to multiple events ([d19ad97](https://github.com/yoannmoinet/nipplejs/commit/d19ad97))
@@ -248,7 +258,6 @@
 
 <a name="0.1.0"></a>
 # 0.1.0 (2015-09-05)
-
 
 
 
