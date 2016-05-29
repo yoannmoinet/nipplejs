@@ -201,8 +201,8 @@ u.map = function (ar, fn) {
 ///////////////////////
 ///   SUPER CLASS   ///
 ///////////////////////
-///
-var Super = function () {};
+
+function Super () {};
 
 // Basic event system.
 Super.prototype.on = function (arg, cb) {
@@ -305,10 +305,6 @@ Super.prototype.unbindEvt = function (el, type) {
 ///   THE NIPPLE    ///
 ///////////////////////
 
-Nipple.prototype = new Super();
-Nipple.constructor = Nipple;
-Nipple.id = 0;
-
 function Nipple (collection, options) {
     this.identifier = options.identifier;
     this.position = options.position;
@@ -362,6 +358,10 @@ function Nipple (collection, options) {
 
     return this.instance;
 };
+
+Nipple.prototype = new Super();
+Nipple.constructor = Nipple;
+Nipple.id = 0;
 
 // Build the dom element of the Nipple instance.
 Nipple.prototype.buildEl = function (options) {
@@ -674,13 +674,11 @@ Nipple.prototype.computeDirection = function (obj) {
     }
     return obj;
 };
+/* global Nipple, Super */
+
 ///////////////////////////
 ///   THE COLLECTION    ///
 ///////////////////////////
-
-Collection.prototype = new Super();
-Collection.constructor = Collection;
-Collection.id = 0;
 
 function Collection (manager, options) {
     var self = this;
@@ -727,6 +725,10 @@ function Collection (manager, options) {
 
     return self.nipples;
 }
+
+Collection.prototype = new Super();
+Collection.constructor = Collection;
+Collection.id = 0;
 
 Collection.prototype.prepareNipples = function () {
     var self = this;
@@ -967,6 +969,8 @@ Collection.prototype.processOnStart = function (evt) {
 Collection.prototype.getOrCreate = function (identifier, position) {
     var self = this;
     var opts = self.options;
+    var nipple;
+
     // If we're in static or semi, we might already have an active.
     if (/(semi|static)/.test(opts.mode)) {
         // Get the active one
@@ -1156,11 +1160,11 @@ Collection.prototype.destroy = function () {
     // Unbind everything.
     self.off();
 };
+/* global u, Super, Collection */
+
 ///////////////////////
 ///     MANAGER     ///
 ///////////////////////
-Manager.prototype = new Super();
-Manager.constructor = Manager;
 
 function Manager (options) {
     var self = this;
@@ -1173,7 +1177,7 @@ function Manager (options) {
 
     // Listen for resize, to reposition every joysticks
     var resizeTimer;
-    window.onresize = function (evt) {
+    u.bindEvt(window, 'resize', function (evt) {
         clearTimeout(resizeTimer);
         resizeTimer = setTimeout(function () {
             var pos;
@@ -1188,10 +1192,13 @@ function Manager (options) {
                 });
             });
         }, 100);
-    };
+    });
 
     return self.collections;
 };
+
+Manager.prototype = new Super();
+Manager.constructor = Manager;
 
 Manager.prototype.prepareCollections = function () {
     var self = this;
