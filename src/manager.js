@@ -30,7 +30,7 @@ function Manager (options) {
                 });
             });
         }, 100);
-    };
+    });
 
     return self.collections;
 };
