@@ -1,3 +1,13 @@
+<a name="0.6.4"></a>
+## [0.6.4](https://github.com/yoannmoinet/nipplejs/compare/v0.6.3...v0.6.4) (2016-07-20)
+
+
+### Bug Fixes
+
+* **nipple:** remove size of container and apply on children only ([0033342](https://github.com/yoannmoinet/nipplejs/commit/0033342)), closes [#32](https://github.com/yoannmoinet/nipplejs/issues/32)
+
+
+
 <a name="0.6.3"></a>
 ## [0.6.3](https://github.com/yoannmoinet/nipplejs/compare/v0.6.2...v0.6.3) (2016-05-29)
 
