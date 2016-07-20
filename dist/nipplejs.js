@@ -396,8 +396,6 @@ Nipple.prototype.stylize = function () {
     var transitStyle = u.getTransitionStyle('transition', 'opacity', animTime);
     var styles = {};
     styles.el = {
-        width: this.options.size + 'px',
-        height: this.options.size + 'px',
         position: 'absolute',
         opacity: this.options.restOpacity,
         display: 'block',
@@ -407,8 +405,8 @@ Nipple.prototype.stylize = function () {
     styles.back = {
         position: 'absolute',
         display: 'block',
-        width: '100%',
-        height: '100%',
+        width: this.options.size + 'px',
+        height: this.options.size + 'px',
         marginLeft: -this.options.size / 2 + 'px',
         marginTop: -this.options.size / 2 + 'px',
         background: this.options.color,
@@ -416,8 +414,8 @@ Nipple.prototype.stylize = function () {
     };
 
     styles.front = {
-        width: '50%',
-        height: '50%',
+        width: this.options.size / 2 + 'px',
+        height: this.options.size / 2 + 'px',
         position: 'absolute',
         display: 'block',
         marginLeft: -this.options.size / 4 + 'px',
