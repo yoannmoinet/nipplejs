@@ -52,7 +52,7 @@ function importBuild (next) {
     console.log(' - checkout build from master and move it to ./javascripts/');
     exec('git checkout master -- ./dist/nipplejs.js && ' +
         'git reset ./dist/nipplejs.js && ' +
-        mv + ' .' + slash + 'dist' + slash + 'nipplejs.js' +
+        mv + ' .' + slash + 'dist' + slash + 'nipplejs.js ' +
         '.' + slash + 'javascripts' + slash,
         next);
 }
