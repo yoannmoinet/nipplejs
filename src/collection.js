@@ -84,6 +84,9 @@ Collection.prototype.bindings = function () {
     var self = this;
     // Touch start event.
     self.bindEvt(self.options.zone, 'start');
+    // Avoid native touch actions (scroll, zoom etc...) on the zone.
+    self.options.zone.style.touchAction = 'none';
+    self.options.zone.style.msTouchAction = 'none';
 };
 
 Collection.prototype.begin = function () {
