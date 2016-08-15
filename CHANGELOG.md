@@ -1,3 +1,13 @@
+<a name="0.6.5"></a>
+## [0.6.5](https://github.com/yoannmoinet/nipplejs/compare/v0.6.4...v0.6.5) (2016-08-15)
+
+
+### Bug Fixes
+
+* **collection:** avoid any native touch action on the `options.zone` ([bea2c42](https://github.com/yoannmoinet/nipplejs/commit/bea2c42))
+
+
+
 <a name="0.6.4"></a>
 ## [0.6.4](https://github.com/yoannmoinet/nipplejs/compare/v0.6.3...v0.6.4) (2016-07-20)
 
