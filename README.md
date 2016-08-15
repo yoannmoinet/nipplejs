@@ -4,6 +4,7 @@
 [![NPM](https://nodei.co/npm-dl/nipplejs.png?months=3)](https://npmjs.org/package/nipplejs)
 
 # Table Of Contents
+<details>
 
 <!-- toc -->
 
@@ -68,6 +69,7 @@
     + [Build](#build)
 
 <!-- tocstop -->
+</details>
 
 ## Install
 
