@@ -3,6 +3,7 @@ var fs = require('fs');
 
 var isWin = /^win/.test(process.platform);
 var mv = isWin ? 'move' : 'mv';
+var slash = isWin ? '\\' : '/';
 
 queue([
     checkoutPage,
@@ -51,7 +52,8 @@ function importBuild (next) {
     console.log(' - checkout build from master and move it to ./javascripts/');
     exec('git checkout master -- ./dist/nipplejs.js && ' +
         'git reset ./dist/nipplejs.js && ' +
-        mv + ' ./dist/nipplejs.js ./javascripts/',
+        mv + ' .' + slash + 'dist' + slash + 'nipplejs.js' +
+        '.' + slash + 'javascripts' + slash,
         next);
 }
 
