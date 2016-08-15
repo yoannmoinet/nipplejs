@@ -1,6 +1,9 @@
 var exec = require('child_process').exec;
 var fs = require('fs');
 
+var isWin = /^win/.test(process.platform);
+var mv = isWin ? 'move' : 'mv';
+
 queue([
     checkoutPage,
     importReadme,
@@ -40,7 +43,7 @@ function importReadme (next) {
     console.log(' - checkout README from master and rename it to index.md');
     exec('git checkout master -- README.md && ' +
         'git reset README.md && ' +
-        'mv README.md index.md',
+        mv + ' README.md index.md',
         next);
 }
 
@@ -48,7 +51,7 @@ function importBuild (next) {
     console.log(' - checkout build from master and move it to ./javascripts/');
     exec('git checkout master -- ./dist/nipplejs.js && ' +
         'git reset ./dist/nipplejs.js && ' +
-        'mv ./dist/nipplejs.js ./javascripts/',
+        mv + ' ./dist/nipplejs.js ./javascripts/',
         next);
 }
 
