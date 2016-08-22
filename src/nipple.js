@@ -62,10 +62,12 @@ Nipple.id = 0;
 
 // Build the dom element of the Nipple instance.
 Nipple.prototype.buildEl = function (options) {
-    if (this.options.dataOnly) {
-        return;
-    }
     this.ui = {};
+
+    if (this.options.dataOnly) {
+        return this;
+    }
+
     this.ui.el = document.createElement('div');
     this.ui.back = document.createElement('div');
     this.ui.front = document.createElement('div');
@@ -86,7 +88,7 @@ Nipple.prototype.buildEl = function (options) {
 // Apply CSS to the Nipple instance.
 Nipple.prototype.stylize = function () {
     if (this.options.dataOnly) {
-        return;
+        return this;
     }
     var animTime = this.options.fadeTime + 'ms';
     var borderStyle = u.getVendorStyle('borderRadius', '50%');
