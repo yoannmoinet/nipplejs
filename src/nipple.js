@@ -149,7 +149,7 @@ Nipple.prototype.applyStyles = function (styles) {
 Nipple.prototype.addToDom = function () {
     // We're not adding it if we're dataOnly or already in dom.
     if (this.options.dataOnly || document.body.contains(this.ui.el)) {
-        return;
+        return this;
     }
     this.options.zone.appendChild(this.ui.el);
     return this;
@@ -158,7 +158,7 @@ Nipple.prototype.addToDom = function () {
 // Remove the Nipple instance from DOM.
 Nipple.prototype.removeFromDom = function () {
     if (this.options.dataOnly || !document.body.contains(this.ui.el)) {
-        return;
+        return this;
     }
     this.options.zone.removeChild(this.ui.el);
     return this;
@@ -179,7 +179,7 @@ Nipple.prototype.show = function (cb) {
     var self = this;
 
     if (self.options.dataOnly) {
-        return;
+        return this;
     }
 
     clearTimeout(self.removeTimeout);
@@ -209,7 +209,7 @@ Nipple.prototype.hide = function (cb) {
     var self = this;
 
     if (self.options.dataOnly) {
-        return;
+        return this;
     }
 
     self.ui.el.style.opacity = self.options.restOpacity;
