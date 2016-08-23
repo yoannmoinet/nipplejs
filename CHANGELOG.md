@@ -1,3 +1,16 @@
+<a name="0.6.6"></a>
+## [0.6.6](https://github.com/yoannmoinet/nipplejs/compare/v0.6.5...v0.6.6) (2016-08-23)
+
+
+### Bug Fixes
+
+* **bin:** adapt slashes to windows if needed ([7dffd7c](https://github.com/yoannmoinet/nipplejs/commit/7dffd7c))
+* **bin:** add missing space ([48f6a1f](https://github.com/yoannmoinet/nipplejs/commit/48f6a1f))
+* **bin:** make the copyToGhPages script windows compatible ([11da89a](https://github.com/yoannmoinet/nipplejs/commit/11da89a))
+* **dataOnly:** conserve chainability even with dataOnly ([d1eddd0](https://github.com/yoannmoinet/nipplejs/commit/d1eddd0))
+
+
+
 <a name="0.6.5"></a>
 ## [0.6.5](https://github.com/yoannmoinet/nipplejs/compare/v0.6.4...v0.6.5) (2016-08-15)
 
