@@ -179,7 +179,7 @@ Nipple.prototype.show = function (cb) {
     var self = this;
 
     if (self.options.dataOnly) {
-        return this;
+        return self;
     }
 
     clearTimeout(self.removeTimeout);
@@ -209,7 +209,7 @@ Nipple.prototype.hide = function (cb) {
     var self = this;
 
     if (self.options.dataOnly) {
-        return this;
+        return self;
     }
 
     self.ui.el.style.opacity = self.options.restOpacity;
