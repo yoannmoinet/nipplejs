@@ -365,10 +365,12 @@ Nipple.id = 0;
 
 // Build the dom element of the Nipple instance.
 Nipple.prototype.buildEl = function (options) {
-    if (this.options.dataOnly) {
-        return;
-    }
     this.ui = {};
+
+    if (this.options.dataOnly) {
+        return this;
+    }
+
     this.ui.el = document.createElement('div');
     this.ui.back = document.createElement('div');
     this.ui.front = document.createElement('div');
@@ -389,7 +391,7 @@ Nipple.prototype.buildEl = function (options) {
 // Apply CSS to the Nipple instance.
 Nipple.prototype.stylize = function () {
     if (this.options.dataOnly) {
-        return;
+        return this;
     }
     var animTime = this.options.fadeTime + 'ms';
     var borderStyle = u.getVendorStyle('borderRadius', '50%');
@@ -450,7 +452,7 @@ Nipple.prototype.applyStyles = function (styles) {
 Nipple.prototype.addToDom = function () {
     // We're not adding it if we're dataOnly or already in dom.
     if (this.options.dataOnly || document.body.contains(this.ui.el)) {
-        return;
+        return this;
     }
     this.options.zone.appendChild(this.ui.el);
     return this;
@@ -459,7 +461,7 @@ Nipple.prototype.addToDom = function () {
 // Remove the Nipple instance from DOM.
 Nipple.prototype.removeFromDom = function () {
     if (this.options.dataOnly || !document.body.contains(this.ui.el)) {
-        return;
+        return this;
     }
     this.options.zone.removeChild(this.ui.el);
     return this;
@@ -480,7 +482,7 @@ Nipple.prototype.show = function (cb) {
     var self = this;
 
     if (self.options.dataOnly) {
-        return;
+        return self;
     }
 
     clearTimeout(self.removeTimeout);
@@ -510,7 +512,7 @@ Nipple.prototype.hide = function (cb) {
     var self = this;
 
     if (self.options.dataOnly) {
-        return;
+        return self;
     }
 
     self.ui.el.style.opacity = self.options.restOpacity;

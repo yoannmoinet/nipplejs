@@ -4,6 +4,7 @@ layout: index
 [![NPM](https://nodei.co/npm-dl/nipplejs.png?months=3)](https://npmjs.org/package/nipplejs)
 
 # Table Of Contents
+<details>
 
 <!-- toc -->
 
@@ -68,6 +69,7 @@ layout: index
     + [Build](#build)
 
 <!-- tocstop -->
+</details>
 
 ## Install
 
