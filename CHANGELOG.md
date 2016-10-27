@@ -1,3 +1,15 @@
+<a name="0.6.7"></a>
+## [0.6.7](https://github.com/yoannmoinet/nipplejs/compare/v0.6.6...v0.6.7) (2016-10-27)
+
+
+### Bug Fixes
+
+* update dependencies ([73bcda9](https://github.com/yoannmoinet/nipplejs/commit/73bcda9))
+* **events:** trigger events with the correct id and not identifier ([17f0fe6](https://github.com/yoannmoinet/nipplejs/commit/17f0fe6))
+* **identifier:** better identifier management ([ff44916](https://github.com/yoannmoinet/nipplejs/commit/ff44916))
+
+
+
 <a name="0.6.6"></a>
 ## [0.6.6](https://github.com/yoannmoinet/nipplejs/compare/v0.6.5...v0.6.6) (2016-08-23)
 
