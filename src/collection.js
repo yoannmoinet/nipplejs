@@ -187,8 +187,8 @@ Collection.prototype.bindNipple = function (nipple) {
     var type;
     // Bubble up identified events.
     var handler = function (evt, data) {
-        // Identify the event type with the nipple's identifier.
-        type = evt.type + ' ' + evt.target.identifier + ':' + evt.type;
+        // Identify the event type with the nipple's id.
+        type = evt.type + ' ' + data.id + ':' + evt.type;
         self.trigger(type, data);
     };
 
@@ -256,7 +256,7 @@ Collection.prototype.processOnStart = function (evt) {
     var process = function (nip) {
         // Trigger the start.
         nip.trigger('start', nip);
-        self.trigger('start ' + nip.identifier + ':start', nip);
+        self.trigger('start ' + nip.id + ':start', nip);
 
         nip.show();
         if (pressure > 0) {
@@ -387,7 +387,7 @@ Collection.prototype.processOnMove = function (evt) {
 
     // Send everything to everyone.
     nipple.trigger('move', toSend);
-    self.trigger('move ' + identifier + ':move', toSend);
+    self.trigger('move ' + nipple.id + ':move', toSend);
 };
 
 Collection.prototype.processOnEnd = function (evt) {
@@ -403,14 +403,14 @@ Collection.prototype.processOnEnd = function (evt) {
 
     if (!opts.dataOnly) {
         nipple.hide(function () {
-                if (opts.mode === 'dynamic') {
-                    nipple.trigger('removed', nipple);
-                    self.trigger('removed ' + identifier + ':removed', nipple);
-                    self.manager.trigger('removed ' + identifier + ':removed',
-                        nipple);
-                    nipple.destroy();
-                }
-            });
+            if (opts.mode === 'dynamic') {
+                nipple.trigger('removed', nipple);
+                self.trigger('removed ' + nipple.id + ':removed', nipple);
+                self.manager
+                    .trigger('removed ' + nipple.id + ':removed', nipple);
+                nipple.destroy();
+            }
+        });
     }
 
     // Clear the pressure interval reader
@@ -421,7 +421,7 @@ Collection.prototype.processOnEnd = function (evt) {
     nipple.resetDirection();
 
     nipple.trigger('end', nipple);
-    self.trigger('end ' + identifier + ':end', nipple);
+    self.trigger('end ' + nipple.id + ':end', nipple);
 
     // Remove identifier from our bank.
     if (self.ids.indexOf(identifier) >= 0) {

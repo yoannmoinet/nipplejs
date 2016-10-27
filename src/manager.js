@@ -82,7 +82,7 @@ Manager.prototype.bindCollection = function (collection) {
     // Bubble up identified events.
     var handler = function (evt, data) {
         // Identify the event type with the nipple's identifier.
-        type = evt.type + ' ' + evt.target.id + ':' + evt.type;
+        type = evt.type + ' ' + data.id + ':' + evt.type;
         self.trigger(type, data);
     };
 
