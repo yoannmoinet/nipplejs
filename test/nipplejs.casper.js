@@ -6,6 +6,8 @@ var NB_TESTS = 10;
 var nippleIndex = 0;
 var collectionIndex = 0;
 var showClientLog = false;
+var currentFile = require('system').args[3];
+var curFilePath = fs.absolute(currentFile);
 
 /*
     CONFIGURE CASPER
@@ -87,7 +89,7 @@ casper.test.begin('NippleJS test page loads correctly', NB_TESTS,
     function suite(test) {
         var box;
         casper
-            .start('http://127.0.0.1:8080')
+            .start(curFilePath + '/index.html')
             .then(function () {
                 // Assert that active zone is here.
                 test.assertExists('#zone_joystick', 'Active zone is found');
