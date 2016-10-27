@@ -31,6 +31,7 @@ Super.prototype.off = function (type, cb) {
             self._handlers_[type].indexOf(cb) >= 0) {
         self._handlers_[type].splice(self._handlers_[type].indexOf(cb), 1);
     }
+
     return self;
 };
 

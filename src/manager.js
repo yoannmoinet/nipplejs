@@ -123,10 +123,10 @@ Manager.prototype.getIdentifier = function (evt) {
         id = this.index;
     } else {
         // Extract identifier from event object.
-        // Unavailable in mouse events so replaced by 0.
+        // Unavailable in mouse events so replaced by latest increment.
         id = evt.identifier === undefined ? evt.pointerId : evt.identifier;
         if (id === undefined) {
-            id = 0;
+            id = this.latest || 0;
         }
     }
 
@@ -134,16 +134,23 @@ Manager.prototype.getIdentifier = function (evt) {
         this.ids[id] = this.index;
         this.index += 1;
     }
+
+    // Keep the latest id used in case we're using an unidentified mouseEvent
+    this.latest = id;
     return this.ids[id];
 };
 
 Manager.prototype.removeIdentifier = function (identifier) {
+    var removed = {};
     for (var id in this.ids) {
         if (this.ids[id] === identifier) {
+            removed.id = id;
+            removed.identifier = this.ids[id];
             delete this.ids[id];
             break;
         }
     }
+    return removed;
 };
 
 Manager.prototype.onmove = function (evt) {
