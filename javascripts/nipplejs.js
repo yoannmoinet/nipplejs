@@ -231,6 +231,7 @@ Super.prototype.off = function (type, cb) {
             self._handlers_[type].indexOf(cb) >= 0) {
         self._handlers_[type].splice(self._handlers_[type].indexOf(cb), 1);
     }
+
     return self;
 };
 
@@ -773,7 +774,8 @@ Collection.prototype.begin = function () {
     // if needed.
     if (opts.mode === 'static') {
         var nipple = self.createNipple(
-            opts.position
+            opts.position,
+            self.manager.getIdentifier()
         );
         // Add it to the dom.
         nipple.add();
@@ -863,8 +865,8 @@ Collection.prototype.bindNipple = function (nipple) {
     var type;
     // Bubble up identified events.
     var handler = function (evt, data) {
-        // Identify the event type with the nipple's identifier.
-        type = evt.type + ' ' + evt.target.identifier + ':' + evt.type;
+        // Identify the event type with the nipple's id.
+        type = evt.type + ' ' + data.id + ':' + evt.type;
         self.trigger(type, data);
     };
 
@@ -928,11 +930,16 @@ Collection.prototype.processOnStart = function (evt) {
         x: evt.pageX,
         y: evt.pageY
     };
+
     var nipple = self.getOrCreate(identifier, position);
+
+    // Update its touch identifier
+    nipple.identifier = identifier;
+
     var process = function (nip) {
         // Trigger the start.
         nip.trigger('start', nip);
-        self.trigger('start ' + nip.identifier + ':start', nip);
+        self.trigger('start ' + nip.id + ':start', nip);
 
         nip.show();
         if (pressure > 0) {
@@ -949,7 +956,7 @@ Collection.prototype.processOnStart = function (evt) {
 
     // Store the nipple in the actives array
     self.actives.push(nipple);
-    self.ids.push(identifier);
+    self.ids.push(nipple.identifier);
 
     if (opts.mode !== 'semi') {
         process(nipple);
@@ -976,11 +983,11 @@ Collection.prototype.getOrCreate = function (identifier, position) {
 
     // If we're in static or semi, we might already have an active.
     if (/(semi|static)/.test(opts.mode)) {
-        // Get the active one
-        // and update its identifier.
+        // Get the active one.
+        // TODO: Multi-touche for semi and static will start here.
+        // Return the nearest one.
         nipple = self.idles[0];
         if (nipple) {
-            nipple.identifier = identifier;
             self.idles.splice(0, 1);
             return nipple;
         }
@@ -1007,9 +1014,12 @@ Collection.prototype.processOnMove = function (evt) {
     if (!nipple) {
         // This is here just for safety.
         // It shouldn't happen.
+        console.error('Found zombie joystick with ID ' + identifier);
         self.manager.removeIdentifier(identifier);
         return;
     }
+
+    nipple.identifier = identifier;
 
     var size = nipple.options.size / 2;
     var pos = {
@@ -1063,7 +1073,7 @@ Collection.prototype.processOnMove = function (evt) {
 
     // Send everything to everyone.
     nipple.trigger('move', toSend);
-    self.trigger('move ' + identifier + ':move', toSend);
+    self.trigger('move ' + nipple.id + ':move', toSend);
 };
 
 Collection.prototype.processOnEnd = function (evt) {
@@ -1071,7 +1081,7 @@ Collection.prototype.processOnEnd = function (evt) {
     var opts = self.options;
     var identifier = self.manager.getIdentifier(evt);
     var nipple = self.nipples.get(identifier);
-    self.manager.removeIdentifier(identifier);
+    var removedIdentifier = self.manager.removeIdentifier(nipple.identifier);
 
     if (!nipple) {
         return;
@@ -1079,29 +1089,29 @@ Collection.prototype.processOnEnd = function (evt) {
 
     if (!opts.dataOnly) {
         nipple.hide(function () {
-                if (opts.mode === 'dynamic') {
-                    nipple.trigger('removed', nipple);
-                    self.trigger('removed ' + identifier + ':removed', nipple);
-                    self.manager.trigger('removed ' + identifier + ':removed',
-                        nipple);
-                    nipple.destroy();
-                }
-            });
+            if (opts.mode === 'dynamic') {
+                nipple.trigger('removed', nipple);
+                self.trigger('removed ' + nipple.id + ':removed', nipple);
+                self.manager
+                    .trigger('removed ' + nipple.id + ':removed', nipple);
+                nipple.destroy();
+            }
+        });
     }
 
     // Clear the pressure interval reader
-    clearInterval(self.pressureIntervals[identifier]);
+    clearInterval(self.pressureIntervals[nipple.identifier]);
 
     // Reset the direciton of the nipple, to be able to trigger a new direction
     // on start.
     nipple.resetDirection();
 
     nipple.trigger('end', nipple);
-    self.trigger('end ' + identifier + ':end', nipple);
+    self.trigger('end ' + nipple.id + ':end', nipple);
 
     // Remove identifier from our bank.
-    if (self.ids.indexOf(identifier) >= 0) {
-        self.ids.splice(self.ids.indexOf(identifier), 1);
+    if (self.ids.indexOf(nipple.identifier) >= 0) {
+        self.ids.splice(self.ids.indexOf(nipple.identifier), 1);
     }
 
     // Clean our actives array.
@@ -1121,6 +1131,11 @@ Collection.prototype.processOnEnd = function (evt) {
 
     // We unbind move and end.
     self.manager.unbindDocument();
+
+    // We add back the identifier of the idle nipple;
+    if (/(semi|static)/.test(opts.mode)) {
+        self.manager.ids[removedIdentifier.id] = removedIdentifier.identifier;
+    }
 };
 
 // Remove destroyed nipple from the lists
@@ -1135,6 +1150,13 @@ Collection.prototype.onDestroyed = function(evt, nipple) {
     if (self.idles.indexOf(nipple) >= 0) {
         self.idles.splice(self.idles.indexOf(nipple), 1);
     }
+    if (self.ids.indexOf(nipple.identifier) >= 0) {
+        self.ids.splice(self.ids.indexOf(nipple.identifier), 1);
+    }
+
+    // Remove the identifier from our bank
+    self.manager.removeIdentifier(nipple.identifier);
+
     // We unbind move and end.
     self.manager.unbindDocument();
 };
@@ -1247,7 +1269,7 @@ Manager.prototype.bindCollection = function (collection) {
     // Bubble up identified events.
     var handler = function (evt, data) {
         // Identify the event type with the nipple's identifier.
-        type = evt.type + ' ' + evt.target.id + ':' + evt.type;
+        type = evt.type + ' ' + data.id + ':' + evt.type;
         self.trigger(type, data);
     };
 
@@ -1288,10 +1310,10 @@ Manager.prototype.getIdentifier = function (evt) {
         id = this.index;
     } else {
         // Extract identifier from event object.
-        // Unavailable in mouse events so replaced by 0.
+        // Unavailable in mouse events so replaced by latest increment.
         id = evt.identifier === undefined ? evt.pointerId : evt.identifier;
         if (id === undefined) {
-            id = 0;
+            id = this.latest || 0;
         }
     }
 
@@ -1299,16 +1321,23 @@ Manager.prototype.getIdentifier = function (evt) {
         this.ids[id] = this.index;
         this.index += 1;
     }
+
+    // Keep the latest id used in case we're using an unidentified mouseEvent
+    this.latest = id;
     return this.ids[id];
 };
 
 Manager.prototype.removeIdentifier = function (identifier) {
+    var removed = {};
     for (var id in this.ids) {
         if (this.ids[id] === identifier) {
+            removed.id = id;
+            removed.identifier = this.ids[id];
             delete this.ids[id];
             break;
         }
     }
+    return removed;
 };
 
 Manager.prototype.onmove = function (evt) {
