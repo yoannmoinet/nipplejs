@@ -320,6 +320,7 @@ function Nipple (collection, options) {
         fadeTime: 250,
         dataOnly: false,
         restOpacity: 0.5,
+        resetNob:true,
         mode: 'dynamic',
         zone: document.body
     };
@@ -534,7 +535,10 @@ Nipple.prototype.hide = function (cb) {
         },
         self.options.fadeTime
     );
-    self.restPosition();
+
+    if (self.options.resetNob) {
+        self.restPosition();
+    }
 
     return self;
 };
@@ -705,7 +709,8 @@ function Collection (manager, options) {
         color: 'white',
         fadeTime: 250,
         dataOnly: false,
-        restOpacity: 0.5
+        restOpacity: 0.5,
+        resetNob:true
     };
 
     self.config(options);
@@ -832,6 +837,7 @@ Collection.prototype.createNipple = function (position, identifier) {
         fadeTime: opts.fadeTime,
         dataOnly: opts.dataOnly,
         restOpacity: opts.restOpacity,
+        resetNob:opts.resetNob,
         mode: opts.mode,
         identifier: identifier,
         position: position,
