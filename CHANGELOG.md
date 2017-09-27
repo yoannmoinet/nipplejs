@@ -1,3 +1,13 @@
+<a name="0.6.8"></a>
+## [0.6.8](https://github.com/yoannmoinet/nipplejs/compare/v0.6.7...v0.6.8) (2017-09-27)
+
+
+### Bug Fixes
+
+* Joystick gets stuck ([82b70cb](https://github.com/yoannmoinet/nipplejs/commit/82b70cb))
+
+
+
 <a name="0.6.7"></a>
 ## [0.6.7](https://github.com/yoannmoinet/nipplejs/compare/v0.6.6...v0.6.7) (2016-10-27)
 
