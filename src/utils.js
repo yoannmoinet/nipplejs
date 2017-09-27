@@ -55,7 +55,7 @@ u.trigger = function (el, type, data) {
 };
 
 u.prepareEvent = function (evt) {
-    evt.preventDefault();
+    //evt.preventDefault();
     return evt.type.match(/^touch/) ? evt.changedTouches : evt;
 };
 
