@@ -28,6 +28,7 @@ function Collection (manager, options) {
         color: 'white',
         fadeTime: 250,
         dataOnly: false,
+        restJoystick: true,
         restOpacity: 0.5
     };
 
@@ -154,6 +155,7 @@ Collection.prototype.createNipple = function (position, identifier) {
         threshold: opts.threshold,
         fadeTime: opts.fadeTime,
         dataOnly: opts.dataOnly,
+        restJoystick: opts.restJoystick,
         restOpacity: opts.restOpacity,
         mode: opts.mode,
         identifier: identifier,
