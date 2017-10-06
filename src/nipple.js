@@ -15,6 +15,7 @@ function Nipple (collection, options) {
         color: 'white',
         fadeTime: 250,
         dataOnly: false,
+        restJoystick: true,
         restOpacity: 0.5,
         mode: 'dynamic',
         zone: document.body
@@ -230,7 +231,9 @@ Nipple.prototype.hide = function (cb) {
         },
         self.options.fadeTime
     );
-    self.restPosition();
+    if (self.options.restJoystick) {
+        self.restPosition();
+    }
 
     return self;
 };
