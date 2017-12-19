@@ -39,6 +39,7 @@ if (isPointer) {
 } else {
     toBind = events.mouse;
 }
+
 ///////////////////////
 ///      UTILS      ///
 ///////////////////////
@@ -198,6 +199,7 @@ u.map = function (ar, fn) {
         fn(ar);
     }
 };
+
 ///////////////////////
 ///   SUPER CLASS   ///
 ///////////////////////
@@ -302,6 +304,7 @@ Super.prototype.unbindEvt = function (el, type) {
 
     return this;
 };
+
 ///////////////////////
 ///   THE NIPPLE    ///
 ///////////////////////
@@ -319,6 +322,7 @@ function Nipple (collection, options) {
         color: 'white',
         fadeTime: 250,
         dataOnly: false,
+        restJoystick: true,
         restOpacity: 0.5,
         mode: 'dynamic',
         zone: document.body
@@ -534,7 +538,9 @@ Nipple.prototype.hide = function (cb) {
         },
         self.options.fadeTime
     );
-    self.restPosition();
+    if (self.options.restJoystick) {
+        self.restPosition();
+    }
 
     return self;
 };
@@ -675,6 +681,7 @@ Nipple.prototype.computeDirection = function (obj) {
     }
     return obj;
 };
+
 /* global Nipple, Super */
 
 ///////////////////////////
@@ -705,6 +712,7 @@ function Collection (manager, options) {
         color: 'white',
         fadeTime: 250,
         dataOnly: false,
+        restJoystick: true,
         restOpacity: 0.5
     };
 
@@ -831,6 +839,7 @@ Collection.prototype.createNipple = function (position, identifier) {
         threshold: opts.threshold,
         fadeTime: opts.fadeTime,
         dataOnly: opts.dataOnly,
+        restJoystick: opts.restJoystick,
         restOpacity: opts.restOpacity,
         mode: opts.mode,
         identifier: identifier,
@@ -1185,6 +1194,7 @@ Collection.prototype.destroy = function () {
     // Unbind everything.
     self.off();
 };
+
 /* global u, Super, Collection */
 
 ///////////////////////
@@ -1401,6 +1411,7 @@ Manager.prototype.onDestroyed = function (evt, coll) {
     }
     self.collections.splice(self.collections.indexOf(coll), 1);
 };
+
 var factory = new Manager();
 return {
     create: function (options) {

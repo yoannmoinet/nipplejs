@@ -1,3 +1,13 @@
+<a name="0.7.0"></a>
+# [0.7.0](https://github.com/yoannmoinet/nipplejs/compare/v0.6.7...v0.7.0) (2017-10-07)
+
+
+### Features
+
+* add restJoystick option ([7166f99](https://github.com/yoannmoinet/nipplejs/commit/7166f99))
+
+
+
 <a name="0.6.7"></a>
 ## [0.6.7](https://github.com/yoannmoinet/nipplejs/compare/v0.6.6...v0.6.7) (2016-10-27)
 
