@@ -109,7 +109,7 @@ Manager.prototype.unbindDocument = function (force) {
     var self = this;
     // If there are no touch left
     // unbind the document.
-    if (!Object.keys(self.ids).length || force === true) {
+    if (!Object.keys(self.ids).length || force === true || self.binded) {
         self.unbindEvt(document, 'move')
             .unbindEvt(document, 'end');
         self.binded = false;

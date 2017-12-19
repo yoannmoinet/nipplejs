@@ -39,6 +39,7 @@ if (isPointer) {
 } else {
     toBind = events.mouse;
 }
+
 ///////////////////////
 ///      UTILS      ///
 ///////////////////////
@@ -198,6 +199,7 @@ u.map = function (ar, fn) {
         fn(ar);
     }
 };
+
 ///////////////////////
 ///   SUPER CLASS   ///
 ///////////////////////
@@ -302,6 +304,7 @@ Super.prototype.unbindEvt = function (el, type) {
 
     return this;
 };
+
 ///////////////////////
 ///   THE NIPPLE    ///
 ///////////////////////
@@ -675,6 +678,7 @@ Nipple.prototype.computeDirection = function (obj) {
     }
     return obj;
 };
+
 /* global Nipple, Super */
 
 ///////////////////////////
@@ -1185,6 +1189,7 @@ Collection.prototype.destroy = function () {
     // Unbind everything.
     self.off();
 };
+
 /* global u, Super, Collection */
 
 ///////////////////////
@@ -1296,7 +1301,7 @@ Manager.prototype.unbindDocument = function (force) {
     var self = this;
     // If there are no touch left
     // unbind the document.
-    if (!Object.keys(self.ids).length || force === true) {
+    if (!Object.keys(self.ids).length || force === true || self.binded) {
         self.unbindEvt(document, 'move')
             .unbindEvt(document, 'end');
         self.binded = false;
@@ -1401,6 +1406,7 @@ Manager.prototype.onDestroyed = function (evt, coll) {
     }
     self.collections.splice(self.collections.indexOf(coll), 1);
 };
+
 var factory = new Manager();
 return {
     create: function (options) {
