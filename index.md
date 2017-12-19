@@ -25,6 +25,7 @@ layout: index
     + [`'dynamic'`](#dynamic)
     + [`'semi'`](#semi)
     + [`'static'`](#static)
+  * [`options.restJoystick` defaults to true](#optionsrestjoystick-defaults-to-true)
   * [`options.restOpacity` defaults to 0.5](#optionsrestopacity-defaults-to-05)
   * [`options.catchDistance` defaults to 200](#optionscatchdistance-defaults-to-200)
 - [API](#api)
@@ -131,6 +132,7 @@ var options = {
     dataOnly: Boolean,              // no dom element whatsoever
     position: Object,               // preset position for 'static' mode
     mode: String,                   // 'dynamic', 'static' or 'semi'
+    restJoystick: Boolean,
     restOpacity: Number,            // opacity when not 'dynamic' and rested
     catchDistance: Number           // distance to recycle previous joystick in
                                     // 'semi' mode
@@ -227,6 +229,9 @@ Three modes are possible :
 - each new touch triggers a new direction.
 - **cannot** be multitouch.
 
+### `options.restJoystick` defaults to true
+Reset the joystick's position when it enters the rest state.
+
 ### `options.restOpacity` defaults to 0.5
 The opacity to apply when the joystick is in a rest position.
 
@@ -264,6 +269,7 @@ Your manager has the following signature :
         color: String,
         fadeTime: Number,
         dataOnly: Boolean,
+        restJoystick: Boolean,
         restOpacity: Number
     }
 }
