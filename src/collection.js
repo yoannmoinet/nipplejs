@@ -259,6 +259,9 @@ Collection.prototype.processOnStart = function (evt) {
     var nipple = self.getOrCreate(identifier, position);
 
     // Update its touch identifier
+    if (nipple.identifier !== identifier) {
+        self.manager.removeIdentifier(nipple.identifier);
+    }
     nipple.identifier = identifier;
 
     var process = function (nip) {
