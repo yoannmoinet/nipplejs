@@ -9,7 +9,7 @@ var events = {
     touch: {
         start: 'touchstart',
         move: 'touchmove',
-        end: 'touchend'
+        end: 'touchend, touchcancel'
     },
     mouse: {
         start: 'mousedown',
@@ -39,6 +39,7 @@ if (isPointer) {
 } else {
     toBind = events.mouse;
 }
+
 ///////////////////////
 ///      UTILS      ///
 ///////////////////////
@@ -74,19 +75,29 @@ u.degrees = function(a) {
     return a * (180 / Math.PI);
 };
 
-u.bindEvt = function (el, type, handler) {
-    if (el.addEventListener) {
-        el.addEventListener(type, handler, false);
-    } else if (el.attachEvent) {
-        el.attachEvent(type, handler);
+u.bindEvt = function (el, arg, handler) {
+    var types = arg.split(/[ ,]+/g);
+    var type;
+    for (var i = 0; i < types.length; i += 1) {
+        type = types[i];
+        if (el.addEventListener) {
+            el.addEventListener(type, handler, false);
+        } else if (el.attachEvent) {
+            el.attachEvent(type, handler);
+        }
     }
 };
 
-u.unbindEvt = function (el, type, handler) {
-    if (el.removeEventListener) {
-        el.removeEventListener(type, handler);
-    } else if (el.detachEvent) {
-        el.detachEvent(type, handler);
+u.unbindEvt = function (el, arg, handler) {
+    var types = arg.split(/[ ,]+/g);
+    var type;
+    for (var i = 0; i < types.length; i += 1) {
+        type = types[i];
+        if (el.removeEventListener) {
+            el.removeEventListener(type, handler);
+        } else if (el.detachEvent) {
+            el.detachEvent(type, handler);
+        }
     }
 };
 
@@ -198,6 +209,7 @@ u.map = function (ar, fn) {
         fn(ar);
     }
 };
+
 ///////////////////////
 ///   SUPER CLASS   ///
 ///////////////////////
@@ -302,6 +314,7 @@ Super.prototype.unbindEvt = function (el, type) {
 
     return this;
 };
+
 ///////////////////////
 ///   THE NIPPLE    ///
 ///////////////////////
@@ -319,6 +332,7 @@ function Nipple (collection, options) {
         color: 'white',
         fadeTime: 250,
         dataOnly: false,
+        restJoystick: true,
         restOpacity: 0.5,
         mode: 'dynamic',
         zone: document.body
@@ -534,7 +548,9 @@ Nipple.prototype.hide = function (cb) {
         },
         self.options.fadeTime
     );
-    self.restPosition();
+    if (self.options.restJoystick) {
+        self.restPosition();
+    }
 
     return self;
 };
@@ -675,6 +691,7 @@ Nipple.prototype.computeDirection = function (obj) {
     }
     return obj;
 };
+
 /* global Nipple, Super */
 
 ///////////////////////////
@@ -705,6 +722,7 @@ function Collection (manager, options) {
         color: 'white',
         fadeTime: 250,
         dataOnly: false,
+        restJoystick: true,
         restOpacity: 0.5
     };
 
@@ -831,6 +849,7 @@ Collection.prototype.createNipple = function (position, identifier) {
         threshold: opts.threshold,
         fadeTime: opts.fadeTime,
         dataOnly: opts.dataOnly,
+        restJoystick: opts.restJoystick,
         restOpacity: opts.restOpacity,
         mode: opts.mode,
         identifier: identifier,
@@ -934,6 +953,9 @@ Collection.prototype.processOnStart = function (evt) {
     var nipple = self.getOrCreate(identifier, position);
 
     // Update its touch identifier
+    if (nipple.identifier !== identifier) {
+        self.manager.removeIdentifier(nipple.identifier);
+    }
     nipple.identifier = identifier;
 
     var process = function (nip) {
@@ -1185,6 +1207,7 @@ Collection.prototype.destroy = function () {
     // Unbind everything.
     self.off();
 };
+
 /* global u, Super, Collection */
 
 ///////////////////////
@@ -1401,6 +1424,7 @@ Manager.prototype.onDestroyed = function (evt, coll) {
     }
     self.collections.splice(self.collections.indexOf(coll), 1);
 };
+
 var factory = new Manager();
 return {
     create: function (options) {
