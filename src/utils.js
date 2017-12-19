@@ -33,19 +33,29 @@ u.degrees = function(a) {
     return a * (180 / Math.PI);
 };
 
-u.bindEvt = function (el, type, handler) {
-    if (el.addEventListener) {
-        el.addEventListener(type, handler, false);
-    } else if (el.attachEvent) {
-        el.attachEvent(type, handler);
+u.bindEvt = function (el, arg, handler) {
+    var types = arg.split(/[ ,]+/g);
+    var type;
+    for (var i = 0; i < types.length; i += 1) {
+        type = types[i];
+        if (el.addEventListener) {
+            el.addEventListener(type, handler, false);
+        } else if (el.attachEvent) {
+            el.attachEvent(type, handler);
+        }
     }
 };
 
-u.unbindEvt = function (el, type, handler) {
-    if (el.removeEventListener) {
-        el.removeEventListener(type, handler);
-    } else if (el.detachEvent) {
-        el.detachEvent(type, handler);
+u.unbindEvt = function (el, arg, handler) {
+    var types = arg.split(/[ ,]+/g);
+    var type;
+    for (var i = 0; i < types.length; i += 1) {
+        type = types[i];
+        if (el.removeEventListener) {
+            el.removeEventListener(type, handler);
+        } else if (el.detachEvent) {
+            el.detachEvent(type, handler);
+        }
     }
 };
 

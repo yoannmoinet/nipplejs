@@ -8,7 +8,7 @@ var events = {
     touch: {
         start: 'touchstart',
         move: 'touchmove',
-        end: 'touchend'
+        end: 'touchend, touchcancel'
     },
     mouse: {
         start: 'mousedown',
