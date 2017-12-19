@@ -1,3 +1,19 @@
+<a name="0.6.8"></a>
+## [0.6.8](https://github.com/yoannmoinet/nipplejs/compare/v0.6.7...v0.6.8) (2017-12-19)
+
+
+### Bug Fixes
+
+* add touchcancel handling as touchend for events coming from outside ([ebc501e](https://github.com/yoannmoinet/nipplejs/commit/ebc501e)), closes [#61](https://github.com/yoannmoinet/nipplejs/issues/61) [#57](https://github.com/yoannmoinet/nipplejs/issues/57) [#33](https://github.com/yoannmoinet/nipplejs/issues/33) [#31](https://github.com/yoannmoinet/nipplejs/issues/31) [#30](https://github.com/yoannmoinet/nipplejs/issues/30)
+* update manager with changing identifier ([45ec1d7](https://github.com/yoannmoinet/nipplejs/commit/45ec1d7)), closes [#64](https://github.com/yoannmoinet/nipplejs/issues/64)
+
+
+### Features
+
+* add restJoystick option ([55b6482](https://github.com/yoannmoinet/nipplejs/commit/55b6482))
+
+
+
 <a name="0.6.7"></a>
 ## [0.6.7](https://github.com/yoannmoinet/nipplejs/compare/v0.6.6...v0.6.7) (2016-10-27)
 
