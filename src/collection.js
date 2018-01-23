@@ -367,9 +367,19 @@ Collection.prototype.processOnMove = function (evt) {
         pos = u.findCoord(nipple.position, dist, angle);
     }
 
+    var xPosition = pos.x - nipple.position.x
+    var yPosition = pos.y - nipple.position.y
+
+    if (opts.isHorizontalLocked){
+        yPosition = 0
+    } 
+    if (opts.isVerticalLocked) {
+        xPosition = 0
+    }
+
     nipple.frontPosition = {
-        x: pos.x - nipple.position.x,
-        y: pos.y - nipple.position.y
+        x: xPosition,
+        y: yPosition
     };
 
     if (!opts.dataOnly) {
@@ -387,7 +397,9 @@ Collection.prototype.processOnMove = function (evt) {
             radian: rAngle,
             degree: angle
         },
-        instance: nipple
+        instance: nipple,
+        horizontalOnly: opts.isHorizontalLocked,
+        verticalOnly: opts.isVerticalLocked
     };
 
     // Compute the direction's datas.

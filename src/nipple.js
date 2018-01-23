@@ -18,7 +18,9 @@ function Nipple (collection, options) {
         restJoystick: true,
         restOpacity: 0.5,
         mode: 'dynamic',
-        zone: document.body
+        zone: document.body,
+        isHorizontalLocked: false,
+        isVerticalLocked: false
     };
 
     this.config(options);
@@ -300,13 +302,14 @@ Nipple.prototype.computeDirection = function (obj) {
     //      /   \
     //     /DOWN \
     //
-    if (rAngle > angle45 && rAngle < (angle45 * 3)) {
+    if (rAngle > angle45 && rAngle < (angle45 * 3) && !obj.horizontalOnly) {
         direction = 'up';
-    } else if (rAngle > -angle45 && rAngle <= angle45) {
+    } else if (rAngle > -angle45 && rAngle <= angle45 && !obj.verticalOnly) {
         direction = 'left';
-    } else if (rAngle > (-angle45 * 3) && rAngle <= -angle45) {
+    }else if (rAngle > (-angle45 * 3) && rAngle <= -angle45 &&
+    !obj.horizontalOnly) {
         direction = 'down';
-    } else {
+    } else if (!obj.verticalOnly) {
         direction = 'right';
     }
 
@@ -315,16 +318,24 @@ Nipple.prototype.computeDirection = function (obj) {
     // _______               | RIGHT
     //                  LEFT |
     //   DOWN                |
-    if (rAngle > -angle90 && rAngle < angle90) {
-        directionX = 'left';
+    if (!obj.verticalOnly) {
+        if (rAngle > -angle90 && rAngle < angle90) {
+            directionX = 'left';
+        } else {
+            directionX = 'right';
+        }
     } else {
-        directionX = 'right';
+        directionX = 'NA';
     }
 
-    if (rAngle > 0) {
-        directionY = 'up';
+    if (!obj.horizontalOnly) {
+        if (rAngle > 0) {
+            directionY = 'up';
+        } else {
+            directionY = 'down';
+        }
     } else {
-        directionY = 'down';
+        directionY = 'NA';
     }
 
     if (obj.force > this.options.threshold) {
