@@ -86,14 +86,14 @@ u.getScroll = function () {
 };
 
 u.applyPosition = function (el, pos) {
-    if (pos.x && pos.y) {
-        el.style.left = pos.x + 'px';
-        el.style.top = pos.y + 'px';
-    } else if (pos.top || pos.right || pos.bottom || pos.left) {
+    if (pos.top || pos.right || pos.bottom || pos.left) {
         el.style.top = pos.top;
         el.style.right = pos.right;
         el.style.bottom = pos.bottom;
         el.style.left = pos.left;
+    } else {
+        el.style.left = pos.x + 'px';
+        el.style.top = pos.y + 'px';
     }
 };
 

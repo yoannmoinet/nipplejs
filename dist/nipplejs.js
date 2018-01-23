@@ -130,14 +130,14 @@ u.getScroll = function () {
 };
 
 u.applyPosition = function (el, pos) {
-    if (pos.x && pos.y) {
-        el.style.left = pos.x + 'px';
-        el.style.top = pos.y + 'px';
-    } else if (pos.top || pos.right || pos.bottom || pos.left) {
+    if (pos.top || pos.right || pos.bottom || pos.left) {
         el.style.top = pos.top;
         el.style.right = pos.right;
         el.style.bottom = pos.bottom;
         el.style.left = pos.left;
+    } else {
+        el.style.left = pos.x + 'px';
+        el.style.top = pos.y + 'px';
     }
 };
 
@@ -337,7 +337,9 @@ function Nipple (collection, options) {
         restJoystick: true,
         restOpacity: 0.5,
         mode: 'dynamic',
-        zone: document.body
+        zone: document.body,
+        lockX: false,
+        lockY: false
     };
 
     this.config(options);
@@ -619,13 +621,25 @@ Nipple.prototype.computeDirection = function (obj) {
     //      /   \
     //     /DOWN \
     //
-    if (rAngle > angle45 && rAngle < (angle45 * 3)) {
+    if (
+        rAngle > angle45 &&
+        rAngle < (angle45 * 3) &&
+        !obj.lockX
+    ) {
         direction = 'up';
-    } else if (rAngle > -angle45 && rAngle <= angle45) {
+    } else if (
+        rAngle > -angle45 &&
+        rAngle <= angle45 &&
+        !obj.lockY
+    ) {
         direction = 'left';
-    } else if (rAngle > (-angle45 * 3) && rAngle <= -angle45) {
+    } else if (
+        rAngle > (-angle45 * 3) &&
+        rAngle <= -angle45 &&
+        !obj.lockX
+    ) {
         direction = 'down';
-    } else {
+    } else if (!obj.lockY) {
         direction = 'right';
     }
 
@@ -634,16 +648,20 @@ Nipple.prototype.computeDirection = function (obj) {
     // _______               | RIGHT
     //                  LEFT |
     //   DOWN                |
-    if (rAngle > -angle90 && rAngle < angle90) {
-        directionX = 'left';
-    } else {
-        directionX = 'right';
+    if (!obj.lockY) {
+        if (rAngle > -angle90 && rAngle < angle90) {
+            directionX = 'left';
+        } else {
+            directionX = 'right';
+        }
     }
 
-    if (rAngle > 0) {
-        directionY = 'up';
-    } else {
-        directionY = 'down';
+    if (!obj.lockX) {
+        if (rAngle > 0) {
+            directionY = 'up';
+        } else {
+            directionY = 'down';
+        }
     }
 
     if (obj.force > this.options.threshold) {
@@ -725,7 +743,9 @@ function Collection (manager, options) {
         fadeTime: 250,
         dataOnly: false,
         restJoystick: true,
-        restOpacity: 0.5
+        restOpacity: 0.5,
+        lockX: false,
+        lockY: false
     };
 
     self.config(options);
@@ -1063,9 +1083,19 @@ Collection.prototype.processOnMove = function (evt) {
         pos = u.findCoord(nipple.position, dist, angle);
     }
 
+    var xPosition = pos.x - nipple.position.x
+    var yPosition = pos.y - nipple.position.y
+
+    if (opts.lockX){
+        yPosition = 0
+    }
+    if (opts.lockY) {
+        xPosition = 0
+    }
+
     nipple.frontPosition = {
-        x: pos.x - nipple.position.x,
-        y: pos.y - nipple.position.y
+        x: xPosition,
+        y: yPosition
     };
 
     if (!opts.dataOnly) {
@@ -1083,7 +1113,9 @@ Collection.prototype.processOnMove = function (evt) {
             radian: rAngle,
             degree: angle
         },
-        instance: nipple
+        instance: nipple,
+        lockX: opts.lockX,
+        lockY: opts.lockY
     };
 
     // Compute the direction's datas.
@@ -1443,4 +1475,3 @@ return {
 };
 
 });
-
