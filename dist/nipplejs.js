@@ -734,7 +734,9 @@ function Collection (manager, options) {
         fadeTime: 250,
         dataOnly: false,
         restJoystick: true,
-        restOpacity: 0.5
+        restOpacity: 0.5,
+        isHorizontalLocked: false,
+        isVerticalLocked: false
     };
 
     self.config(options);
