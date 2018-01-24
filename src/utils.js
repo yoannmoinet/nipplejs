@@ -91,7 +91,7 @@ u.applyPosition = function (el, pos) {
         el.style.right = pos.right;
         el.style.bottom = pos.bottom;
         el.style.left = pos.left;
-    }else {
+    } else {
         el.style.left = pos.x + 'px';
         el.style.top = pos.y + 'px';
     }

@@ -306,7 +306,7 @@ Nipple.prototype.computeDirection = function (obj) {
         direction = 'up';
     } else if (rAngle > -angle45 && rAngle <= angle45 && !obj.verticalOnly) {
         direction = 'left';
-    }else if (rAngle > (-angle45 * 3) && rAngle <= -angle45 &&
+    } else if (rAngle > (-angle45 * 3) && rAngle <= -angle45 &&
     !obj.horizontalOnly) {
         direction = 'down';
     } else if (!obj.verticalOnly) {
