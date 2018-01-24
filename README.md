@@ -241,6 +241,13 @@ This is only useful in the `semi` mode, and determine at which distance we recyc
 At 200 (px), if you press the zone into a rayon of 200px around the previously displayed joystick,
 it will act as a `static` one.
 
+### `options.isHorizontalLocked` defaults to false
+Locks joystick's movement to the x (horizontal) axis
+
+### `options.isHorizontalLocked` defaults to false
+Locks joystick's movement to the y (vertical) axis
+
+
 ----
 
 ## API

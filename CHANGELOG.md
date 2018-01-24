@@ -1,3 +1,8 @@
+<a name="0.7.0"></a>
+# [0.7.0](https://github.com/yoannmoinet/nipplejs/compare/v0.6.8...v0.7.0) (2018-01-24)
+
+
+
 <a name="0.6.8"></a>
 ## [0.6.8](https://github.com/yoannmoinet/nipplejs/compare/v0.6.7...v0.6.8) (2017-12-19)
 
