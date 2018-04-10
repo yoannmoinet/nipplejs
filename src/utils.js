@@ -2,41 +2,40 @@
 ///      UTILS      ///
 ///////////////////////
 
-var u = {};
-u.distance = function (p1, p2) {
-    var dx = p2.x - p1.x;
-    var dy = p2.y - p1.y;
+export const distance = (p1, p2) => {
+    const dx = p2.x - p1.x;
+    const dy = p2.y - p1.y;
 
     return Math.sqrt((dx * dx) + (dy * dy));
 };
 
-u.angle = function(p1, p2) {
-    var dx = p2.x - p1.x;
-    var dy = p2.y - p1.y;
+export const angle = (p1, p2) => {
+    const dx = p2.x - p1.x;
+    const dy = p2.y - p1.y;
 
-    return u.degrees(Math.atan2(dy, dx));
+    return degrees(Math.atan2(dy, dx));
 };
 
-u.findCoord = function(p, d, a) {
-    var b = {x: 0, y: 0};
-    a = u.radians(a);
+export const findCoord = (p, d, a) => {
+    const b = {x: 0, y: 0};
+    a = radians(a);
     b.x = p.x - d * Math.cos(a);
     b.y = p.y - d * Math.sin(a);
     return b;
 };
 
-u.radians = function(a) {
+export const radians = (a) => {
     return a * (Math.PI / 180);
 };
 
-u.degrees = function(a) {
+export const degrees = (a) => {
     return a * (180 / Math.PI);
 };
 
-u.bindEvt = function (el, arg, handler) {
-    var types = arg.split(/[ ,]+/g);
-    var type;
-    for (var i = 0; i < types.length; i += 1) {
+export const bindEvt = (el, arg, handler) => {
+    const types = arg.split(/[ ,]+/g);
+    let type;
+    for (let i = 0; i < types.length; i += 1) {
         type = types[i];
         if (el.addEventListener) {
             el.addEventListener(type, handler, false);
@@ -46,10 +45,10 @@ u.bindEvt = function (el, arg, handler) {
     }
 };
 
-u.unbindEvt = function (el, arg, handler) {
-    var types = arg.split(/[ ,]+/g);
-    var type;
-    for (var i = 0; i < types.length; i += 1) {
+export const unbindEvt = (el, arg, handler) => {
+    const types = arg.split(/[ ,]+/g);
+    let type;
+    for (let i = 0; i < types.length; i += 1) {
         type = types[i];
         if (el.removeEventListener) {
             el.removeEventListener(type, handler);
@@ -59,23 +58,23 @@ u.unbindEvt = function (el, arg, handler) {
     }
 };
 
-u.trigger = function (el, type, data) {
-    var evt = new CustomEvent(type, data);
+export const trigger = (el, type, data) => {
+    const evt = new CustomEvent(type, data);
     el.dispatchEvent(evt);
 };
 
-u.prepareEvent = function (evt) {
+export const prepareEvent = (evt) => {
     evt.preventDefault();
     return evt.type.match(/^touch/) ? evt.changedTouches : evt;
 };
 
-u.getScroll = function () {
-    var x = (window.pageXOffset !== undefined) ?
+export const getScroll = () => {
+    const x = (window.pageXOffset !== undefined) ?
         window.pageXOffset :
         (document.documentElement || document.body.parentNode || document.body)
             .scrollLeft;
 
-    var y = (window.pageYOffset !== undefined) ?
+    const y = (window.pageYOffset !== undefined) ?
         window.pageYOffset :
         (document.documentElement || document.body.parentNode || document.body)
             .scrollTop;
@@ -85,7 +84,7 @@ u.getScroll = function () {
     };
 };
 
-u.applyPosition = function (el, pos) {
+export const applyPosition = (el, pos) => {
     if (pos.top || pos.right || pos.bottom || pos.left) {
         el.style.top = pos.top;
         el.style.right = pos.right;
@@ -97,15 +96,15 @@ u.applyPosition = function (el, pos) {
     }
 };
 
-u.getTransitionStyle = function (property, values, time) {
-    var obj = u.configStylePropertyObject(property);
-    for (var i in obj) {
+export const getTransitionStyle = (property, values, time) => {
+    const obj = configStylePropertyObject(property);
+    for (let i in obj) {
         if (obj.hasOwnProperty(i)) {
             if (typeof values === 'string') {
                 obj[i] = values + ' ' + time;
             } else {
-                var st = '';
-                for (var j = 0, max = values.length; j < max; j += 1) {
+                let st = '';
+                for (let j = 0, max = values.length; j < max; j += 1) {
                     st += values[j] + ' ' + time + ', ';
                 }
                 obj[i] = st.slice(0, -2);
@@ -115,9 +114,9 @@ u.getTransitionStyle = function (property, values, time) {
     return obj;
 };
 
-u.getVendorStyle = function (property, value) {
-    var obj = u.configStylePropertyObject(property);
-    for (var i in obj) {
+export const getVendorStyle = (property, value) => {
+    const obj = configStylePropertyObject(property);
+    for (let i in obj) {
         if (obj.hasOwnProperty(i)) {
             obj[i] = value;
         }
@@ -125,18 +124,18 @@ u.getVendorStyle = function (property, value) {
     return obj;
 };
 
-u.configStylePropertyObject = function (prop) {
-    var obj = {};
+export const configStylePropertyObject = (prop) => {
+    const obj = {};
     obj[prop] = '';
-    var vendors = ['webkit', 'Moz', 'o'];
+    const vendors = ['webkit', 'Moz', 'o'];
     vendors.forEach(function (vendor) {
         obj[vendor + prop.charAt(0).toUpperCase() + prop.slice(1)] = '';
     });
     return obj;
 };
 
-u.extend = function (objA, objB) {
-    for (var i in objB) {
+export const extend = (objA, objB) => {
+    for (let i in objB) {
         if (objB.hasOwnProperty(i)) {
             objA[i] = objB[i];
         }
@@ -145,9 +144,9 @@ u.extend = function (objA, objB) {
 };
 
 // Overwrite only what's already present
-u.safeExtend = function (objA, objB) {
-    var obj = {};
-    for (var i in objA) {
+export const safeExtend = (objA, objB) => {
+    const obj = {};
+    for (let i in objA) {
         if (objA.hasOwnProperty(i) && objB.hasOwnProperty(i)) {
             obj[i] = objB[i];
         } else if (objA.hasOwnProperty(i)) {
@@ -158,9 +157,9 @@ u.safeExtend = function (objA, objB) {
 };
 
 // Map for array or unique item.
-u.map = function (ar, fn) {
+export const map = (ar, fn) => {
     if (ar.length) {
-        for (var i = 0, max = ar.length; i < max; i += 1) {
+        for (let i = 0, max = ar.length; i < max; i += 1) {
             fn(ar[i]);
         }
     } else {

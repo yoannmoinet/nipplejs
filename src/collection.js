@@ -1,4 +1,6 @@
-/* global Nipple, Super */
+import Nipple from './nipple';
+import Super from './super';
+import * as u from './utils';
 
 ///////////////////////////
 ///   THE COLLECTION    ///
@@ -125,11 +127,11 @@ Collection.prototype.createNipple = function (position, identifier) {
                 (scroll.y + self.box.top)
         };
     } else if (
-            position.top ||
-            position.right ||
-            position.bottom ||
-            position.left
-        ) {
+        position.top ||
+        position.right ||
+        position.bottom ||
+        position.left
+    ) {
 
         // We need to compute the position X / Y of the joystick.
         var dumb = document.createElement('DIV');
@@ -527,3 +529,5 @@ Collection.prototype.destroy = function () {
     // Unbind everything.
     self.off();
 };
+
+export default Collection;
