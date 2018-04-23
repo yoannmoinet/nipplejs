@@ -19,7 +19,8 @@ var events = {
     pointer: {
         start: 'pointerdown',
         move: 'pointermove',
-        end: 'pointerup'
+        end: 'pointerup',
+        cancel: 'pointercancel'
     },
     MSPointer: {
         start: 'MSPointerDown',
@@ -1310,7 +1311,8 @@ Manager.prototype.bindDocument = function () {
     // Bind only if not already binded
     if (!self.binded) {
         self.bindEvt(document, 'move')
-            .bindEvt(document, 'end');
+            .bindEvt(document, 'end')
+            .bindEvt(document, 'cancel');
         self.binded = true;
     }
 };
@@ -1375,6 +1377,12 @@ Manager.prototype.onend = function (evt) {
     return false;
 };
 
+Manager.prototype.oncancel = function (evt) {
+    var self = this;
+    self.onAny('end', evt);
+    return false;
+};
+
 Manager.prototype.onAny = function (which, evt) {
     var self = this;
     var id;
@@ -1434,3 +1442,4 @@ return {
 };
 
 });
+

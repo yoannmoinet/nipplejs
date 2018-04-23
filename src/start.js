@@ -18,7 +18,8 @@ var events = {
     pointer: {
         start: 'pointerdown',
         move: 'pointermove',
-        end: 'pointerup'
+        end: 'pointerup',
+        cancel: 'pointercancel'
     },
     MSPointer: {
         start: 'MSPointerDown',
