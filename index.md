@@ -1,7 +1,11 @@
 ---
 layout: index
 ---
-[![NPM](https://nodei.co/npm-dl/nipplejs.png?months=3)](https://npmjs.org/package/nipplejs)
+
+[![npm](https://img.shields.io/npm/v/nipplejs.svg)](https://npmjs.org/package/nipplejs)
+[![CDNJS](https://img.shields.io/cdnjs/v/nipplejs.svg)](https://cdnjs.com/libraries/nipplejs)
+![Bower](https://img.shields.io/bower/v/nipplejs.svg)
+[![npm](https://img.shields.io/npm/dm/nipplejs.svg)](https://npmjs.org/package/nipplejs)
 
 # Table Of Contents
 <details>
