@@ -1,6 +1,6 @@
 {
 	"env": {
-		"umd": true,
+		"amd": true,
 		"node": true
 	}
 }
