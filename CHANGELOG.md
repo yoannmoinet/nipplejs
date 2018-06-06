@@ -1,3 +1,18 @@
+<a name="0.7.0"></a>
+# [0.7.0](https://github.com/yoannmoinet/nipplejs/compare/v0.6.8...v0.7.0) (2018-06-06)
+
+
+### Bug Fixes
+
+* register touchcancel and pointercancel events ([2c541a6](https://github.com/yoannmoinet/nipplejs/commit/2c541a6))
+
+
+### Features
+
+* **joystick:** add lockX and lockY options ([6baba97](https://github.com/yoannmoinet/nipplejs/commit/6baba97))
+
+
+
 <a name="0.6.8"></a>
 ## [0.6.8](https://github.com/yoannmoinet/nipplejs/compare/v0.6.7...v0.6.8) (2017-12-19)
 
