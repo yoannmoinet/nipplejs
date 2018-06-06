@@ -9,8 +9,7 @@ var events = {
     touch: {
         start: 'touchstart',
         move: 'touchmove',
-        end: 'touchend, touchcancel',
-        cancel: 'touchcancel'
+        end: 'touchend, touchcancel'
     },
     mouse: {
         start: 'mousedown',
@@ -20,8 +19,7 @@ var events = {
     pointer: {
         start: 'pointerdown',
         move: 'pointermove',
-        end: 'pointerup',
-        cancel: 'pointercancel'
+        end: 'pointerup, pointercancel'
     },
     MSPointer: {
         start: 'MSPointerDown',
@@ -1344,8 +1342,7 @@ Manager.prototype.bindDocument = function () {
     // Bind only if not already binded
     if (!self.binded) {
         self.bindEvt(document, 'move')
-            .bindEvt(document, 'end')
-            .bindEvt(document, 'cancel');
+            .bindEvt(document, 'end');
         self.binded = true;
     }
 };

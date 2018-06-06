@@ -100,8 +100,7 @@ Manager.prototype.bindDocument = function () {
     // Bind only if not already binded
     if (!self.binded) {
         self.bindEvt(document, 'move')
-            .bindEvt(document, 'end')
-            .bindEvt(document, 'cancel');
+            .bindEvt(document, 'end');
         self.binded = true;
     }
 };

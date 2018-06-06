@@ -8,8 +8,7 @@ var events = {
     touch: {
         start: 'touchstart',
         move: 'touchmove',
-        end: 'touchend, touchcancel',
-        cancel: 'touchcancel'
+        end: 'touchend, touchcancel'
     },
     mouse: {
         start: 'mousedown',
@@ -19,8 +18,7 @@ var events = {
     pointer: {
         start: 'pointerdown',
         move: 'pointermove',
-        end: 'pointerup',
-        cancel: 'pointercancel'
+        end: 'pointerup, pointercancel'
     },
     MSPointer: {
         start: 'MSPointerDown',
