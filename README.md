@@ -7,6 +7,8 @@
 ![Bower](https://img.shields.io/bower/v/nipplejs.svg)
 [![npm](https://img.shields.io/npm/dm/nipplejs.svg)](https://npmjs.org/package/nipplejs)
 
+Looking for a version of this library with a more work-appropriate name? Check out [ThumbstickJS](https://github.com/lazerwalker/thumbstick).
+
 # Table Of Contents
 <details>
 
