@@ -6,12 +6,12 @@
     "license": "MIT",
     "repository": {
         "type": "git",
-        "url": "https://github.com/yoannmoinet/nipplejs.git"
+        "url": "https://github.com/yoannmoinet/thumbjs.git"
     },
     "bugs": {
-        "url": "https://github.com/yoannmoinet/nipplejs/issues"
+        "url": "https://github.com/yoannmoinet/thumbjs/issues"
     },
-    "homepage": "https://github.com/yoannmoinet/nipplejs",
+    "homepage": "https://github.com/yoannmoinet/thumbjs",
     "main": "./dist/thumbjs.js",
     "scripts": {
         "postversion": "npm run bowerSync && npm run changelog",
