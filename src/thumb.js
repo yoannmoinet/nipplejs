@@ -1,8 +1,8 @@
 ///////////////////////
-///   THE NIPPLE    ///
+///   THE THUMB    ///
 ///////////////////////
 
-function Nipple (collection, options) {
+function Thumb (collection, options) {
     this.identifier = options.identifier;
     this.position = options.position;
     this.frontPosition = options.frontPosition;
@@ -30,12 +30,12 @@ function Nipple (collection, options) {
         this.options.restOpacity = 0;
     }
 
-    this.id = Nipple.id;
-    Nipple.id += 1;
+    this.id = Thumb.id;
+    Thumb.id += 1;
     this.buildEl()
         .stylize();
 
-    // Nipple's API.
+    // Thumb's API.
     this.instance = {
         el: this.ui.el,
         on: this.on.bind(this),
@@ -59,12 +59,12 @@ function Nipple (collection, options) {
     return this.instance;
 };
 
-Nipple.prototype = new Super();
-Nipple.constructor = Nipple;
-Nipple.id = 0;
+Thumb.prototype = new Super();
+Thumb.constructor = Thumb;
+Thumb.id = 0;
 
-// Build the dom element of the Nipple instance.
-Nipple.prototype.buildEl = function (options) {
+// Build the dom element of the Thumb instance.
+Thumb.prototype.buildEl = function (options) {
     this.ui = {};
 
     if (this.options.dataOnly) {
@@ -75,11 +75,11 @@ Nipple.prototype.buildEl = function (options) {
     this.ui.back = document.createElement('div');
     this.ui.front = document.createElement('div');
 
-    this.ui.el.className = 'nipple collection_' + this.collection.id;
+    this.ui.el.className = 'thumb collection_' + this.collection.id;
     this.ui.back.className = 'back';
     this.ui.front.className = 'front';
 
-    this.ui.el.setAttribute('id', 'nipple_' + this.collection.id +
+    this.ui.el.setAttribute('id', 'thumb_' + this.collection.id +
         '_' + this.id);
 
     this.ui.el.appendChild(this.ui.back);
@@ -88,8 +88,8 @@ Nipple.prototype.buildEl = function (options) {
     return this;
 };
 
-// Apply CSS to the Nipple instance.
-Nipple.prototype.stylize = function () {
+// Apply CSS to the Thumb instance.
+Thumb.prototype.stylize = function () {
     if (this.options.dataOnly) {
         return this;
     }
@@ -135,7 +135,7 @@ Nipple.prototype.stylize = function () {
     return this;
 };
 
-Nipple.prototype.applyStyles = function (styles) {
+Thumb.prototype.applyStyles = function (styles) {
     // Apply styles
     for (var i in this.ui) {
         if (this.ui.hasOwnProperty(i)) {
@@ -148,8 +148,8 @@ Nipple.prototype.applyStyles = function (styles) {
     return this;
 };
 
-// Inject the Nipple instance into DOM.
-Nipple.prototype.addToDom = function () {
+// Inject the Thumb instance into DOM.
+Thumb.prototype.addToDom = function () {
     // We're not adding it if we're dataOnly or already in dom.
     if (this.options.dataOnly || document.body.contains(this.ui.el)) {
         return this;
@@ -158,8 +158,8 @@ Nipple.prototype.addToDom = function () {
     return this;
 };
 
-// Remove the Nipple instance from DOM.
-Nipple.prototype.removeFromDom = function () {
+// Remove the Thumb instance from DOM.
+Thumb.prototype.removeFromDom = function () {
     if (this.options.dataOnly || !document.body.contains(this.ui.el)) {
         return this;
     }
@@ -167,8 +167,8 @@ Nipple.prototype.removeFromDom = function () {
     return this;
 };
 
-// Entirely destroy this nipple
-Nipple.prototype.destroy = function () {
+// Entirely destroy this thumb
+Thumb.prototype.destroy = function () {
     clearTimeout(this.removeTimeout);
     clearTimeout(this.showTimeout);
     clearTimeout(this.restTimeout);
@@ -177,8 +177,8 @@ Nipple.prototype.destroy = function () {
     this.off();
 };
 
-// Fade in the Nipple instance.
-Nipple.prototype.show = function (cb) {
+// Fade in the Thumb instance.
+Thumb.prototype.show = function (cb) {
     var self = this;
 
     if (self.options.dataOnly) {
@@ -207,8 +207,8 @@ Nipple.prototype.show = function (cb) {
     return self;
 };
 
-// Fade out the Nipple instance.
-Nipple.prototype.hide = function (cb) {
+// Fade out the Thumb instance.
+Thumb.prototype.hide = function (cb) {
     var self = this;
 
     if (self.options.dataOnly) {
@@ -240,7 +240,7 @@ Nipple.prototype.hide = function (cb) {
     return self;
 };
 
-Nipple.prototype.restPosition = function (cb) {
+Thumb.prototype.restPosition = function (cb) {
     var self = this;
     self.frontPosition = {
         x: 0,
@@ -272,7 +272,7 @@ Nipple.prototype.restPosition = function (cb) {
     );
 };
 
-Nipple.prototype.restCallback = function () {
+Thumb.prototype.restCallback = function () {
     var self = this;
     var transitStyle = {};
     transitStyle.front = u.getTransitionStyle('transition', 'none', '');
@@ -280,7 +280,7 @@ Nipple.prototype.restCallback = function () {
     self.trigger('rested', self.instance);
 };
 
-Nipple.prototype.resetDirection = function () {
+Thumb.prototype.resetDirection = function () {
     // Fully rebuild the object to let the iteration possible.
     this.direction = {
         x: false,
@@ -289,7 +289,7 @@ Nipple.prototype.resetDirection = function () {
     };
 };
 
-Nipple.prototype.computeDirection = function (obj) {
+Thumb.prototype.computeDirection = function (obj) {
     var rAngle = obj.angle.radian;
     var angle45 = Math.PI / 4;
     var angle90 = Math.PI / 2;

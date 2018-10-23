@@ -50,9 +50,9 @@ function importReadme (next) {
 
 function importBuild (next) {
     console.log(' - checkout build from master and move it to ./javascripts/');
-    exec('git checkout master -- ./dist/nipplejs.js && ' +
-        'git reset ./dist/nipplejs.js && ' +
-        mv + ' .' + slash + 'dist' + slash + 'nipplejs.js ' +
+    exec('git checkout master -- ./dist/thumbjs.js && ' +
+        'git reset ./dist/thumbjs.js && ' +
+        mv + ' .' + slash + 'dist' + slash + 'thumbjs.js ' +
         '.' + slash + 'javascripts' + slash,
         next);
 }
@@ -74,7 +74,7 @@ function modifyFile (next) {
 function commit (next) {
     console.log(' - commit latest doc to gh-pages');
     exec('git add index.md && ' +
-        'git add ./javascripts/nipplejs.js && ' +
+        'git add ./javascripts/thumbjs.js && ' +
         'git commit -m "chore: sync from master" && ' +
         'git push origin gh-pages', next);
 }

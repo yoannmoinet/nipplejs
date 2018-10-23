@@ -2,7 +2,7 @@
 <html>
     <head>
         <meta charset="utf-8">
-        <title>NippleJS</title>
+        <title>ThumbJS</title>
         <meta name="viewport" content="width=device-width, initial-scale=0.5, maximum-scale=0.5">
         <style>
         html, body {
@@ -37,9 +37,9 @@
     <body>
         <div id="left"></div>
         <div id="right"></div>
-        <script src="../dist/nipplejs.js" charset="utf-8"></script>
+        <script src="../dist/thumbjs.js" charset="utf-8"></script>
         <script>
-        var joystickL = nipplejs.create({
+        var joystickL = thumbjs.create({
             zone: document.getElementById('left'),
             mode: 'static',
             position: { left: '20%', top: '50%' },
@@ -47,7 +47,7 @@
             size: 200
         });
 
-        var joystickR = nipplejs.create({
+        var joystickR = thumbjs.create({
             zone: document.getElementById('right'),
             mode: 'static',
             position: { left: '80%', top: '50%' },

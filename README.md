@@ -1,11 +1,11 @@
-![alt tag](./test/nipplejs.png)
+![alt tag](./test/thumbjs.png)
 > A vanilla virtual joystick for touch capable interfaces
 
 
-[![npm](https://img.shields.io/npm/v/nipplejs.svg)](https://npmjs.org/package/nipplejs)
-[![CDNJS](https://img.shields.io/cdnjs/v/nipplejs.svg)](https://cdnjs.com/libraries/nipplejs)
-![Bower](https://img.shields.io/bower/v/nipplejs.svg)
-[![npm](https://img.shields.io/npm/dm/nipplejs.svg)](https://npmjs.org/package/nipplejs)
+[![npm](https://img.shields.io/npm/v/thumbjs.svg)](https://npmjs.org/package/thumbjs)
+[![CDNJS](https://img.shields.io/cdnjs/v/thumbjs.svg)](https://cdnjs.com/libraries/thumbjs)
+![Bower](https://img.shields.io/bower/v/thumbjs.svg)
+[![npm](https://img.shields.io/npm/dm/thumbjs.svg)](https://npmjs.org/package/thumbjs)
 
 # Table Of Contents
 <details>
@@ -22,7 +22,7 @@
   * [`options.threshold` defaults to 0.1](#optionsthreshold-defaults-to-01)
   * [`options.fadeTime` defaults to 250](#optionsfadetime-defaults-to-250)
   * [`options.multitouch` defaults to false](#optionsmultitouch-defaults-to-false)
-  * [`options.maxNumberOfNipples` defaults to 1](#optionsmaxnumberofnipples-defaults-to-1)
+  * [`options.maxNumberOfThumbs` defaults to 1](#optionsmaxnumberofthumbs-defaults-to-1)
   * [`options.dataOnly` defaults to false](#optionsdataonly-defaults-to-false)
   * [`options.position` defaults to `{top: 0, left: 0}`](#optionsposition-defaults-to-top-0-left-0)
   * [`options.mode` defaults to 'dynamic'.](#optionsmode-defaults-to-dynamic)
@@ -33,14 +33,14 @@
   * [`options.restOpacity` defaults to 0.5](#optionsrestopacity-defaults-to-05)
   * [`options.catchDistance` defaults to 200](#optionscatchdistance-defaults-to-200)
 - [API](#api)
-  * [NippleJS instance (manager)](#nipplejs-instance-manager)
+  * [ThumbJS instance (manager)](#thumbjs-instance-manager)
     + [`manager.on(type, handler)`](#managerontype-handler)
     + [`manager.off([type, handler])`](#managerofftype-handler)
     + [`manager.get(identifier)`](#managergetidentifier)
     + [`manager.destroy()`](#managerdestroy)
     + [`manager.ids`](#managerids)
     + [`manager.id`](#managerid)
-  * [nipple instance (joystick)](#nipple-instance-joystick)
+  * [thumb instance (joystick)](#thumb-instance-joystick)
   * [`joystick.on`, `joystick.off`](#joystickon-joystickoff)
   * [`joystick.el`](#joystickel)
   * [`joystick.show([cb])`](#joystickshowcb)
@@ -79,17 +79,17 @@
 ## Install
 
 ```bash
-npm install nipplejs --save
+npm install thumbjs --save
 
 // OR
 
-bower install nipplejs --save
+bower install thumbjs --save
 ```
 
 ----
 
 ## Demo
-Check out the [demo here](http://yoannmoinet.github.io/nipplejs/#demo).
+Check out the [demo here](http://yoannmoinet.github.io/thumbjs/#demo).
 
 ----
 
@@ -99,21 +99,21 @@ Import it the way you want into your project :
 
 ```javascript
 // CommonJS
-var manager = require('nipplejs').create(options);
+var manager = require('thumbjs').create(options);
 ```
 
 ```javascript
 // AMD
-define(['nipplejs'], function (nipplejs) {
-    var manager = nipplejs.create(options);
+define(['thumbjs'], function (thumbjs) {
+    var manager = thumbjs.create(options);
 });
 ```
 
 ```html
 // Global
-<script src="./dist/nipplejs.min.js"></script>
+<script src="./dist/thumbjs.min.js"></script>
 <script>
-    var manager = nipplejs.create(options);
+    var manager = thumbjs.create(options);
 </script>
 ```
 
@@ -132,7 +132,7 @@ var options = {
     threshold: Float,               // before triggering a directional event
     fadeTime: Integer,              // transition time
     multitouch: Boolean,
-    maxNumberOfNipples: Number,     // when multitouch, what is too many?
+    maxNumberOfThumbs: Number,     // when multitouch, what is too many?
     dataOnly: Boolean,              // no dom element whatsoever
     position: Object,               // preset position for 'static' mode
     mode: String,                   // 'dynamic', 'static' or 'semi'
@@ -151,12 +151,12 @@ The dom element in which all your joysticks will be injected.
 ```html
 <div id="zone_joystick"></div>
 
-<script type="text/javascript" src="./nipplejs.min.js"></script>
+<script type="text/javascript" src="./thumbjs.min.js"></script>
 <script type="text/javascript">
     var options = {
         zone: document.getElementById('zone_joystick');
     };
-    var manager = nipplejs.create(options);
+    var manager = thumbjs.create(options);
 </script>
 ```
 
@@ -187,13 +187,13 @@ The time it takes for joystick to fade-out and fade-in when activated or de-acti
 ### `options.multitouch` defaults to false
 Enable the multitouch capabilities.
 
-If, for reasons, you need to have multiple nipples into the same zone.
+If, for reasons, you need to have multiple thumbs into the same zone.
 
 Otherwise it will only get one, and all new touches won't do a thing.
 
 Please note that multitouch is off when in `static` or `semi` modes.
 
-### `options.maxNumberOfNipples` defaults to 1
+### `options.maxNumberOfThumbs` defaults to 1
 If you need to, you can also control the maximum number of instance that could be created.
 
 Obviously in a multitouch configuration.
@@ -256,7 +256,7 @@ Locks joystick's movement to the y (vertical) axis
 
 ## API
 
-### NippleJS instance (manager)
+### ThumbJS instance (manager)
 
 Your manager has the following signature :
 
@@ -271,7 +271,7 @@ Your manager has the following signature :
     options: {
         zone: Element,                  // reactive zone
         multitouch: Boolean,
-        maxNumberOfNipples: Number,
+        maxNumberOfThumbs: Number,
         mode: String,
         position: Object,
         catchDistance: Number,
@@ -316,13 +316,13 @@ If you don't specify the handler but just a type, all handlers for that type wil
 An helper to get an instance via its identifier.
 
 ```javascript
-// Will return the nipple instanciated by the touch identified by 0
+// Will return the thumb instanciated by the touch identified by 0
 manager.get(0);
 ```
 
 #### `manager.destroy()`
 
-Gently remove all nipples from the DOM and unbind all events.
+Gently remove all thumbs from the DOM and unbind all events.
 
 ```javascript
 manager.destroy();
@@ -330,13 +330,13 @@ manager.destroy();
 
 #### `manager.ids`
 
-The array of nipples' ids under this manager.
+The array of thumbs' ids under this manager.
 
 #### `manager.id`
 
 The incremented id of this manager.
 
-### nipple instance (joystick)
+### thumb instance (joystick)
 
 Each joystick has the following signature :
 
@@ -383,7 +383,7 @@ The same as the manager.
 Dom element in which the joystick gets created.
 
 ```html
-<div class="nipple">
+<div class="thumb">
     <div class="front"></div>
     <div class="back"></div>
 </div>
@@ -411,7 +411,7 @@ Remove the joystick's element from the dom.
 
 ### `joystick.destroy()`
 
-Gently remove this nipple from the DOM and unbind all related events.
+Gently remove this thumb from the DOM and unbind all related events.
 
 ### `joystick.identifier`
 
@@ -439,7 +439,7 @@ The object that store its ui elements
 
 ```html
 {
-    el: <div class="nipple"></div>
+    el: <div class="thumb"></div>
     back: <div class="back"></div>
     front: <div class="front"></div>
 }
@@ -456,12 +456,12 @@ But some of them are specific to its instance.
 If you need to listen to each joystick, for example, you can :
 
 ```javascript
-manager.on('added', function (evt, nipple) {
-    nipple.on('start move end dir plain', function (evt) {
+manager.on('added', function (evt, thumb) {
+    thumb.on('start move end dir plain', function (evt) {
         // DO EVERYTHING
     });
-}).on('removed', function (evt, nipple) {
-    nipple.off('start move end dir plain');
+}).on('removed', function (evt, thumb) {
+    thumb.off('start move end dir plain');
 });
 ```
 
@@ -525,7 +525,7 @@ Comes with data :
         radian: 1.5707963268,   // angle in radian
         degree: 90
     },
-    instance: Nipple            // the nipple instance that triggered the event
+    instance: Thumb            // the thumb instance that triggered the event
 }
 ```
 

@@ -3,7 +3,7 @@ var u = require('utils');
 var c = require('colorizer').create('Colorizer');
 
 var NB_TESTS = 10;
-var nippleIndex = 0;
+var thumbIndex = 0;
 var collectionIndex = 0;
 var showClientLog = false;
 var currentFile = require('system').args[3];
@@ -65,27 +65,27 @@ function clickZone () {
     mouse.down('.zone.active');
 }
 
-function assertNipple (test) {
+function assertThumb (test) {
     return function () {
-        test.assertExists('#nipple_' + collectionIndex +
-            '_' + nippleIndex,
-            'Nipple ' + nippleIndex + ' from collection ' +
+        test.assertExists('#thumb_' + collectionIndex +
+            '_' + thumbIndex,
+            'Thumb ' + thumbIndex + ' from collection ' +
             collectionIndex + ' is found');
-        nippleIndex += 1;
+        thumbIndex += 1;
     };
 }
 
-function assertNotNipple (test) {
+function assertNotThumb (test) {
     return function () {
-        test.assertDoesntExist('#nipple_' + collectionIndex +
-            '_' + nippleIndex,
-            'Nipple ' + nippleIndex + ' from collection ' +
+        test.assertDoesntExist('#thumb_' + collectionIndex +
+            '_' + thumbIndex,
+            'Thumb ' + thumbIndex + ' from collection ' +
             collectionIndex + ' is NOT found');
-        nippleIndex += 1;
+        thumbIndex += 1;
     };
 }
 
-casper.test.begin('NippleJS test page loads correctly', NB_TESTS,
+casper.test.begin('ThumbJS test page loads correctly', NB_TESTS,
     function suite(test) {
         var box;
         casper
@@ -107,11 +107,11 @@ casper.test.begin('NippleJS test page loads correctly', NB_TESTS,
             *				DYNAMIC
             *
             \**********************************/
-            // Assert we can create more than one nipple on dynamic
+            // Assert we can create more than one thumb on dynamic
             .then(clickZone)
-            .then(assertNipple(test))
+            .then(assertThumb(test))
             .then(clickZone)
-            .then(assertNipple(test))
+            .then(assertThumb(test))
             /**********************************\
             *
             *				SEMI
@@ -124,14 +124,14 @@ casper.test.begin('NippleJS test page loads correctly', NB_TESTS,
             .then(function () {
                 test.assertVisible('.zone.semi', 'Semi zone should be visible');
             })
-            // Assert we can't create more than one nipple on semi
+            // Assert we can't create more than one thumb on semi
             .then(clickZone)
-            .then(assertNipple(test))
+            .then(assertThumb(test))
             .then(clickZone)
-            .then(assertNotNipple(test))
+            .then(assertNotThumb(test))
             .then(function () {
-                // Revert increment because last nipple doesn't exist
-                nippleIndex -= 1;
+                // Revert increment because last thumb doesn't exist
+                thumbIndex -= 1;
             })
             /**********************************\
             *
@@ -146,14 +146,14 @@ casper.test.begin('NippleJS test page loads correctly', NB_TESTS,
                 test.assertVisible('.zone.static',
                     'Static zone should be visible');
             })
-            // Assert we can't create more than one nipple on semi
+            // Assert we can't create more than one thumb on semi
             .then(clickZone)
-            .then(assertNipple(test))
+            .then(assertThumb(test))
             .then(clickZone)
-            .then(assertNotNipple(test))
+            .then(assertNotThumb(test))
             .then(function () {
-                // Revert increment because last nipple doesn't exist
-                nippleIndex -= 1;
+                // Revert increment because last thumb doesn't exist
+                thumbIndex -= 1;
             })
             .run(function () {
                 // End tests
