@@ -13,6 +13,7 @@
   },
   "homepage": "https://github.com/yoannmoinet/nipplejs",
   "main": "./dist/nipplejs.js",
+  "types": "./types/index.d.ts",
   "scripts": {
     "postversion": "npm run bowerSync && npm run changelog",
     "buildWatch": "npm run concat && npm run umd",
