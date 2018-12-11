@@ -1,3 +1,13 @@
+<a name="0.7.2"></a>
+## [0.7.2](https://github.com/yoannmoinet/nipplejs/compare/v0.7.1...v0.7.2) (2018-12-11)
+
+
+### Features
+
+* Add TypeScript Definitions ([#85](https://github.com/yoannmoinet/nipplejs/issues/85)) ([0b1f4ae](https://github.com/yoannmoinet/nipplejs/commit/0b1f4ae)), closes [#21](https://github.com/yoannmoinet/nipplejs/issues/21)
+
+
+
 <a name="0.7.1"></a>
 ## [0.7.1](https://github.com/yoannmoinet/nipplejs/compare/v0.7.0...v0.7.1) (2018-06-06)
 
