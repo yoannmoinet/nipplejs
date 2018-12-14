@@ -1,10 +1,8 @@
-![alt tag](./test/nipplejs.png)
+![alt tag](./assets/nipplejs.png)
 > A vanilla virtual joystick for touch capable interfaces
 
 
 [![npm](https://img.shields.io/npm/v/nipplejs.svg)](https://npmjs.org/package/nipplejs)
-[![CDNJS](https://img.shields.io/cdnjs/v/nipplejs.svg)](https://cdnjs.com/libraries/nipplejs)
-![Bower](https://img.shields.io/bower/v/nipplejs.svg)
 [![npm](https://img.shields.io/npm/dm/nipplejs.svg)](https://npmjs.org/package/nipplejs)
 
 # Table Of Contents
@@ -138,6 +136,8 @@ var options = {
     mode: String,                   // 'dynamic', 'static' or 'semi'
     restJoystick: Boolean,
     restOpacity: Number,            // opacity when not 'dynamic' and rested
+    lockX: Boolean,                 // only move on the X axis
+    lockY: Boolean,                 // only move on the Y axis
     catchDistance: Number           // distance to recycle previous joystick in
                                     // 'semi' mode
 };
