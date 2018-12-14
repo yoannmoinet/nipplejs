@@ -142,3 +142,5 @@ Super.prototype.unbindEvt = function (el, type) {
 
     return this;
 };
+
+export default Super;

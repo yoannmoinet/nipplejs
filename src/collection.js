@@ -371,14 +371,14 @@ Collection.prototype.processOnMove = function (evt) {
         pos = u.findCoord(nipple.position, dist, angle);
     }
 
-    var xPosition = pos.x - nipple.position.x
-    var yPosition = pos.y - nipple.position.y
+    var xPosition = pos.x - nipple.position.x;
+    var yPosition = pos.y - nipple.position.y;
 
     if (opts.lockX){
-        yPosition = 0
+        yPosition = 0;
     }
     if (opts.lockY) {
-        xPosition = 0
+        xPosition = 0;
     }
 
     nipple.frontPosition = {
