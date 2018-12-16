@@ -37,15 +37,14 @@
     <body>
         <div id="left"></div>
         <div id="right"></div>
-        <script src="../dist/nipplejs.js" charset="utf-8"></script>
-        <script>
+        <script type="module">
+        import nipplejs from '/dist/nipplejs.js';
         var joystickL = nipplejs.create({
             zone: document.getElementById('left'),
             mode: 'static',
             position: { left: '20%', top: '50%' },
             color: 'green',
-            size: 200,
-            lockX: true
+            size: 200
         });
 
         var joystickR = nipplejs.create({
@@ -53,8 +52,7 @@
             mode: 'static',
             position: { left: '80%', top: '50%' },
             color: 'red',
-            size: 200,
-            lockY: true
+            size: 200
         });
         </script>
     </body>

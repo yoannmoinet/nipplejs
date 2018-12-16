@@ -29,11 +29,11 @@
     "postversion": "npm run bowerSync && npm run changelog",
     "prepare": "npm run build",
     "build": "webpack --config webpack.config.js",
-    "pretest": "npm run build",
+    "build:dev": "webpack-dev-server --config webpack.config.js",
     "test": "casperjs test ./test/nipplejs.casper.js",
     "changelog": "node ./bin/changelog.js",
     "bowerSync": "node ./bin/bowerSync.js",
-    "start": "npm run build -- --progress --watch",
+    "start": "npm run build:dev -- --progress --watch",
     "toc": "markdown-toc -i README.md",
     "copyGh": "node ./bin/copyToGhPages.js"
   },
@@ -52,6 +52,7 @@
     "mocha": "5.2.0",
     "phantomjs-prebuilt": "2.1.16",
     "webpack": "4.27.1",
-    "webpack-cli": "3.1.2"
+    "webpack-cli": "3.1.2",
+    "webpack-dev-server": "3.1.10"
   }
 }

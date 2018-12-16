@@ -4,8 +4,8 @@
         <meta charset="utf-8">
         <title>NippleJS</title>
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-        <link rel="stylesheet" href="../assets/styles.css" media="screen" title="no title" charset="utf-8">
-        <link rel="stylesheet" href="../assets/github-light.css" media="screen" title="no title" charset="utf-8">
+        <link rel="stylesheet" href="/assets/styles.css" media="screen" title="no title" charset="utf-8">
+        <link rel="stylesheet" href="/assets/github-light.css" media="screen" title="no title" charset="utf-8">
         <style>
             body {
                 margin: 0;
@@ -176,8 +176,10 @@
         <div>
             <a href="https://codepen.io/YoannM/full/gapmMG" target="_blank">> Open the demo in a new window.</a>
         </div>
-        <script src="../dist/nipplejs.js" charset="utf-8"></script>
-        <script>
+        <!-- <script src="/dist/nipplejs.js"></script> -->
+        <script type="module" >
+            import nipplejs from '/src/manager.js';
+            console.log(nipplejs);
             var s = function (sel) { return document.querySelector(sel); };
             var sId = function (sel) { return document.getElementById(sel); };
             var removeClass = function (el, clss) {
