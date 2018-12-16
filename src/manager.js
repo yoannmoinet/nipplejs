@@ -222,10 +222,4 @@ Manager.prototype.onDestroyed = function (evt, coll) {
     self.collections.splice(self.collections.indexOf(coll), 1);
 };
 
-var factory = new Manager();
-export default {
-    create: function (options) {
-        return factory.create(options);
-    },
-    factory: factory
-};
+export default Manager;

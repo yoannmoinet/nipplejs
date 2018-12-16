@@ -12,13 +12,13 @@
     "url": "https://github.com/yoannmoinet/nipplejs/issues"
   },
   "files": [
-      "dist/*",
-      "src/*"
+    "dist/*",
+    "src/*"
   ],
   "homepage": "https://github.com/yoannmoinet/nipplejs",
   "main": "./dist/nipplejs.js",
   "browser": "./dist/nipplejs.js",
-  "module": "./src/manager.js",
+  "module": "./src/index.js",
   "types": "./types/index.d.ts",
   "directories": {
     "lib": "src",

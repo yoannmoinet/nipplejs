@@ -1,14 +1,12 @@
-var exec = require('child_process').exec;
-var fs = require('fs');
+const exec = require('child_process').exec;
+const fs = require('fs');
 
-var isWin = /^win/.test(process.platform);
-var mv = isWin ? 'move' : 'mv';
-var slash = isWin ? '\\' : '/';
+const isWin = /^win/.test(process.platform);
+const mv = isWin ? 'move' : 'mv';
 
 queue([
     checkoutPage,
     importReadme,
-    importBuild,
     modifyFile,
     commit,
     checkoutMaster
@@ -16,8 +14,8 @@ queue([
 
 function queue (fns) {
     // Execute and remove the first function.
-    var fn = fns.shift();
-    fn(function (err) {
+    const fn = fns.shift();
+    fn((err) => {
         if (!err) {
             if (fns.length) {
                 // If we still have functions
@@ -42,30 +40,23 @@ function checkoutPage (next) {
 
 function importReadme (next) {
     console.log(' - checkout README from master and rename it to index.md');
-    exec('git checkout master -- README.md && ' +
+    exec(
+        'git checkout master -- README.md && ' +
         'git reset README.md && ' +
         mv + ' README.md index.md',
-        next);
-}
-
-function importBuild (next) {
-    console.log(' - checkout build from master and move it to ./javascripts/');
-    exec('git checkout master -- ./dist/nipplejs.js && ' +
-        'git reset ./dist/nipplejs.js && ' +
-        mv + ' .' + slash + 'dist' + slash + 'nipplejs.js ' +
-        '.' + slash + 'javascripts' + slash,
-        next);
+        next
+    );
 }
 
 function modifyFile (next) {
     console.log(' - reading the new index.md');
-    fs.readFile('index.md', function (err, data) {
+    fs.readFile('index.md', (err, data) => {
         if (err) {
             next(err);
             return;
         }
         console.log(' - writing the new content for Jekyll');
-        var body = data.toString().split('\n');
+        const body = data.toString().split('\n');
         body.splice(0, 3, '---', 'layout: index', '---');
         fs.writeFile('index.md', body.join('\n'), next);
     });
