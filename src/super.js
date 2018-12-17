@@ -112,6 +112,7 @@ Super.prototype.bindEvt = function (el, type) {
         if (typeof self['on' + type] === 'function') {
             self['on' + type].apply(self, arguments);
         } else {
+            // eslint-disable-next-line no-console
             console.warn('[WARNING] : Missing "on' + type + '" handler.');
         }
     };

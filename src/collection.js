@@ -329,6 +329,7 @@ Collection.prototype.getOrCreate = function (identifier, position) {
             return self.createNipple(position, identifier);
         }
 
+        // eslint-disable-next-line no-console
         console.warn('Coudln\'t find the needed nipple.');
         return false;
     }
@@ -346,6 +347,7 @@ Collection.prototype.processOnMove = function (evt) {
     if (!nipple) {
         // This is here just for safety.
         // It shouldn't happen.
+        // eslint-disable-next-line no-console
         console.error('Found zombie joystick with ID ' + identifier);
         self.manager.removeIdentifier(identifier);
         return;
