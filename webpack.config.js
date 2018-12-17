@@ -1,19 +1,24 @@
 const path = require('path');
-const debug = process.env.NODE_ENV === 'production';
+
+const DEBUG = process.env.NODE_ENV !== 'production';
+const NAME = 'nipplejs';
 
 module.exports = {
     context: __dirname,
-    entry: './src/manager.js',
-    mode: debug ? 'development' : 'production',
+    entry: './src/index.js',
+    mode: DEBUG ? 'development' : 'production',
     devServer:{
         contentBase: __dirname,
         publicPath: '/dist/',
         port: 9000,
     },
     output: {
-        filename: 'nipplejs.js',
         path: path.resolve(__dirname, 'dist'),
-        library: 'nipplejs'
+        filename: `${NAME}.js`,
+        library: NAME,
+        libraryExport: 'default',
+        libraryTarget: 'umd',
+        umdNamedDefine: true
     },
     module: {
         rules: [

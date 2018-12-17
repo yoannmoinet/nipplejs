@@ -78,10 +78,6 @@
 
 ```bash
 npm install nipplejs --save
-
-// OR
-
-bower install nipplejs --save
 ```
 
 ----
@@ -107,9 +103,14 @@ define(['nipplejs'], function (nipplejs) {
 });
 ```
 
+```javascript
+// Module
+import nipplejs from 'nipplejs';
+```
+
 ```html
-// Global
-<script src="./dist/nipplejs.min.js"></script>
+<!-- Global -->
+<script src="./nipplejs.js"></script>
 <script>
     var manager = nipplejs.create(options);
 </script>
@@ -151,7 +152,7 @@ The dom element in which all your joysticks will be injected.
 ```html
 <div id="zone_joystick"></div>
 
-<script type="text/javascript" src="./nipplejs.min.js"></script>
+<script type="text/javascript" src="./nipplejs.js"></script>
 <script type="text/javascript">
     var options = {
         zone: document.getElementById('zone_joystick');
