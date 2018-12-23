@@ -1,3 +1,4 @@
+/* eslint no-console: 0 */
 var fs = require('fs');
 var conventionalChangelog = require('conventional-changelog');
 var changelogFile = fs.createWriteStream('CHANGELOG.md');

@@ -1,4 +1,4 @@
-/* global casper, fs */
+/* global casper */
 var mouse = require('mouse').create(casper);
 var u = require('utils');
 
@@ -6,8 +6,6 @@ var NB_TESTS = 10;
 var nippleIndex = 0;
 var collectionIndex = 0;
 var showClientLog = false;
-var currentFile = require('system').args[3];
-var curFilePath = fs.absolute(currentFile);
 
 /*
     CONFIGURE CASPER
