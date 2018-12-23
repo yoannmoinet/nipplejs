@@ -1,4 +1,6 @@
-/* global u, Super, Collection */
+import Collection from './collection';
+import Super from './super';
+import * as u from './utils';
 
 ///////////////////////
 ///     MANAGER     ///
@@ -33,7 +35,7 @@ function Manager (options) {
     });
 
     return self.collections;
-};
+}
 
 Manager.prototype = new Super();
 Manager.constructor = Manager;
@@ -51,11 +53,10 @@ Manager.prototype.prepareCollections = function () {
     // Get any nipple
     self.collections.get = function (id) {
         var nipple;
+        // Use .every() to break the loop as soon as found.
         self.collections.every(function (collection) {
-            if (nipple = collection.get(id)) {
-                return false;
-            }
-            return true;
+            nipple = collection.get(id);
+            return nipple ? false : true;
         });
         return nipple;
     };
@@ -220,3 +221,5 @@ Manager.prototype.onDestroyed = function (evt, coll) {
     }
     self.collections.splice(self.collections.indexOf(coll), 1);
 };
+
+export default Manager;

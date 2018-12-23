@@ -1,13 +1,11 @@
+/* global casper */
 var mouse = require('mouse').create(casper);
 var u = require('utils');
-var c = require('colorizer').create('Colorizer');
 
 var NB_TESTS = 10;
 var nippleIndex = 0;
 var collectionIndex = 0;
 var showClientLog = false;
-var currentFile = require('system').args[3];
-var curFilePath = fs.absolute(currentFile);
 
 /*
     CONFIGURE CASPER
@@ -67,29 +65,32 @@ function clickZone () {
 
 function assertNipple (test) {
     return function () {
-        test.assertExists('#nipple_' + collectionIndex +
+        test.assertExists(
+            '#nipple_' + collectionIndex +
             '_' + nippleIndex,
             'Nipple ' + nippleIndex + ' from collection ' +
-            collectionIndex + ' is found');
+            collectionIndex + ' is found'
+        );
         nippleIndex += 1;
     };
 }
 
 function assertNotNipple (test) {
     return function () {
-        test.assertDoesntExist('#nipple_' + collectionIndex +
+        test.assertDoesntExist(
+            '#nipple_' + collectionIndex +
             '_' + nippleIndex,
             'Nipple ' + nippleIndex + ' from collection ' +
-            collectionIndex + ' is NOT found');
+            collectionIndex + ' is NOT found'
+        );
         nippleIndex += 1;
     };
 }
 
 casper.test.begin('NippleJS test page loads correctly', NB_TESTS,
     function suite(test) {
-        var box;
         casper
-            .start(curFilePath + '/index.html')
+            .start('http://localhost:9000/example/codepen-demo.html')
             .then(function () {
                 // Assert that active zone is here.
                 test.assertExists('#zone_joystick', 'Active zone is found');
@@ -97,7 +98,7 @@ casper.test.begin('NippleJS test page loads correctly', NB_TESTS,
             })
             .then(function () {
                 // Get position of active zone.
-                box = casper.evaluate(function () {
+                casper.evaluate(function () {
                     return document.getElementById('zone_joystick')
                         .getBoundingClientRect();
                 });

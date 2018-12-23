@@ -1,4 +1,6 @@
-/* global Nipple, Super */
+import Nipple from './nipple';
+import Super from './super';
+import * as u from './utils';
 
 ///////////////////////////
 ///   THE COLLECTION    ///
@@ -125,11 +127,11 @@ Collection.prototype.createNipple = function (position, identifier) {
                 (scroll.y + self.box.top)
         };
     } else if (
-            position.top ||
-            position.right ||
-            position.bottom ||
-            position.left
-        ) {
+        position.top ||
+        position.right ||
+        position.bottom ||
+        position.left
+    ) {
 
         // We need to compute the position X / Y of the joystick.
         var dumb = document.createElement('DIV');
@@ -327,6 +329,7 @@ Collection.prototype.getOrCreate = function (identifier, position) {
             return self.createNipple(position, identifier);
         }
 
+        // eslint-disable-next-line no-console
         console.warn('Coudln\'t find the needed nipple.');
         return false;
     }
@@ -344,6 +347,7 @@ Collection.prototype.processOnMove = function (evt) {
     if (!nipple) {
         // This is here just for safety.
         // It shouldn't happen.
+        // eslint-disable-next-line no-console
         console.error('Found zombie joystick with ID ' + identifier);
         self.manager.removeIdentifier(identifier);
         return;
@@ -369,14 +373,14 @@ Collection.prototype.processOnMove = function (evt) {
         pos = u.findCoord(nipple.position, dist, angle);
     }
 
-    var xPosition = pos.x - nipple.position.x
-    var yPosition = pos.y - nipple.position.y
+    var xPosition = pos.x - nipple.position.x;
+    var yPosition = pos.y - nipple.position.y;
 
     if (opts.lockX){
-        yPosition = 0
+        yPosition = 0;
     }
     if (opts.lockY) {
-        xPosition = 0
+        xPosition = 0;
     }
 
     nipple.frontPosition = {
@@ -527,3 +531,5 @@ Collection.prototype.destroy = function () {
     // Unbind everything.
     self.off();
 };
+
+export default Collection;

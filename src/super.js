@@ -1,8 +1,48 @@
 ///////////////////////
 ///   SUPER CLASS   ///
 ///////////////////////
+import * as u from './utils';
 
-function Super () {};
+// Constants
+var isTouch = !!('ontouchstart' in window);
+var isPointer = window.PointerEvent ? true : false;
+var isMSPointer = window.MSPointerEvent ? true : false;
+var events = {
+    touch: {
+        start: 'touchstart',
+        move: 'touchmove',
+        end: 'touchend, touchcancel'
+    },
+    mouse: {
+        start: 'mousedown',
+        move: 'mousemove',
+        end: 'mouseup'
+    },
+    pointer: {
+        start: 'pointerdown',
+        move: 'pointermove',
+        end: 'pointerup, pointercancel'
+    },
+    MSPointer: {
+        start: 'MSPointerDown',
+        move: 'MSPointerMove',
+        end: 'MSPointerUp'
+    }
+};
+var toBind;
+var secondBind = {};
+if (isPointer) {
+    toBind = events.pointer;
+} else if (isMSPointer) {
+    toBind = events.MSPointer;
+} else if (isTouch) {
+    toBind = events.touch;
+    secondBind = events.mouse;
+} else {
+    toBind = events.mouse;
+}
+
+function Super () {}
 
 // Basic event system.
 Super.prototype.on = function (arg, cb) {
@@ -72,6 +112,7 @@ Super.prototype.bindEvt = function (el, type) {
         if (typeof self['on' + type] === 'function') {
             self['on' + type].apply(self, arguments);
         } else {
+            // eslint-disable-next-line no-console
             console.warn('[WARNING] : Missing "on' + type + '" handler.');
         }
     };
@@ -102,3 +143,5 @@ Super.prototype.unbindEvt = function (el, type) {
 
     return this;
 };
+
+export default Super;
