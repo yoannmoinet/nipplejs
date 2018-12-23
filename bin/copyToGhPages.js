@@ -6,10 +6,12 @@ const isWin = /^win/.test(process.platform);
 const mv = isWin ? 'move' : 'mv';
 
 queue([
+    stash,
     checkoutPage,
     importReadme,
     modifyFile,
     commit,
+    push,
     checkoutMaster
 ]);
 
@@ -34,6 +36,11 @@ function queue (fns) {
     });
 }
 
+function stash (next) {
+    console.log('- stash changes');
+    exec('git stash', next);
+}
+
 function checkoutPage (next) {
     console.log(' - checkout gh-pages.');
     exec('git checkout gh-pages', next);
@@ -41,12 +48,11 @@ function checkoutPage (next) {
 
 function importReadme (next) {
     console.log(' - checkout README from master and rename it to index.md');
-    exec(
-        'git checkout master -- README.md && ' +
-        'git reset README.md && ' +
-        mv + ' README.md index.md',
-        next
-    );
+    exec(`
+git checkout master -- README.md &&
+git reset README.md &&
+${mv} README.md index.md
+    `, next);
 }
 
 function modifyFile (next) {
@@ -65,10 +71,15 @@ function modifyFile (next) {
 
 function commit (next) {
     console.log(' - commit latest doc to gh-pages');
-    exec('git add index.md && ' +
-        'git add ./javascripts/nipplejs.js && ' +
-        'git commit -m "chore: sync from master" && ' +
-        'git push origin gh-pages', next);
+    exec(`
+git add index.md &&
+git commit -m "chore: sync from master"
+    `, next);
+}
+
+function push (next) {
+    console.log(' - push latest doc to gh-pages');
+    exec('git push origin gh-pages', next);
 }
 
 function checkoutMaster (next) {
