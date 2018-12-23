@@ -1,3 +1,13 @@
+<a name="0.8.0"></a>
+# [0.8.0](https://github.com/yoannmoinet/nipplejs/compare/v0.7.3...v0.8.0) (2018-12-23)
+
+
+### Features
+
+* upgrade dev experience with webpack and es6 ([cc1e824](https://github.com/yoannmoinet/nipplejs/commit/cc1e824))
+
+
+
 <a name="0.7.3"></a>
 ## [0.7.3](https://github.com/yoannmoinet/nipplejs/compare/v0.7.2...v0.7.3) (2018-12-11)
 
