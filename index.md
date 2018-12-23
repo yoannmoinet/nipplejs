@@ -3,8 +3,6 @@ layout: index
 ---
 
 [![npm](https://img.shields.io/npm/v/nipplejs.svg)](https://npmjs.org/package/nipplejs)
-[![CDNJS](https://img.shields.io/cdnjs/v/nipplejs.svg)](https://cdnjs.com/libraries/nipplejs)
-![Bower](https://img.shields.io/bower/v/nipplejs.svg)
 [![npm](https://img.shields.io/npm/dm/nipplejs.svg)](https://npmjs.org/package/nipplejs)
 
 # Table Of Contents
@@ -80,10 +78,6 @@ layout: index
 
 ```bash
 npm install nipplejs --save
-
-// OR
-
-bower install nipplejs --save
 ```
 
 ----
@@ -109,9 +103,14 @@ define(['nipplejs'], function (nipplejs) {
 });
 ```
 
+```javascript
+// Module
+import nipplejs from 'nipplejs';
+```
+
 ```html
-// Global
-<script src="./dist/nipplejs.min.js"></script>
+<!-- Global -->
+<script src="./nipplejs.js"></script>
 <script>
     var manager = nipplejs.create(options);
 </script>
@@ -138,6 +137,8 @@ var options = {
     mode: String,                   // 'dynamic', 'static' or 'semi'
     restJoystick: Boolean,
     restOpacity: Number,            // opacity when not 'dynamic' and rested
+    lockX: Boolean,                 // only move on the X axis
+    lockY: Boolean,                 // only move on the Y axis
     catchDistance: Number           // distance to recycle previous joystick in
                                     // 'semi' mode
 };
@@ -151,7 +152,7 @@ The dom element in which all your joysticks will be injected.
 ```html
 <div id="zone_joystick"></div>
 
-<script type="text/javascript" src="./nipplejs.min.js"></script>
+<script type="text/javascript" src="./nipplejs.js"></script>
 <script type="text/javascript">
     var options = {
         zone: document.getElementById('zone_joystick');
@@ -607,31 +608,4 @@ The value, between 0 and 1, is sent back alongside the event.
 ----
 
 ## Contributing
-Your help is more than welcome, I would be very honored to have you on my side.
-
-Here are some very basic guidelines.
-
-#### Commits
-Please follow these [guidelines](https://github.com/angular/angular.js/blob/master/CONTRIBUTING.md#commit) so your commits will be taken by the self-generated changelog.
-
-#### Style
-There are both [JSCS](http://jscs.info/) and [ESLint](http://eslint.org/) in the project.
-
-To test your code against them simply run `npm run prebuild`.
-
-We follow a **4 spaces** rule around here.
-
-#### Workflow
-You can use the available scripts if needed.
-
-- `npm run watch` will run the build each time a change is detected.
-- `npm run formatAndLint` will test the formatting and the linting of your code.
-- `npm start` will run a static server that will serve the [`test/`](./test) folder on [`localhost:8080`](http://localhost:8080).
-- `npm test` will test using CasperJS, you have to run `npm start` in another window to have a local server available to CasperJS.
-
-#### Build
-Once you're satisfied with your changes, you can also include a build.
-
-1. `npm run build` to generate built files.
-2. commit your build with the message `chore: new build`.
-3. `npm version patch|minor|major` depending on your change. Changelog will be generated and bower's version synced and everything is automatically committed (not pushed though).
+You can follow [this document](./CONTRIBUTING.md) to help you get started.
