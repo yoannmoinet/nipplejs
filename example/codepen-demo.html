@@ -226,7 +226,16 @@
                 }
             };
 
-            sId('buttons').onclick = createNipple;
+            var timeoutCreate;
+            function createThrottle (evt) {
+                clearTimeout(timeoutCreate);
+                timeoutCreate = setTimeout(() => {
+                    createNipple(evt);
+                }, 100);
+            }
+
+            sId('buttons').onclick = sId('buttons').ontouchend = createThrottle;
+
             createNipple('dynamic');
 
             function bindNipple () {
@@ -251,6 +260,7 @@
                 if (joystick) {
                     joystick.destroy();
                 }
+
                 removeClass(s('.zone.active'), 'active');
                 removeClass(s('.button.active'), 'active');
                 removeClass(s('.highlight.active'), 'active');
