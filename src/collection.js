@@ -26,6 +26,7 @@ function Collection (manager, options) {
         position: {top: 0, left: 0},
         catchDistance: 200,
         size: 100,
+        nipplesize : 50,
         threshold: 0.1,
         color: 'white',
         fadeTime: 250,
@@ -156,6 +157,7 @@ Collection.prototype.createNipple = function (position, identifier) {
     var nipple = new Nipple(self, {
         color: opts.color,
         size: opts.size,
+        nipplesize : opts.nipplesize,
         threshold: opts.threshold,
         fadeTime: opts.fadeTime,
         dataOnly: opts.dataOnly,

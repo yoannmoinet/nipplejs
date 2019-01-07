@@ -14,6 +14,7 @@ function Nipple (collection, options) {
     // Defaults
     this.defaults = {
         size: 100,
+        nipplesize : 50,
         threshold: 0.1,
         color: 'white',
         fadeTime: 250,
@@ -99,6 +100,7 @@ Nipple.prototype.stylize = function () {
     var animTime = this.options.fadeTime + 'ms';
     var borderStyle = u.getVendorStyle('borderRadius', '50%');
     var transitStyle = u.getTransitionStyle('transition', 'opacity', animTime);
+
     var styles = {};
     styles.el = {
         position: 'absolute',
@@ -118,13 +120,17 @@ Nipple.prototype.stylize = function () {
         'opacity': '.5'
     };
 
+    
+    var nipplesizemultiple = (this.options.nipplesize / 100);
+    var nipplesizemarginmultiple = nipplesizemultiple / 2;
+
     styles.front = {
-        width: this.options.size / 2 + 'px',
-        height: this.options.size / 2 + 'px',
+        width: this.options.size * nipplesizemultiple + 'px',
+        height: this.options.size * nipplesizemultiple+ 'px',
         position: 'absolute',
         display: 'block',
-        marginLeft: -this.options.size / 4 + 'px',
-        marginTop: -this.options.size / 4 + 'px',
+        marginLeft: -this.options.size * nipplesizemarginmultiple + 'px',
+        marginTop: -this.options.size * nipplesizemarginmultiple + 'px',
         background: this.options.color,
         'opacity': '.5'
     };
