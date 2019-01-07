@@ -1,15 +1,16 @@
+/* eslint no-console: 0 */
 var fs = require('fs');
 var conventionalChangelog = require('conventional-changelog');
 var changelogFile = fs.createWriteStream('CHANGELOG.md');
 var exec = require('child_process').exec;
 
 conventionalChangelog({
-	preset: 'angular'
+    preset: 'angular'
 }, {}, {
     // You'll want to add your first commit's hash in here,
     // otherwise it will take from the latest tag only.
-	from: '',
-	to: 'HEAD'
+    from: '',
+    to: 'HEAD'
 }).pipe(changelogFile);
 
 // Commit what's changed in the changelog.

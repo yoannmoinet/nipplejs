@@ -37,23 +37,23 @@
     <body>
         <div id="left"></div>
         <div id="right"></div>
-        <script src="../dist/nipplejs.js" charset="utf-8"></script>
+        <script src="/dist/nipplejs.js"></script>
         <script>
-        var joystickL = nipplejs.create({
-            zone: document.getElementById('left'),
-            mode: 'static',
-            position: { left: '20%', top: '50%' },
-            color: 'green',
-            size: 200
-        });
+            var joystickL = nipplejs.create({
+                zone: document.getElementById('left'),
+                mode: 'static',
+                position: { left: '20%', top: '50%' },
+                color: 'green',
+                size: 200
+            });
 
-        var joystickR = nipplejs.create({
-            zone: document.getElementById('right'),
-            mode: 'static',
-            position: { left: '80%', top: '50%' },
-            color: 'red',
-            size: 200
-        });
+            var joystickR = nipplejs.create({
+                zone: document.getElementById('right'),
+                mode: 'static',
+                position: { left: '80%', top: '50%' },
+                color: 'red',
+                size: 200
+            });
         </script>
     </body>
 </html>

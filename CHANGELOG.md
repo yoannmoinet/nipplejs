@@ -1,5 +1,45 @@
+<a name="0.8.0"></a>
+# [0.8.0](https://github.com/yoannmoinet/nipplejs/compare/v0.7.3...v0.8.0) (2018-12-23)
+
+
+### Features
+
+* upgrade dev experience with webpack and es6 ([cc1e824](https://github.com/yoannmoinet/nipplejs/commit/cc1e824))
+
+
+
+<a name="0.7.3"></a>
+## [0.7.3](https://github.com/yoannmoinet/nipplejs/compare/v0.7.2...v0.7.3) (2018-12-11)
+
+
+
+<a name="0.7.2"></a>
+## [0.7.2](https://github.com/yoannmoinet/nipplejs/compare/v0.7.1...v0.7.2) (2018-12-11)
+
+
+### Features
+
+* Add TypeScript Definitions ([#85](https://github.com/yoannmoinet/nipplejs/issues/85)) ([0b1f4ae](https://github.com/yoannmoinet/nipplejs/commit/0b1f4ae)), closes [#21](https://github.com/yoannmoinet/nipplejs/issues/21)
+
+
+
+<a name="0.7.1"></a>
+## [0.7.1](https://github.com/yoannmoinet/nipplejs/compare/v0.7.0...v0.7.1) (2018-06-06)
+
+
+
 <a name="0.7.0"></a>
-# [0.7.0](https://github.com/yoannmoinet/nipplejs/compare/v0.6.8...v0.7.0) (2018-01-24)
+# [0.7.0](https://github.com/yoannmoinet/nipplejs/compare/v0.6.8...v0.7.0) (2018-06-06)
+
+
+### Bug Fixes
+
+* register touchcancel and pointercancel events ([2c541a6](https://github.com/yoannmoinet/nipplejs/commit/2c541a6))
+
+
+### Features
+
+* **joystick:** add lockX and lockY options ([6baba97](https://github.com/yoannmoinet/nipplejs/commit/6baba97))
 
 
 

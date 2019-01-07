@@ -1,3 +1,6 @@
+import Super from './super';
+import * as u from './utils';
+
 ///////////////////////
 ///   THE NIPPLE    ///
 ///////////////////////
@@ -19,8 +22,8 @@ function Nipple (collection, options) {
         restOpacity: 0.5,
         mode: 'dynamic',
         zone: document.body,
-        isHorizontalLocked: false,
-        isVerticalLocked: false
+        lockX: false,
+        lockY: false
     };
 
     this.config(options);
@@ -57,7 +60,7 @@ function Nipple (collection, options) {
     };
 
     return this.instance;
-};
+}
 
 Nipple.prototype = new Super();
 Nipple.constructor = Nipple;
@@ -302,14 +305,25 @@ Nipple.prototype.computeDirection = function (obj) {
     //      /   \
     //     /DOWN \
     //
-    if (rAngle > angle45 && rAngle < (angle45 * 3) && !obj.horizontalOnly) {
+    if (
+        rAngle > angle45 &&
+        rAngle < (angle45 * 3) &&
+        !obj.lockX
+    ) {
         direction = 'up';
-    } else if (rAngle > -angle45 && rAngle <= angle45 && !obj.verticalOnly) {
+    } else if (
+        rAngle > -angle45 &&
+        rAngle <= angle45 &&
+        !obj.lockY
+    ) {
         direction = 'left';
-    } else if (rAngle > (-angle45 * 3) && rAngle <= -angle45 &&
-    !obj.horizontalOnly) {
+    } else if (
+        rAngle > (-angle45 * 3) &&
+        rAngle <= -angle45 &&
+        !obj.lockX
+    ) {
         direction = 'down';
-    } else if (!obj.verticalOnly) {
+    } else if (!obj.lockY) {
         direction = 'right';
     }
 
@@ -318,29 +332,26 @@ Nipple.prototype.computeDirection = function (obj) {
     // _______               | RIGHT
     //                  LEFT |
     //   DOWN                |
-    if (!obj.verticalOnly) {
+    if (!obj.lockY) {
         if (rAngle > -angle90 && rAngle < angle90) {
             directionX = 'left';
         } else {
             directionX = 'right';
         }
-    } else {
-        directionX = 'NA';
     }
 
-    if (!obj.horizontalOnly) {
+    if (!obj.lockX) {
         if (rAngle > 0) {
             directionY = 'up';
         } else {
             directionY = 'down';
         }
-    } else {
-        directionY = 'NA';
     }
 
     if (obj.force > this.options.threshold) {
         var oldDirection = {};
-        for (var i in this.direction) {
+        var i;
+        for (i in this.direction) {
             if (this.direction.hasOwnProperty(i)) {
                 oldDirection[i] = this.direction[i];
             }
@@ -356,7 +367,7 @@ Nipple.prototype.computeDirection = function (obj) {
 
         obj.direction = this.direction;
 
-        for (var i in oldDirection) {
+        for (i in oldDirection) {
             if (oldDirection[i] === this.direction[i]) {
                 same[i] = true;
             }
@@ -385,3 +396,5 @@ Nipple.prototype.computeDirection = function (obj) {
     }
     return obj;
 };
+
+export default Nipple;
