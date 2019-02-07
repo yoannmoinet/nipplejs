@@ -35,6 +35,11 @@ function Nipple (collection, options) {
 
     this.id = Nipple.id;
     Nipple.id += 1;
+    
+    if (this.collection.buildEl !== false) {
+        this.buildEl = this.collection.buildEl;
+    }
+    
     this.buildEl()
         .stylize();
 
