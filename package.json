@@ -13,7 +13,8 @@
   },
   "files": [
     "dist/*",
-    "src/*"
+    "src/*",
+    "types/*"
   ],
   "homepage": "https://github.com/yoannmoinet/nipplejs",
   "main": "./dist/nipplejs.js",
