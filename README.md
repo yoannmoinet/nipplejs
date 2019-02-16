@@ -133,6 +133,7 @@ var options = {
     multitouch: Boolean,
     maxNumberOfNipples: Number,     // when multitouch, what is too many?
     dataOnly: Boolean,              // no dom element whatsoever
+    buildEl: Function               // [advanced] defines dom elements
     position: Object,               // preset position for 'static' mode
     mode: String,                   // 'dynamic', 'static' or 'semi'
     restJoystick: Boolean,
@@ -201,6 +202,51 @@ Obviously in a multitouch configuration.
 
 ### `options.dataOnly` defaults to false
 The library won't draw anything in the DOM and will only trigger events with data.
+
+### `options.buildEl` defaults to internal function
+You can pass a function to override the default DOM elements that are used by every joystick. You will need to create and define at least 3 DOM elements into the internal `this.ui` object: `this.ui.el` with 2 children: `this.ui.back` and `this.ui.front`. 
+
+Example:
+
+```
+this.ui.el = document.createElement('div');
+this.ui.front = document.createElement('div');
+this.ui.back = document.createElement('div');
+
+// add your code here
+
+// front and back need to be appended in this order to this.ui.el:
+this.ui.el.appendChild(this.ui.back);
+this.ui.el.appendChild(this.ui.front);
+```
+
+Here is the default implementation. This function can be used as a starting point, because it adds correct IDs and class names, and takes care of other options as well:
+
+```
+function (options) {
+    this.ui = {};
+
+    if (this.options.dataOnly) {
+        return this;
+    }
+
+    this.ui.el = document.createElement('div');
+    this.ui.back = document.createElement('div');
+    this.ui.front = document.createElement('div');
+
+    this.ui.el.className = 'nipple collection_' + this.collection.id;
+    this.ui.back.className = 'back';
+    this.ui.front.className = 'front';
+
+    this.ui.el.setAttribute('id', 'nipple_' + this.collection.id +
+        '_' + this.id);
+
+    this.ui.el.appendChild(this.ui.back);
+    this.ui.el.appendChild(this.ui.front);
+
+    return this;
+}
+```
 
 ### `options.position` defaults to `{top: 0, left: 0}`
 An object that will determine the position of a `static` mode.
