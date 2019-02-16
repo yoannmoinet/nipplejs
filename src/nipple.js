@@ -36,7 +36,7 @@ function Nipple (collection, options) {
     this.id = Nipple.id;
     Nipple.id += 1;
     
-    if (this.collection.buildEl !== false) {
+    if (this.collection.buildEl !== false && typeof this.collection.buildEl == 'function') {
         this.buildEl = this.collection.buildEl;
     }
     

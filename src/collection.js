@@ -14,6 +14,7 @@ function Collection (manager, options) {
     self.ids = [];
     self.pressureIntervals = {};
     self.manager = manager;
+    self.buildEl = options.buildEl;
     self.id = Collection.id;
     Collection.id += 1;
 
