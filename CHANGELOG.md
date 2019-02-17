@@ -1,5 +1,5 @@
-<a name="0.8.0"></a>
-# [0.8.0](https://github.com/yoannmoinet/nipplejs/compare/v0.7.3...v0.8.0) (2018-12-23)
+<a name="0.8.1"></a>
+## [0.8.1](https://github.com/yoannmoinet/nipplejs/compare/v0.7.3...v0.8.1) (2019-02-17)
 
 
 ### Features
