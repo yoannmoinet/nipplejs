@@ -282,9 +282,9 @@ export class JoystickManager {
 }
 
 export interface Collection {
-    nipples: [];
-    idles: [];
-    actives: [];
+    nipples: any[];
+    idles: any[];
+    actives: any[];
     ids: number[];
     pressureIntervals: {};
     manager: JoystickManager;
