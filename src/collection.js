@@ -228,6 +228,7 @@ Collection.prototype.pressureFn = function (touch, nipple, identifier) {
 Collection.prototype.onstart = function (evt) {
     var self = this;
     var opts = self.options;
+    var origEvt = evt;
     evt = u.prepareEvent(evt);
 
     // Update the box position
@@ -238,6 +239,22 @@ Collection.prototype.onstart = function (evt) {
         // meaning we don't have more active nipples than we should.
         if (self.actives.length < opts.maxNumberOfNipples) {
             self.processOnStart(touch);
+        }
+        else if(origEvt.type.match(/^touch/)){
+            // zombies occur when end event is not received on Safari
+            // first touch removed before second touch, we need to catch up...
+            // so remove where touches in manager that no longer exist
+            Object.keys(self.manager.ids).forEach(function(k){
+                if(Object.values(origEvt.touches).findIndex(function(t){return t.identifier===k;}) < 0){
+                    // manager has id that doesn't exist in touches
+                    var e = [evt[0]];
+                    e.identifier = k;
+                    self.processOnEnd(e);
+                }
+            });
+            if(self.actives.length < opts.maxNumberOfNipples){
+                self.processOnStart(touch);
+            }
         }
     };
 
