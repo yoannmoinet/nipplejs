@@ -225,11 +225,11 @@ Three modes are possible :
 - new joystick is created at each new touch farther than `options.catchDistance` of any previously created joystick.
 - the joystick is faded-out when released but not destroyed.
 - when touch is made **inside** the `options.catchDistance` a new direction is triggered immediately.
-- when touch is made **oustide** the `options.catchDistance` the previous joystick is destroyed and a new one is created.
+- when touch is made **outside** the `options.catchDistance` the previous joystick is destroyed and a new one is created.
 - **cannot** be multitouch.
 
 #### `'static'`
-- a joystick is positionned immediately at `options.position`.
+- a joystick is positioned immediately at `options.position`.
 - one joystick per zone.
 - each new touch triggers a new direction.
 - **cannot** be multitouch.
@@ -289,7 +289,7 @@ Your manager has the following signature :
 
 #### `manager.on(type, handler)`
 
-If you whish to listen to internal events like :
+If you wish to listen to internal events like :
 
 ```javascript
 manager.on('event#1 event#2', function (evt, data) {
