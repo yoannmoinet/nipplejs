@@ -366,6 +366,11 @@ Collection.prototype.processOnMove = function (evt) {
     var rAngle = u.radians(angle);
     var force = dist / size;
 
+    var raw = {
+        distance: dist,
+        position: pos
+    };
+
     // If distance is bigger than nipple's size
     // we clamp the position.
     if (dist > size) {
@@ -403,6 +408,7 @@ Collection.prototype.processOnMove = function (evt) {
             radian: rAngle,
             degree: angle
         },
+        raw: raw,
         instance: nipple,
         lockX: opts.lockX,
         lockY: opts.lockY

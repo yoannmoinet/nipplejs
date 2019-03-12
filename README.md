@@ -188,14 +188,14 @@ The time it takes for joystick to fade-out and fade-in when activated or de-acti
 ### `options.multitouch` defaults to false
 Enable the multitouch capabilities.
 
-If, for reasons, you need to have multiple nipples into the same zone.
+If, for reasons, you need to have multiple nipples in the same zone.
 
-Otherwise it will only get one, and all new touches won't do a thing.
+Otherwise, it will only get one, and all new touches won't do a thing.
 
 Please note that multitouch is off when in `static` or `semi` modes.
 
 ### `options.maxNumberOfNipples` defaults to 1
-If you need to, you can also control the maximum number of instance that could be created.
+If you need to, you can also control the maximum number of instances that could be created.
 
 Obviously in a multitouch configuration.
 
@@ -314,10 +314,10 @@ If you don't specify the handler but just a type, all handlers for that type wil
 
 #### `manager.get(identifier)`
 
-An helper to get an instance via its identifier.
+A helper to get an instance via its identifier.
 
 ```javascript
-// Will return the nipple instanciated by the touch identified by 0
+// Will return the nipple instantiated by the touch identified by 0
 manager.get(0);
 ```
 
@@ -525,6 +525,13 @@ Comes with data :
     angle: {
         radian: 1.5707963268,   // angle in radian
         degree: 90
+    },
+    raw: {                      // note: angle is the same, beyond the 50 pixel limit
+        distance: 25.4,         // distance which continues beyond the 50 pixel limit
+        position: {             // position of the finger/mouse in pixels, beyond joystick limits
+            x: 125,
+            y: 95
+        }
     },
     instance: Nipple            // the nipple instance that triggered the event
 }
