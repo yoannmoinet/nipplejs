@@ -1,3 +1,19 @@
+<a name="0.8.2"></a>
+## [0.8.2](https://github.com/yoannmoinet/nipplejs/compare/v0.8.1...v0.8.2) (2019-05-08)
+
+
+### Bug Fixes
+
+* allow older typescript ([c164597](https://github.com/yoannmoinet/nipplejs/commit/c164597))
+* joystick in 'dynamic' mode gets stuck on iOS ([94bb784](https://github.com/yoannmoinet/nipplejs/commit/94bb784)), closes [#94](https://github.com/yoannmoinet/nipplejs/issues/94)
+
+
+### Features
+
+* add raw data on move for data-only usage ([c818fb2](https://github.com/yoannmoinet/nipplejs/commit/c818fb2)), closes [#54](https://github.com/yoannmoinet/nipplejs/issues/54)
+
+
+
 <a name="0.8.1"></a>
 ## [0.8.1](https://github.com/yoannmoinet/nipplejs/compare/v0.7.3...v0.8.1) (2019-02-17)
 
