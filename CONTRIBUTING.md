@@ -4,7 +4,7 @@ Your help is more than welcome, I would be very honored to have you on my side.
 Here are some very basic guidelines.
 
 ### Commits
-Please follow these [guidelines](https://github.com/angular/angular.js/blob/master/CONTRIBUTING.md#commit) so your commits will be taken by the self-generated changelog.
+Please follow these [guidelines](https://github.com/angular/angular.js/blob/master/DEVELOPERS.md#commits) so your commits will be taken by the self-generated changelog.
 
 ### Style
 [ESLint](http://eslint.org/) is set up on the project. It will be checked at build time.
