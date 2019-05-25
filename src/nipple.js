@@ -5,7 +5,7 @@ import * as u from './utils';
 ///   THE NIPPLE    ///
 ///////////////////////
 
-function Nipple (collection, options) {
+function Nipple(collection, options) {
     this.identifier = options.identifier;
     this.position = options.position;
     this.frontPosition = options.frontPosition;
@@ -23,7 +23,8 @@ function Nipple (collection, options) {
         mode: 'dynamic',
         zone: document.body,
         lockX: false,
-        lockY: false
+        lockY: false,
+        shape: 'circle'
     };
 
     this.config(options);
@@ -35,8 +36,7 @@ function Nipple (collection, options) {
 
     this.id = Nipple.id;
     Nipple.id += 1;
-    this.buildEl()
-        .stylize();
+    this.buildEl().stylize();
 
     // Nipple's API.
     this.instance = {
@@ -67,7 +67,7 @@ Nipple.constructor = Nipple;
 Nipple.id = 0;
 
 // Build the dom element of the Nipple instance.
-Nipple.prototype.buildEl = function (options) {
+Nipple.prototype.buildEl = function(options) {
     this.ui = {};
 
     if (this.options.dataOnly) {
@@ -82,8 +82,10 @@ Nipple.prototype.buildEl = function (options) {
     this.ui.back.className = 'back';
     this.ui.front.className = 'front';
 
-    this.ui.el.setAttribute('id', 'nipple_' + this.collection.id +
-        '_' + this.id);
+    this.ui.el.setAttribute(
+        'id',
+        'nipple_' + this.collection.id + '_' + this.id
+    );
 
     this.ui.el.appendChild(this.ui.back);
     this.ui.el.appendChild(this.ui.front);
@@ -92,19 +94,20 @@ Nipple.prototype.buildEl = function (options) {
 };
 
 // Apply CSS to the Nipple instance.
-Nipple.prototype.stylize = function () {
+Nipple.prototype.stylize = function() {
     if (this.options.dataOnly) {
         return this;
     }
     var animTime = this.options.fadeTime + 'ms';
-    var borderStyle = u.getVendorStyle('borderRadius', '50%');
+    var squareBorderStyle = u.getVendorStyle('borderRadius', '0%');
+    var circleBorderStyle = u.getVendorStyle('borderRadius', '50%');
     var transitStyle = u.getTransitionStyle('transition', 'opacity', animTime);
     var styles = {};
     styles.el = {
         position: 'absolute',
         opacity: this.options.restOpacity,
         display: 'block',
-        'zIndex': 999
+        zIndex: 999
     };
 
     styles.back = {
@@ -115,7 +118,7 @@ Nipple.prototype.stylize = function () {
         marginLeft: -this.options.size / 2 + 'px',
         marginTop: -this.options.size / 2 + 'px',
         background: this.options.color,
-        'opacity': '.5'
+        opacity: '.5'
     };
 
     styles.front = {
@@ -126,19 +129,22 @@ Nipple.prototype.stylize = function () {
         marginLeft: -this.options.size / 4 + 'px',
         marginTop: -this.options.size / 4 + 'px',
         background: this.options.color,
-        'opacity': '.5'
+        opacity: '.5'
     };
 
     u.extend(styles.el, transitStyle);
-    u.extend(styles.back, borderStyle);
-    u.extend(styles.front, borderStyle);
+    u.extend(
+        styles.back,
+        this.options.shape === 'circle' ? circleBorderStyle : squareBorderStyle
+    );
+    u.extend(styles.front, circleBorderStyle);
 
     this.applyStyles(styles);
 
     return this;
 };
 
-Nipple.prototype.applyStyles = function (styles) {
+Nipple.prototype.applyStyles = function(styles) {
     // Apply styles
     for (var i in this.ui) {
         if (this.ui.hasOwnProperty(i)) {
@@ -152,7 +158,7 @@ Nipple.prototype.applyStyles = function (styles) {
 };
 
 // Inject the Nipple instance into DOM.
-Nipple.prototype.addToDom = function () {
+Nipple.prototype.addToDom = function() {
     // We're not adding it if we're dataOnly or already in dom.
     if (this.options.dataOnly || document.body.contains(this.ui.el)) {
         return this;
@@ -162,7 +168,7 @@ Nipple.prototype.addToDom = function () {
 };
 
 // Remove the Nipple instance from DOM.
-Nipple.prototype.removeFromDom = function () {
+Nipple.prototype.removeFromDom = function() {
     if (this.options.dataOnly || !document.body.contains(this.ui.el)) {
         return this;
     }
@@ -171,7 +177,7 @@ Nipple.prototype.removeFromDom = function () {
 };
 
 // Entirely destroy this nipple
-Nipple.prototype.destroy = function () {
+Nipple.prototype.destroy = function() {
     clearTimeout(this.removeTimeout);
     clearTimeout(this.showTimeout);
     clearTimeout(this.restTimeout);
@@ -181,7 +187,7 @@ Nipple.prototype.destroy = function () {
 };
 
 // Fade in the Nipple instance.
-Nipple.prototype.show = function (cb) {
+Nipple.prototype.show = function(cb) {
     var self = this;
 
     if (self.options.dataOnly) {
@@ -196,11 +202,11 @@ Nipple.prototype.show = function (cb) {
 
     self.restCallback();
 
-    setTimeout(function () {
+    setTimeout(function() {
         self.ui.el.style.opacity = 1;
     }, 0);
 
-    self.showTimeout = setTimeout(function () {
+    self.showTimeout = setTimeout(function() {
         self.trigger('shown', self.instance);
         if (typeof cb === 'function') {
             cb.call(this);
@@ -211,7 +217,7 @@ Nipple.prototype.show = function (cb) {
 };
 
 // Fade out the Nipple instance.
-Nipple.prototype.hide = function (cb) {
+Nipple.prototype.hide = function(cb) {
     var self = this;
 
     if (self.options.dataOnly) {
@@ -224,18 +230,15 @@ Nipple.prototype.hide = function (cb) {
     clearTimeout(self.showTimeout);
     clearTimeout(self.restTimeout);
 
-    self.removeTimeout = setTimeout(
-        function () {
-            var display = self.options.mode === 'dynamic' ? 'none' : 'block';
-            self.ui.el.style.display = display;
-            if (typeof cb === 'function') {
-                cb.call(self);
-            }
+    self.removeTimeout = setTimeout(function() {
+        var display = self.options.mode === 'dynamic' ? 'none' : 'block';
+        self.ui.el.style.display = display;
+        if (typeof cb === 'function') {
+            cb.call(self);
+        }
 
-            self.trigger('hidden', self.instance);
-        },
-        self.options.fadeTime
-    );
+        self.trigger('hidden', self.instance);
+    }, self.options.fadeTime);
     if (self.options.restJoystick) {
         self.restPosition();
     }
@@ -243,7 +246,7 @@ Nipple.prototype.hide = function (cb) {
     return self;
 };
 
-Nipple.prototype.restPosition = function (cb) {
+Nipple.prototype.restPosition = function(cb) {
     var self = this;
     self.frontPosition = {
         x: 0,
@@ -252,10 +255,13 @@ Nipple.prototype.restPosition = function (cb) {
     var animTime = self.options.fadeTime + 'ms';
 
     var transitStyle = {};
-    transitStyle.front = u.getTransitionStyle('transition',
-        ['top', 'left'], animTime);
+    transitStyle.front = u.getTransitionStyle(
+        'transition',
+        ['top', 'left'],
+        animTime
+    );
 
-    var styles = {front: {}};
+    var styles = { front: {} };
     styles.front = {
         left: self.frontPosition.x + 'px',
         top: self.frontPosition.y + 'px'
@@ -264,18 +270,15 @@ Nipple.prototype.restPosition = function (cb) {
     self.applyStyles(transitStyle);
     self.applyStyles(styles);
 
-    self.restTimeout = setTimeout(
-        function () {
-            if (typeof cb === 'function') {
-                cb.call(self);
-            }
-            self.restCallback();
-        },
-        self.options.fadeTime
-    );
+    self.restTimeout = setTimeout(function() {
+        if (typeof cb === 'function') {
+            cb.call(self);
+        }
+        self.restCallback();
+    }, self.options.fadeTime);
 };
 
-Nipple.prototype.restCallback = function () {
+Nipple.prototype.restCallback = function() {
     var self = this;
     var transitStyle = {};
     transitStyle.front = u.getTransitionStyle('transition', 'none', '');
@@ -283,7 +286,7 @@ Nipple.prototype.restCallback = function () {
     self.trigger('rested', self.instance);
 };
 
-Nipple.prototype.resetDirection = function () {
+Nipple.prototype.resetDirection = function() {
     // Fully rebuild the object to let the iteration possible.
     this.direction = {
         x: false,
@@ -292,7 +295,7 @@ Nipple.prototype.resetDirection = function () {
     };
 };
 
-Nipple.prototype.computeDirection = function (obj) {
+Nipple.prototype.computeDirection = function(obj) {
     var rAngle = obj.angle.radian;
     var angle45 = Math.PI / 4;
     var angle90 = Math.PI / 2;
@@ -305,23 +308,11 @@ Nipple.prototype.computeDirection = function (obj) {
     //      /   \
     //     /DOWN \
     //
-    if (
-        rAngle > angle45 &&
-        rAngle < (angle45 * 3) &&
-        !obj.lockX
-    ) {
+    if (rAngle > angle45 && rAngle < angle45 * 3 && !obj.lockX) {
         direction = 'up';
-    } else if (
-        rAngle > -angle45 &&
-        rAngle <= angle45 &&
-        !obj.lockY
-    ) {
+    } else if (rAngle > -angle45 && rAngle <= angle45 && !obj.lockY) {
         direction = 'left';
-    } else if (
-        rAngle > (-angle45 * 3) &&
-        rAngle <= -angle45 &&
-        !obj.lockX
-    ) {
+    } else if (rAngle > -angle45 * 3 && rAngle <= -angle45 && !obj.lockX) {
         direction = 'down';
     } else if (!obj.lockY) {
         direction = 'right';

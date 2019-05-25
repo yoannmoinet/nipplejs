@@ -6,7 +6,7 @@ import * as u from './utils';
 ///   THE COLLECTION    ///
 ///////////////////////////
 
-function Collection (manager, options) {
+function Collection(manager, options) {
     var self = this;
     self.nipples = [];
     self.idles = [];
@@ -23,7 +23,7 @@ function Collection (manager, options) {
         multitouch: false,
         maxNumberOfNipples: 10,
         mode: 'dynamic',
-        position: {top: 0, left: 0},
+        position: { top: 0, left: 0 },
         catchDistance: 200,
         size: 100,
         threshold: 0.1,
@@ -33,7 +33,8 @@ function Collection (manager, options) {
         restJoystick: true,
         restOpacity: 0.5,
         lockX: false,
-        lockY: false
+        lockY: false,
+        shape: 'circle'
     };
 
     self.config(options);
@@ -59,7 +60,7 @@ Collection.prototype = new Super();
 Collection.constructor = Collection;
 Collection.id = 0;
 
-Collection.prototype.prepareNipples = function () {
+Collection.prototype.prepareNipples = function() {
     var self = this;
     var nips = self.nipples;
 
@@ -72,7 +73,7 @@ Collection.prototype.prepareNipples = function () {
     nips.id = self.id;
     nips.processOnMove = self.processOnMove.bind(self);
     nips.processOnEnd = self.processOnEnd.bind(self);
-    nips.get = function (id) {
+    nips.get = function(id) {
         if (id === undefined) {
             return nips[0];
         }
@@ -85,7 +86,7 @@ Collection.prototype.prepareNipples = function () {
     };
 };
 
-Collection.prototype.bindings = function () {
+Collection.prototype.bindings = function() {
     var self = this;
     // Touch start event.
     self.bindEvt(self.options.zone, 'start');
@@ -94,7 +95,7 @@ Collection.prototype.bindings = function () {
     self.options.zone.style.msTouchAction = 'none';
 };
 
-Collection.prototype.begin = function () {
+Collection.prototype.begin = function() {
     var self = this;
     var opts = self.options;
 
@@ -113,7 +114,7 @@ Collection.prototype.begin = function () {
 };
 
 // Nipple Factory
-Collection.prototype.createNipple = function (position, identifier) {
+Collection.prototype.createNipple = function(position, identifier) {
     var self = this;
     var scroll = u.getScroll();
     var toPutOn = {};
@@ -121,10 +122,8 @@ Collection.prototype.createNipple = function (position, identifier) {
 
     if (position.x && position.y) {
         toPutOn = {
-            x: position.x -
-                (scroll.x + self.box.left),
-            y: position.y -
-                (scroll.y + self.box.top)
+            x: position.x - (scroll.x + self.box.left),
+            y: position.y - (scroll.y + self.box.top)
         };
     } else if (
         position.top ||
@@ -132,7 +131,6 @@ Collection.prototype.createNipple = function (position, identifier) {
         position.bottom ||
         position.left
     ) {
-
         // We need to compute the position X / Y of the joystick.
         var dumb = document.createElement('DIV');
         dumb.style.display = 'hidden';
@@ -168,7 +166,8 @@ Collection.prototype.createNipple = function (position, identifier) {
         frontPosition: {
             x: 0,
             y: 0
-        }
+        },
+        shape: opts.shape
     });
 
     if (!opts.dataOnly) {
@@ -184,16 +183,16 @@ Collection.prototype.createNipple = function (position, identifier) {
     return nipple;
 };
 
-Collection.prototype.updateBox = function () {
+Collection.prototype.updateBox = function() {
     var self = this;
     self.box = self.options.zone.getBoundingClientRect();
 };
 
-Collection.prototype.bindNipple = function (nipple) {
+Collection.prototype.bindNipple = function(nipple) {
     var self = this;
     var type;
     // Bubble up identified events.
-    var handler = function (evt, data) {
+    var handler = function(evt, data) {
         // Identify the event type with the nipple's id.
         type = evt.type + ' ' + data.id + ':' + evt.type;
         self.trigger(type, data);
@@ -208,24 +207,29 @@ Collection.prototype.bindNipple = function (nipple) {
     nipple.on('plain:up plain:right plain:down plain:left', handler);
 };
 
-Collection.prototype.pressureFn = function (touch, nipple, identifier) {
+Collection.prototype.pressureFn = function(touch, nipple, identifier) {
     var self = this;
     var previousPressure = 0;
     clearInterval(self.pressureIntervals[identifier]);
     // Create an interval that will read the pressure every 100ms
-    self.pressureIntervals[identifier] = setInterval(function () {
-        var pressure = touch.force || touch.pressure ||
-            touch.webkitForce || 0;
-        if (pressure !== previousPressure) {
-            nipple.trigger('pressure', pressure);
-            self.trigger('pressure ' +
-                nipple.identifier + ':pressure', pressure);
-            previousPressure = pressure;
-        }
-    }.bind(self), 100);
+    self.pressureIntervals[identifier] = setInterval(
+        function() {
+            var pressure =
+                touch.force || touch.pressure || touch.webkitForce || 0;
+            if (pressure !== previousPressure) {
+                nipple.trigger('pressure', pressure);
+                self.trigger(
+                    'pressure ' + nipple.identifier + ':pressure',
+                    pressure
+                );
+                previousPressure = pressure;
+            }
+        }.bind(self),
+        100
+    );
 };
 
-Collection.prototype.onstart = function (evt) {
+Collection.prototype.onstart = function(evt) {
     var self = this;
     var opts = self.options;
     var origEvt = evt;
@@ -234,25 +238,28 @@ Collection.prototype.onstart = function (evt) {
     // Update the box position
     self.updateBox();
 
-    var process = function (touch) {
+    var process = function(touch) {
         // If we can create new nipples
         // meaning we don't have more active nipples than we should.
         if (self.actives.length < opts.maxNumberOfNipples) {
             self.processOnStart(touch);
-        }
-        else if(origEvt.type.match(/^touch/)){
+        } else if (origEvt.type.match(/^touch/)) {
             // zombies occur when end event is not received on Safari
             // first touch removed before second touch, we need to catch up...
             // so remove where touches in manager that no longer exist
-            Object.keys(self.manager.ids).forEach(function(k){
-                if(Object.values(origEvt.touches).findIndex(function(t){return t.identifier===k;}) < 0){
+            Object.keys(self.manager.ids).forEach(function(k) {
+                if (
+                    Object.values(origEvt.touches).findIndex(function(t) {
+                        return t.identifier === k;
+                    }) < 0
+                ) {
                     // manager has id that doesn't exist in touches
                     var e = [evt[0]];
                     e.identifier = k;
                     self.processOnEnd(e);
                 }
             });
-            if(self.actives.length < opts.maxNumberOfNipples){
+            if (self.actives.length < opts.maxNumberOfNipples) {
                 self.processOnStart(touch);
             }
         }
@@ -266,7 +273,7 @@ Collection.prototype.onstart = function (evt) {
     return false;
 };
 
-Collection.prototype.processOnStart = function (evt) {
+Collection.prototype.processOnStart = function(evt) {
     var self = this;
     var opts = self.options;
     var indexInIdles;
@@ -285,7 +292,7 @@ Collection.prototype.processOnStart = function (evt) {
     }
     nipple.identifier = identifier;
 
-    var process = function (nip) {
+    var process = function(nip) {
         // Trigger the start.
         nip.trigger('start', nip);
         self.trigger('start ' + nip.id + ':start', nip);
@@ -325,7 +332,7 @@ Collection.prototype.processOnStart = function (evt) {
     return nipple;
 };
 
-Collection.prototype.getOrCreate = function (identifier, position) {
+Collection.prototype.getOrCreate = function(identifier, position) {
     var self = this;
     var opts = self.options;
     var nipple;
@@ -355,7 +362,7 @@ Collection.prototype.getOrCreate = function (identifier, position) {
     return nipple;
 };
 
-Collection.prototype.processOnMove = function (evt) {
+Collection.prototype.processOnMove = function(evt) {
     var self = this;
     var opts = self.options;
     var identifier = self.manager.getIdentifier(evt);
@@ -390,15 +397,33 @@ Collection.prototype.processOnMove = function (evt) {
 
     // If distance is bigger than nipple's size
     // we clamp the position.
-    if (dist > size) {
-        dist = size;
-        pos = u.findCoord(nipple.position, dist, angle);
+    var xPosition, yPosition;
+    switch (nipple.options.shape) {
+    case 'square':
+        // Clamping for x-axis
+        xPosition = pos.x - nipple.position.x;
+        yPosition = pos.y - nipple.position.y;
+        if (Math.abs(xPosition) >= size) {
+            xPosition = Math.sign(xPosition) * size;
+        }
+
+        //Clamping for y-axis
+        if (Math.abs(yPosition) >= size) {
+            yPosition = Math.sign(yPosition) * size;
+        }
+        break;
+    default:
+        if (dist > size) {
+            dist = size;
+            pos = u.findCoord(nipple.position, dist, angle);
+        }
+
+        xPosition = pos.x - nipple.position.x;
+        yPosition = pos.y - nipple.position.y;
+        break;
     }
 
-    var xPosition = pos.x - nipple.position.x;
-    var yPosition = pos.y - nipple.position.y;
-
-    if (opts.lockX){
+    if (opts.lockX) {
         yPosition = 0;
     }
     if (opts.lockY) {
@@ -445,7 +470,7 @@ Collection.prototype.processOnMove = function (evt) {
     self.trigger('move ' + nipple.id + ':move', toSend);
 };
 
-Collection.prototype.processOnEnd = function (evt) {
+Collection.prototype.processOnEnd = function(evt) {
     var self = this;
     var opts = self.options;
     var identifier = self.manager.getIdentifier(evt);
@@ -457,12 +482,14 @@ Collection.prototype.processOnEnd = function (evt) {
     }
 
     if (!opts.dataOnly) {
-        nipple.hide(function () {
+        nipple.hide(function() {
             if (opts.mode === 'dynamic') {
                 nipple.trigger('removed', nipple);
                 self.trigger('removed ' + nipple.id + ':removed', nipple);
-                self.manager
-                    .trigger('removed ' + nipple.id + ':removed', nipple);
+                self.manager.trigger(
+                    'removed ' + nipple.id + ':removed',
+                    nipple
+                );
                 nipple.destroy();
             }
         });
@@ -531,7 +558,7 @@ Collection.prototype.onDestroyed = function(evt, nipple) {
 };
 
 // Cleanly destroy the manager
-Collection.prototype.destroy = function () {
+Collection.prototype.destroy = function() {
     var self = this;
     self.unbindEvt(self.options.zone, 'start');
 
