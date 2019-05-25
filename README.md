@@ -10,66 +10,68 @@
 
 <!-- toc -->
 
-- [Install](#install)
-- [Demo](#demo)
-- [Usage](#usage)
-- [Options](#options)
-  * [`options.zone` defaults to 'body'](#optionszone-defaults-to-body)
-  * [`options.color` defaults to 'white'](#optionscolor-defaults-to-white)
-  * [`options.size` defaults to 100](#optionssize-defaults-to-100)
-  * [`options.threshold` defaults to 0.1](#optionsthreshold-defaults-to-01)
-  * [`options.fadeTime` defaults to 250](#optionsfadetime-defaults-to-250)
-  * [`options.multitouch` defaults to false](#optionsmultitouch-defaults-to-false)
-  * [`options.maxNumberOfNipples` defaults to 1](#optionsmaxnumberofnipples-defaults-to-1)
-  * [`options.dataOnly` defaults to false](#optionsdataonly-defaults-to-false)
-  * [`options.position` defaults to `{top: 0, left: 0}`](#optionsposition-defaults-to-top-0-left-0)
-  * [`options.mode` defaults to 'dynamic'.](#optionsmode-defaults-to-dynamic)
-    + [`'dynamic'`](#dynamic)
-    + [`'semi'`](#semi)
-    + [`'static'`](#static)
-  * [`options.restJoystick` defaults to true](#optionsrestjoystick-defaults-to-true)
-  * [`options.restOpacity` defaults to 0.5](#optionsrestopacity-defaults-to-05)
-  * [`options.catchDistance` defaults to 200](#optionscatchdistance-defaults-to-200)
-- [API](#api)
-  * [NippleJS instance (manager)](#nipplejs-instance-manager)
-    + [`manager.on(type, handler)`](#managerontype-handler)
-    + [`manager.off([type, handler])`](#managerofftype-handler)
-    + [`manager.get(identifier)`](#managergetidentifier)
-    + [`manager.destroy()`](#managerdestroy)
-    + [`manager.ids`](#managerids)
-    + [`manager.id`](#managerid)
-  * [nipple instance (joystick)](#nipple-instance-joystick)
-  * [`joystick.on`, `joystick.off`](#joystickon-joystickoff)
-  * [`joystick.el`](#joystickel)
-  * [`joystick.show([cb])`](#joystickshowcb)
-  * [`joystick.hide([cb])`](#joystickhidecb)
-  * [`joystick.add()`](#joystickadd)
-  * [`joystick.remove()`](#joystickremove)
-  * [`joystick.destroy()`](#joystickdestroy)
-  * [`joystick.identifier`](#joystickidentifier)
-  * [`joystick.trigger(type [, data])`](#joysticktriggertype--data)
-  * [`joystick.position`](#joystickposition)
-  * [`joystick.frontPosition`](#joystickfrontposition)
-  * [`joystick.ui`](#joystickui)
-- [Events](#events)
-  * [manager only](#manager-only)
-    + [`added`](#added)
-    + [`removed`](#removed)
-  * [manager and joysticks](#manager-and-joysticks)
-    + [`start`](#start)
-    + [`end`](#end)
-    + [`move`](#move)
-    + [`dir`](#dir)
-    + [`plain`](#plain)
-    + [`shown`](#shown)
-    + [`hidden`](#hidden)
-    + [`destroyed`](#destroyed)
-    + [`pressure`](#pressure)
-- [Contributing](#contributing)
-    + [Commits](#commits)
-    + [Style](#style)
-    + [Workflow](#workflow)
-    + [Build](#build)
+- [Table Of Contents](#table-of-contents)
+  - [Install](#install)
+  - [Demo](#demo)
+  - [Usage](#usage)
+  - [Options](#options)
+    - [`options.zone` defaults to 'body'](#optionszone-defaults-to-body)
+    - [`options.color` defaults to 'white'](#optionscolor-defaults-to-white)
+    - [`options.size` defaults to 100](#optionssize-defaults-to-100)
+    - [`options.threshold` defaults to 0.1](#optionsthreshold-defaults-to-01)
+    - [`options.fadeTime` defaults to 250](#optionsfadetime-defaults-to-250)
+    - [`options.multitouch` defaults to false](#optionsmultitouch-defaults-to-false)
+    - [`options.maxNumberOfNipples` defaults to 1](#optionsmaxnumberofnipples-defaults-to-1)
+    - [`options.dataOnly` defaults to false](#optionsdataonly-defaults-to-false)
+    - [`options.position` defaults to `{top: 0, left: 0}`](#optionsposition-defaults-to-top-0-left-0)
+    - [`options.mode` defaults to 'dynamic'.](#optionsmode-defaults-to-dynamic)
+      - [`'dynamic'`](#dynamic)
+      - [`'semi'`](#semi)
+      - [`'static'`](#static)
+    - [`options.restJoystick` defaults to true](#optionsrestjoystick-defaults-to-true)
+    - [`options.restOpacity` defaults to 0.5](#optionsrestopacity-defaults-to-05)
+    - [`options.catchDistance` defaults to 200](#optionscatchdistance-defaults-to-200)
+    - [`options.lockX` defaults to false](#optionslockx-defaults-to-false)
+    - [`options.lockY` defaults to false](#optionslocky-defaults-to-false)
+    - [`options.shape` defaults to 'circle'](#optionsshape-defaults-to-circle)
+      - [`'circle'`](#circle)
+      - [`'square'`](#square)
+  - [API](#api)
+    - [NippleJS instance (manager)](#nipplejs-instance-manager)
+      - [`manager.on(type, handler)`](#managerontype-handler)
+      - [`manager.off([type, handler])`](#managerofftype-handler)
+      - [`manager.get(identifier)`](#managergetidentifier)
+      - [`manager.destroy()`](#managerdestroy)
+      - [`manager.ids`](#managerids)
+      - [`manager.id`](#managerid)
+    - [nipple instance (joystick)](#nipple-instance-joystick)
+    - [`joystick.on`, `joystick.off`](#joystickon-joystickoff)
+    - [`joystick.el`](#joystickel)
+    - [`joystick.show([cb])`](#joystickshowcb)
+    - [`joystick.hide([cb])`](#joystickhidecb)
+    - [`joystick.add()`](#joystickadd)
+    - [`joystick.remove()`](#joystickremove)
+    - [`joystick.destroy()`](#joystickdestroy)
+    - [`joystick.identifier`](#joystickidentifier)
+    - [`joystick.trigger(type [, data])`](#joysticktriggertype--data)
+    - [`joystick.position`](#joystickposition)
+    - [`joystick.frontPosition`](#joystickfrontposition)
+    - [`joystick.ui`](#joystickui)
+  - [Events](#events)
+    - [manager only](#manager-only)
+      - [`added`](#added)
+      - [`removed`](#removed)
+    - [manager and joysticks](#manager-and-joysticks)
+      - [`start`](#start)
+      - [`end`](#end)
+      - [`move`](#move)
+      - [`dir`](#dir)
+      - [`plain`](#plain)
+      - [`shown`](#shown)
+      - [`hidden`](#hidden)
+      - [`destroyed`](#destroyed)
+      - [`pressure`](#pressure)
+  - [Contributing](#contributing)
 
 <!-- tocstop -->
 </details>
@@ -139,8 +141,9 @@ var options = {
     restOpacity: Number,            // opacity when not 'dynamic' and rested
     lockX: Boolean,                 // only move on the X axis
     lockY: Boolean,                 // only move on the Y axis
-    catchDistance: Number           // distance to recycle previous joystick in
+    catchDistance: Number,          // distance to recycle previous joystick in
                                     // 'semi' mode
+    shape: String                   // 'circle' or 'square'
 };
 ```
 
@@ -252,6 +255,14 @@ Locks joystick's movement to the x (horizontal) axis
 ### `options.lockY` defaults to false
 Locks joystick's movement to the y (vertical) axis
 
+### `options.shape` defaults to 'circle'
+The shape of region within which joystick can move.
+
+#### `'circle'`
+Creates circle region for joystick movement
+
+#### `'square'`
+Creates square region for joystick movement
 
 ----
 
