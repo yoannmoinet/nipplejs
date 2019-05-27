@@ -6,7 +6,7 @@ import * as u from './utils';
 ///   THE COLLECTION    ///
 ///////////////////////////
 
-function Collection(manager, options) {
+function Collection (manager, options) {
     var self = this;
     self.nipples = [];
     self.idles = [];
@@ -60,7 +60,7 @@ Collection.prototype = new Super();
 Collection.constructor = Collection;
 Collection.id = 0;
 
-Collection.prototype.prepareNipples = function() {
+Collection.prototype.prepareNipples = function () {
     var self = this;
     var nips = self.nipples;
 
@@ -73,7 +73,7 @@ Collection.prototype.prepareNipples = function() {
     nips.id = self.id;
     nips.processOnMove = self.processOnMove.bind(self);
     nips.processOnEnd = self.processOnEnd.bind(self);
-    nips.get = function(id) {
+    nips.get = function (id) {
         if (id === undefined) {
             return nips[0];
         }
@@ -86,7 +86,7 @@ Collection.prototype.prepareNipples = function() {
     };
 };
 
-Collection.prototype.bindings = function() {
+Collection.prototype.bindings = function () {
     var self = this;
     // Touch start event.
     self.bindEvt(self.options.zone, 'start');
@@ -95,7 +95,7 @@ Collection.prototype.bindings = function() {
     self.options.zone.style.msTouchAction = 'none';
 };
 
-Collection.prototype.begin = function() {
+Collection.prototype.begin = function () {
     var self = this;
     var opts = self.options;
 
@@ -114,7 +114,7 @@ Collection.prototype.begin = function() {
 };
 
 // Nipple Factory
-Collection.prototype.createNipple = function(position, identifier) {
+Collection.prototype.createNipple = function (position, identifier) {
     var self = this;
     var scroll = u.getScroll();
     var toPutOn = {};
@@ -183,16 +183,16 @@ Collection.prototype.createNipple = function(position, identifier) {
     return nipple;
 };
 
-Collection.prototype.updateBox = function() {
+Collection.prototype.updateBox = function () {
     var self = this;
     self.box = self.options.zone.getBoundingClientRect();
 };
 
-Collection.prototype.bindNipple = function(nipple) {
+Collection.prototype.bindNipple = function (nipple) {
     var self = this;
     var type;
     // Bubble up identified events.
-    var handler = function(evt, data) {
+    var handler = function (evt, data) {
         // Identify the event type with the nipple's id.
         type = evt.type + ' ' + data.id + ':' + evt.type;
         self.trigger(type, data);
@@ -207,13 +207,13 @@ Collection.prototype.bindNipple = function(nipple) {
     nipple.on('plain:up plain:right plain:down plain:left', handler);
 };
 
-Collection.prototype.pressureFn = function(touch, nipple, identifier) {
+Collection.prototype.pressureFn = function (touch, nipple, identifier) {
     var self = this;
     var previousPressure = 0;
     clearInterval(self.pressureIntervals[identifier]);
     // Create an interval that will read the pressure every 100ms
     self.pressureIntervals[identifier] = setInterval(
-        function() {
+        function () {
             var pressure =
                 touch.force || touch.pressure || touch.webkitForce || 0;
             if (pressure !== previousPressure) {
@@ -229,7 +229,7 @@ Collection.prototype.pressureFn = function(touch, nipple, identifier) {
     );
 };
 
-Collection.prototype.onstart = function(evt) {
+Collection.prototype.onstart = function (evt) {
     var self = this;
     var opts = self.options;
     var origEvt = evt;
@@ -238,7 +238,7 @@ Collection.prototype.onstart = function(evt) {
     // Update the box position
     self.updateBox();
 
-    var process = function(touch) {
+    var process = function (touch) {
         // If we can create new nipples
         // meaning we don't have more active nipples than we should.
         if (self.actives.length < opts.maxNumberOfNipples) {
@@ -247,9 +247,9 @@ Collection.prototype.onstart = function(evt) {
             // zombies occur when end event is not received on Safari
             // first touch removed before second touch, we need to catch up...
             // so remove where touches in manager that no longer exist
-            Object.keys(self.manager.ids).forEach(function(k) {
+            Object.keys(self.manager.ids).forEach(function (k) {
                 if (
-                    Object.values(origEvt.touches).findIndex(function(t) {
+                    Object.values(origEvt.touches).findIndex(function (t) {
                         return t.identifier === k;
                     }) < 0
                 ) {
@@ -273,7 +273,7 @@ Collection.prototype.onstart = function(evt) {
     return false;
 };
 
-Collection.prototype.processOnStart = function(evt) {
+Collection.prototype.processOnStart = function (evt) {
     var self = this;
     var opts = self.options;
     var indexInIdles;
@@ -292,7 +292,7 @@ Collection.prototype.processOnStart = function(evt) {
     }
     nipple.identifier = identifier;
 
-    var process = function(nip) {
+    var process = function (nip) {
         // Trigger the start.
         nip.trigger('start', nip);
         self.trigger('start ' + nip.id + ':start', nip);
@@ -332,7 +332,7 @@ Collection.prototype.processOnStart = function(evt) {
     return nipple;
 };
 
-Collection.prototype.getOrCreate = function(identifier, position) {
+Collection.prototype.getOrCreate = function (identifier, position) {
     var self = this;
     var opts = self.options;
     var nipple;
@@ -362,7 +362,7 @@ Collection.prototype.getOrCreate = function(identifier, position) {
     return nipple;
 };
 
-Collection.prototype.processOnMove = function(evt) {
+Collection.prototype.processOnMove = function (evt) {
     var self = this;
     var opts = self.options;
     var identifier = self.manager.getIdentifier(evt);
@@ -470,7 +470,7 @@ Collection.prototype.processOnMove = function(evt) {
     self.trigger('move ' + nipple.id + ':move', toSend);
 };
 
-Collection.prototype.processOnEnd = function(evt) {
+Collection.prototype.processOnEnd = function (evt) {
     var self = this;
     var opts = self.options;
     var identifier = self.manager.getIdentifier(evt);
@@ -482,7 +482,7 @@ Collection.prototype.processOnEnd = function(evt) {
     }
 
     if (!opts.dataOnly) {
-        nipple.hide(function() {
+        nipple.hide(function () {
             if (opts.mode === 'dynamic') {
                 nipple.trigger('removed', nipple);
                 self.trigger('removed ' + nipple.id + ':removed', nipple);
@@ -535,7 +535,7 @@ Collection.prototype.processOnEnd = function(evt) {
 };
 
 // Remove destroyed nipple from the lists
-Collection.prototype.onDestroyed = function(evt, nipple) {
+Collection.prototype.onDestroyed = function (evt, nipple) {
     var self = this;
     if (self.nipples.indexOf(nipple) >= 0) {
         self.nipples.splice(self.nipples.indexOf(nipple), 1);
@@ -558,12 +558,12 @@ Collection.prototype.onDestroyed = function(evt, nipple) {
 };
 
 // Cleanly destroy the manager
-Collection.prototype.destroy = function() {
+Collection.prototype.destroy = function () {
     var self = this;
     self.unbindEvt(self.options.zone, 'start');
 
     // Destroy nipples.
-    self.nipples.forEach(function(nipple) {
+    self.nipples.forEach(function (nipple) {
         nipple.destroy();
     });
 

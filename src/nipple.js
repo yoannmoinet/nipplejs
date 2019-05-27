@@ -5,7 +5,7 @@ import * as u from './utils';
 ///   THE NIPPLE    ///
 ///////////////////////
 
-function Nipple(collection, options) {
+function Nipple (collection, options) {
     this.identifier = options.identifier;
     this.position = options.position;
     this.frontPosition = options.frontPosition;
@@ -67,7 +67,7 @@ Nipple.constructor = Nipple;
 Nipple.id = 0;
 
 // Build the dom element of the Nipple instance.
-Nipple.prototype.buildEl = function(options) {
+Nipple.prototype.buildEl = function (options) {
     this.ui = {};
 
     if (this.options.dataOnly) {
@@ -94,7 +94,7 @@ Nipple.prototype.buildEl = function(options) {
 };
 
 // Apply CSS to the Nipple instance.
-Nipple.prototype.stylize = function() {
+Nipple.prototype.stylize = function () {
     if (this.options.dataOnly) {
         return this;
     }
@@ -144,7 +144,7 @@ Nipple.prototype.stylize = function() {
     return this;
 };
 
-Nipple.prototype.applyStyles = function(styles) {
+Nipple.prototype.applyStyles = function (styles) {
     // Apply styles
     for (var i in this.ui) {
         if (this.ui.hasOwnProperty(i)) {
@@ -158,7 +158,7 @@ Nipple.prototype.applyStyles = function(styles) {
 };
 
 // Inject the Nipple instance into DOM.
-Nipple.prototype.addToDom = function() {
+Nipple.prototype.addToDom = function () {
     // We're not adding it if we're dataOnly or already in dom.
     if (this.options.dataOnly || document.body.contains(this.ui.el)) {
         return this;
@@ -168,7 +168,7 @@ Nipple.prototype.addToDom = function() {
 };
 
 // Remove the Nipple instance from DOM.
-Nipple.prototype.removeFromDom = function() {
+Nipple.prototype.removeFromDom = function () {
     if (this.options.dataOnly || !document.body.contains(this.ui.el)) {
         return this;
     }
@@ -177,7 +177,7 @@ Nipple.prototype.removeFromDom = function() {
 };
 
 // Entirely destroy this nipple
-Nipple.prototype.destroy = function() {
+Nipple.prototype.destroy = function () {
     clearTimeout(this.removeTimeout);
     clearTimeout(this.showTimeout);
     clearTimeout(this.restTimeout);
@@ -187,7 +187,7 @@ Nipple.prototype.destroy = function() {
 };
 
 // Fade in the Nipple instance.
-Nipple.prototype.show = function(cb) {
+Nipple.prototype.show = function (cb) {
     var self = this;
 
     if (self.options.dataOnly) {
@@ -202,11 +202,11 @@ Nipple.prototype.show = function(cb) {
 
     self.restCallback();
 
-    setTimeout(function() {
+    setTimeout(function () {
         self.ui.el.style.opacity = 1;
     }, 0);
 
-    self.showTimeout = setTimeout(function() {
+    self.showTimeout = setTimeout(function () {
         self.trigger('shown', self.instance);
         if (typeof cb === 'function') {
             cb.call(this);
@@ -217,7 +217,7 @@ Nipple.prototype.show = function(cb) {
 };
 
 // Fade out the Nipple instance.
-Nipple.prototype.hide = function(cb) {
+Nipple.prototype.hide = function (cb) {
     var self = this;
 
     if (self.options.dataOnly) {
@@ -230,7 +230,7 @@ Nipple.prototype.hide = function(cb) {
     clearTimeout(self.showTimeout);
     clearTimeout(self.restTimeout);
 
-    self.removeTimeout = setTimeout(function() {
+    self.removeTimeout = setTimeout(function () {
         var display = self.options.mode === 'dynamic' ? 'none' : 'block';
         self.ui.el.style.display = display;
         if (typeof cb === 'function') {
@@ -246,7 +246,7 @@ Nipple.prototype.hide = function(cb) {
     return self;
 };
 
-Nipple.prototype.restPosition = function(cb) {
+Nipple.prototype.restPosition = function (cb) {
     var self = this;
     self.frontPosition = {
         x: 0,
@@ -270,7 +270,7 @@ Nipple.prototype.restPosition = function(cb) {
     self.applyStyles(transitStyle);
     self.applyStyles(styles);
 
-    self.restTimeout = setTimeout(function() {
+    self.restTimeout = setTimeout(function () {
         if (typeof cb === 'function') {
             cb.call(self);
         }
@@ -278,7 +278,7 @@ Nipple.prototype.restPosition = function(cb) {
     }, self.options.fadeTime);
 };
 
-Nipple.prototype.restCallback = function() {
+Nipple.prototype.restCallback = function () {
     var self = this;
     var transitStyle = {};
     transitStyle.front = u.getTransitionStyle('transition', 'none', '');
@@ -286,7 +286,7 @@ Nipple.prototype.restCallback = function() {
     self.trigger('rested', self.instance);
 };
 
-Nipple.prototype.resetDirection = function() {
+Nipple.prototype.resetDirection = function () {
     // Fully rebuild the object to let the iteration possible.
     this.direction = {
         x: false,
@@ -295,7 +295,7 @@ Nipple.prototype.resetDirection = function() {
     };
 };
 
-Nipple.prototype.computeDirection = function(obj) {
+Nipple.prototype.computeDirection = function (obj) {
     var rAngle = obj.angle.radian;
     var angle45 = Math.PI / 4;
     var angle90 = Math.PI / 2;
