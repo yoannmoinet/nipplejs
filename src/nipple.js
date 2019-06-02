@@ -36,7 +36,8 @@ function Nipple (collection, options) {
 
     this.id = Nipple.id;
     Nipple.id += 1;
-    this.buildEl().stylize();
+    this.buildEl()
+        .stylize();
 
     // Nipple's API.
     this.instance = {
@@ -82,10 +83,8 @@ Nipple.prototype.buildEl = function (options) {
     this.ui.back.className = 'back';
     this.ui.front.className = 'front';
 
-    this.ui.el.setAttribute(
-        'id',
-        'nipple_' + this.collection.id + '_' + this.id
-    );
+    this.ui.el.setAttribute('id', 'nipple_' + this.collection.id +
+        '_' + this.id);
 
     this.ui.el.appendChild(this.ui.back);
     this.ui.el.appendChild(this.ui.front);
@@ -107,7 +106,7 @@ Nipple.prototype.stylize = function () {
         position: 'absolute',
         opacity: this.options.restOpacity,
         display: 'block',
-        zIndex: 999
+        'zIndex': 999
     };
 
     styles.back = {
@@ -118,7 +117,7 @@ Nipple.prototype.stylize = function () {
         marginLeft: -this.options.size / 2 + 'px',
         marginTop: -this.options.size / 2 + 'px',
         background: this.options.color,
-        opacity: '.5'
+        'opacity': '.5'
     };
 
     styles.front = {
@@ -129,7 +128,7 @@ Nipple.prototype.stylize = function () {
         marginLeft: -this.options.size / 4 + 'px',
         marginTop: -this.options.size / 4 + 'px',
         background: this.options.color,
-        opacity: '.5'
+        'opacity': '.5'
     };
 
     u.extend(styles.el, transitStyle);
@@ -230,15 +229,18 @@ Nipple.prototype.hide = function (cb) {
     clearTimeout(self.showTimeout);
     clearTimeout(self.restTimeout);
 
-    self.removeTimeout = setTimeout(function () {
-        var display = self.options.mode === 'dynamic' ? 'none' : 'block';
-        self.ui.el.style.display = display;
-        if (typeof cb === 'function') {
-            cb.call(self);
-        }
+    self.removeTimeout = setTimeout(
+        function () {
+            var display = self.options.mode === 'dynamic' ? 'none' : 'block';
+            self.ui.el.style.display = display;
+            if (typeof cb === 'function') {
+                cb.call(self);
+            }
 
-        self.trigger('hidden', self.instance);
-    }, self.options.fadeTime);
+            self.trigger('hidden', self.instance);
+        },
+        self.options.fadeTime
+    );
     if (self.options.restJoystick) {
         self.restPosition();
     }
@@ -255,13 +257,10 @@ Nipple.prototype.restPosition = function (cb) {
     var animTime = self.options.fadeTime + 'ms';
 
     var transitStyle = {};
-    transitStyle.front = u.getTransitionStyle(
-        'transition',
-        ['top', 'left'],
-        animTime
-    );
+    transitStyle.front = u.getTransitionStyle('transition',
+        ['top', 'left'], animTime);
 
-    var styles = { front: {} };
+    var styles = {front: {}};
     styles.front = {
         left: self.frontPosition.x + 'px',
         top: self.frontPosition.y + 'px'
@@ -270,12 +269,15 @@ Nipple.prototype.restPosition = function (cb) {
     self.applyStyles(transitStyle);
     self.applyStyles(styles);
 
-    self.restTimeout = setTimeout(function () {
-        if (typeof cb === 'function') {
-            cb.call(self);
-        }
-        self.restCallback();
-    }, self.options.fadeTime);
+    self.restTimeout = setTimeout(
+        function () {
+            if (typeof cb === 'function') {
+                cb.call(self);
+            }
+            self.restCallback();
+        },
+        self.options.fadeTime
+    );
 };
 
 Nipple.prototype.restCallback = function () {
@@ -308,11 +310,23 @@ Nipple.prototype.computeDirection = function (obj) {
     //      /   \
     //     /DOWN \
     //
-    if (rAngle > angle45 && rAngle < angle45 * 3 && !obj.lockX) {
+    if (
+        rAngle > angle45 &&
+        rAngle < (angle45 * 3) &&
+        !obj.lockX
+    ) {
         direction = 'up';
-    } else if (rAngle > -angle45 && rAngle <= angle45 && !obj.lockY) {
+    } else if (
+        rAngle > -angle45 &&
+        rAngle <= angle45 &&
+        !obj.lockY
+    ) {
         direction = 'left';
-    } else if (rAngle > -angle45 * 3 && rAngle <= -angle45 && !obj.lockX) {
+    } else if (
+        rAngle > (-angle45 * 3) &&
+        rAngle <= -angle45 &&
+        !obj.lockX
+    ) {
         direction = 'down';
     } else if (!obj.lockY) {
         direction = 'right';
