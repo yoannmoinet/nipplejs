@@ -23,7 +23,7 @@ function Collection (manager, options) {
         multitouch: false,
         maxNumberOfNipples: 10,
         mode: 'dynamic',
-        position: { top: 0, left: 0 },
+        position: {top: 0, left: 0},
         catchDistance: 200,
         size: 100,
         threshold: 0.1,
@@ -122,8 +122,10 @@ Collection.prototype.createNipple = function (position, identifier) {
 
     if (position.x && position.y) {
         toPutOn = {
-            x: position.x - (scroll.x + self.box.left),
-            y: position.y - (scroll.y + self.box.top)
+            x: position.x -
+                (scroll.x + self.box.left),
+            y: position.y -
+                (scroll.y + self.box.top)
         };
     } else if (
         position.top ||
@@ -131,6 +133,7 @@ Collection.prototype.createNipple = function (position, identifier) {
         position.bottom ||
         position.left
     ) {
+
         // We need to compute the position X / Y of the joystick.
         var dumb = document.createElement('DIV');
         dumb.style.display = 'hidden';
@@ -212,21 +215,16 @@ Collection.prototype.pressureFn = function (touch, nipple, identifier) {
     var previousPressure = 0;
     clearInterval(self.pressureIntervals[identifier]);
     // Create an interval that will read the pressure every 100ms
-    self.pressureIntervals[identifier] = setInterval(
-        function () {
-            var pressure =
-                touch.force || touch.pressure || touch.webkitForce || 0;
-            if (pressure !== previousPressure) {
-                nipple.trigger('pressure', pressure);
-                self.trigger(
-                    'pressure ' + nipple.identifier + ':pressure',
-                    pressure
-                );
-                previousPressure = pressure;
-            }
-        }.bind(self),
-        100
-    );
+    self.pressureIntervals[identifier] = setInterval(function () {
+        var pressure = touch.force || touch.pressure ||
+            touch.webkitForce || 0;
+        if (pressure !== previousPressure) {
+            nipple.trigger('pressure', pressure);
+            self.trigger('pressure ' +
+                nipple.identifier + ':pressure', pressure);
+            previousPressure = pressure;
+        }
+    }.bind(self), 100);
 };
 
 Collection.prototype.onstart = function (evt) {
@@ -243,23 +241,20 @@ Collection.prototype.onstart = function (evt) {
         // meaning we don't have more active nipples than we should.
         if (self.actives.length < opts.maxNumberOfNipples) {
             self.processOnStart(touch);
-        } else if (origEvt.type.match(/^touch/)) {
+        }
+        else if(origEvt.type.match(/^touch/)){
             // zombies occur when end event is not received on Safari
             // first touch removed before second touch, we need to catch up...
             // so remove where touches in manager that no longer exist
-            Object.keys(self.manager.ids).forEach(function (k) {
-                if (
-                    Object.values(origEvt.touches).findIndex(function (t) {
-                        return t.identifier === k;
-                    }) < 0
-                ) {
+            Object.keys(self.manager.ids).forEach(function(k){
+                if(Object.values(origEvt.touches).findIndex(function(t){return t.identifier===k;}) < 0){
                     // manager has id that doesn't exist in touches
                     var e = [evt[0]];
                     e.identifier = k;
                     self.processOnEnd(e);
                 }
             });
-            if (self.actives.length < opts.maxNumberOfNipples) {
+            if(self.actives.length < opts.maxNumberOfNipples){
                 self.processOnStart(touch);
             }
         }
@@ -423,7 +418,7 @@ Collection.prototype.processOnMove = function (evt) {
         break;
     }
 
-    if (opts.lockX) {
+    if (opts.lockX){
         yPosition = 0;
     }
     if (opts.lockY) {
@@ -486,10 +481,8 @@ Collection.prototype.processOnEnd = function (evt) {
             if (opts.mode === 'dynamic') {
                 nipple.trigger('removed', nipple);
                 self.trigger('removed ' + nipple.id + ':removed', nipple);
-                self.manager.trigger(
-                    'removed ' + nipple.id + ':removed',
-                    nipple
-                );
+                self.manager
+                    .trigger('removed ' + nipple.id + ':removed', nipple);
                 nipple.destroy();
             }
         });
@@ -535,7 +528,7 @@ Collection.prototype.processOnEnd = function (evt) {
 };
 
 // Remove destroyed nipple from the lists
-Collection.prototype.onDestroyed = function (evt, nipple) {
+Collection.prototype.onDestroyed = function(evt, nipple) {
     var self = this;
     if (self.nipples.indexOf(nipple) >= 0) {
         self.nipples.splice(self.nipples.indexOf(nipple), 1);
@@ -563,7 +556,7 @@ Collection.prototype.destroy = function () {
     self.unbindEvt(self.options.zone, 'start');
 
     // Destroy nipples.
-    self.nipples.forEach(function (nipple) {
+    self.nipples.forEach(function(nipple) {
         nipple.destroy();
     });
 
