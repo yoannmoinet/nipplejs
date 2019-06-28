@@ -17,7 +17,7 @@ export const angle = (p1, p2) => {
 };
 
 export const findCoord = (p, d, a) => {
-    const b = {x: 0, y: 0};
+    const b = { x: 0, y: 0 };
     a = radians(a);
     b.x = p.x - d * Math.cos(a);
     b.y = p.y - d * Math.sin(a);
@@ -94,6 +94,12 @@ export const applyPosition = (el, pos) => {
         el.style.left = pos.x + 'px';
         el.style.top = pos.y + 'px';
     }
+};
+
+export const applyImgStyle = (el, bgImg) => {
+
+    el.style.background = bgImg;
+
 };
 
 export const getTransitionStyle = (property, values, time) => {

@@ -1,0 +1,67 @@
+
+.up,.left,.right,.down {
+    display: block;
+    width: 270px;
+    height: 270px;
+    position: absolute;
+    top:-5px;
+    left:-5px;
+}
+/* .top {
+  background: url('../assets/imgs/top_active.png') center center no-repeat;
+
+}
+.btm {
+    background: url('../assets/imgs/btm_active.png') center center no-repeat;
+
+}
+.rt {
+    background: url('../assets/imgs/rt_active.png') center center no-repeat;
+}
+.lt {
+    background: url('../assets/imgs/lt_active.png') center center no-repeat;
+} */
+
+.right::after,.left::after {
+    display: block;
+    width: 16px;
+    height: 28px;
+    position: absolute;
+}
+.up::after,.down::after {
+    display: block;
+    width: 28px;
+    height: 16px;
+    position: absolute;
+}
+
+
+.up::after {
+    top: 10px;
+    left: 50%;
+    margin-left: -14px;
+    content: url('../imgs/top.png');
+}
+
+.down::after {
+    bottom: 10px;
+    left: 50%;
+    margin-left: -14px;
+    content: url('../imgs/btm.png');
+
+}
+
+.right::after {
+    top: 50%;
+    right: 10px;
+    margin-top: -8px;
+    content: url('../imgs/rt.png');
+}
+.left::after {
+    top: 50%;
+    left: 10px;
+    margin-top: -8px;
+    content: url('../imgs/lt.png');
+}
+
+

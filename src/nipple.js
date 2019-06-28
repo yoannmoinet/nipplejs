@@ -1,15 +1,24 @@
 import Super from './super';
 import * as u from './utils';
+// import * as style from './style/nipple.scss';
+
 
 ///////////////////////
 ///   THE NIPPLE    ///
 ///////////////////////
 
-function Nipple (collection, options) {
+function Nipple(collection, options) {
     this.identifier = options.identifier;
     this.position = options.position;
+    this.color = options.color;
     this.frontPosition = options.frontPosition;
     this.collection = collection;
+    this.frontImg = options.frontImg;
+    this.frontMoveImg = options.frontMoveImg;
+    this.arrows = options.arrows ? ['up', 'down', 'left', 'right'] : [];
+
+
+    // console.log('Nipple==>>>', this.options);
 
     // Defaults
     this.defaults = {
@@ -23,7 +32,7 @@ function Nipple (collection, options) {
         mode: 'dynamic',
         zone: document.body,
         lockX: false,
-        lockY: false
+        lockY: false,
     };
 
     this.config(options);
@@ -76,14 +85,21 @@ Nipple.prototype.buildEl = function (options) {
 
     this.ui.el = document.createElement('div');
     this.ui.back = document.createElement('div');
+
     this.ui.front = document.createElement('div');
 
     this.ui.el.className = 'nipple collection_' + this.collection.id;
     this.ui.back.className = 'back';
     this.ui.front.className = 'front';
-
     this.ui.el.setAttribute('id', 'nipple_' + this.collection.id +
         '_' + this.id);
+
+
+    this.arrows.forEach((item) => {
+        this.ui[item] = document.createElement('span');
+        this.ui[item].setAttribute('class', item);
+        this.ui.back.appendChild(this.ui[item]);
+    });
 
     this.ui.el.appendChild(this.ui.back);
     this.ui.el.appendChild(this.ui.front);
@@ -96,6 +112,7 @@ Nipple.prototype.stylize = function () {
     if (this.options.dataOnly) {
         return this;
     }
+
     var animTime = this.options.fadeTime + 'ms';
     var borderStyle = u.getVendorStyle('borderRadius', '50%');
     var transitStyle = u.getTransitionStyle('transition', 'opacity', animTime);
@@ -118,6 +135,7 @@ Nipple.prototype.stylize = function () {
         'opacity': '.5'
     };
 
+
     styles.front = {
         width: this.options.size / 2 + 'px',
         height: this.options.size / 2 + 'px',
@@ -125,7 +143,7 @@ Nipple.prototype.stylize = function () {
         display: 'block',
         marginLeft: -this.options.size / 4 + 'px',
         marginTop: -this.options.size / 4 + 'px',
-        background: this.options.color,
+        background: this.frontImg || this.options.color,
         'opacity': '.5'
     };
 
@@ -219,6 +237,11 @@ Nipple.prototype.hide = function (cb) {
     }
 
     self.ui.el.style.opacity = self.options.restOpacity;
+    u.applyImgStyle(self.ui.front, self.frontImg || self.color);
+    this.arrows.forEach(item => {
+        u.applyImgStyle(self.ui[item], '');
+    });
+
 
     clearTimeout(self.removeTimeout);
     clearTimeout(self.showTimeout);
@@ -255,7 +278,7 @@ Nipple.prototype.restPosition = function (cb) {
     transitStyle.front = u.getTransitionStyle('transition',
         ['top', 'left'], animTime);
 
-    var styles = {front: {}};
+    var styles = { front: {} };
     styles.front = {
         left: self.frontPosition.x + 'px',
         top: self.frontPosition.y + 'px'

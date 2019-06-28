@@ -2,11 +2,12 @@ import Nipple from './nipple';
 import Super from './super';
 import * as u from './utils';
 
+
 ///////////////////////////
 ///   THE COLLECTION    ///
 ///////////////////////////
 
-function Collection (manager, options) {
+function Collection(manager, options) {
     var self = this;
     self.nipples = [];
     self.idles = [];
@@ -23,17 +24,26 @@ function Collection (manager, options) {
         multitouch: false,
         maxNumberOfNipples: 10,
         mode: 'dynamic',
-        position: {top: 0, left: 0},
+        position: { top: 0, left: 0 },
         catchDistance: 200,
         size: 100,
-        threshold: 0.1,
+        threshold: 0.9,
         color: 'white',
         fadeTime: 250,
         dataOnly: false,
         restJoystick: true,
         restOpacity: 0.5,
         lockX: false,
-        lockY: false
+        lockY: false,
+        limitIn: false,
+        arrows: false,
+        centerRest: 0,
+        frontImg: '',
+        frontMoveImg: '',
+        upImg: '',
+        leftImg: '',
+        rightImg: '',
+        downImg: '',
     };
 
     self.config(options);
@@ -153,6 +163,7 @@ Collection.prototype.createNipple = function (position, identifier) {
         };
     }
 
+
     var nipple = new Nipple(self, {
         color: opts.color,
         size: opts.size,
@@ -168,7 +179,10 @@ Collection.prototype.createNipple = function (position, identifier) {
         frontPosition: {
             x: 0,
             y: 0
-        }
+        },
+        frontImg: opts.frontImg,
+        frontMoveImg: opts.frontMoveImg,
+        arrows: opts.arrows
     });
 
     if (!opts.dataOnly) {
@@ -240,19 +254,19 @@ Collection.prototype.onstart = function (evt) {
         if (self.actives.length < opts.maxNumberOfNipples) {
             self.processOnStart(touch);
         }
-        else if(origEvt.type.match(/^touch/)){
+        else if (origEvt.type.match(/^touch/)) {
             // zombies occur when end event is not received on Safari
             // first touch removed before second touch, we need to catch up...
             // so remove where touches in manager that no longer exist
-            Object.keys(self.manager.ids).forEach(function(k){
-                if(Object.values(origEvt.touches).findIndex(function(t){return t.identifier===k;}) < 0){
+            Object.keys(self.manager.ids).forEach(function (k) {
+                if (Object.values(origEvt.touches).findIndex(function (t) { return t.identifier === k; }) < 0) {
                     // manager has id that doesn't exist in touches
                     var e = [evt[0]];
                     e.identifier = k;
                     self.processOnEnd(e);
                 }
             });
-            if(self.actives.length < opts.maxNumberOfNipples){
+            if (self.actives.length < opts.maxNumberOfNipples) {
                 self.processOnStart(touch);
             }
         }
@@ -372,7 +386,7 @@ Collection.prototype.processOnMove = function (evt) {
 
     nipple.identifier = identifier;
 
-    var size = nipple.options.size / 2;
+    var size = opts.limitIn ? nipple.options.size / 4 : nipple.options.size / 2;
     var pos = {
         x: evt.pageX,
         y: evt.pageY
@@ -390,15 +404,15 @@ Collection.prototype.processOnMove = function (evt) {
 
     // If distance is bigger than nipple's size
     // we clamp the position.
-    if (dist > size) {
-        dist = size;
+    if (dist > size + opts.centerRest) {
+        dist = size + opts.centerRest;
         pos = u.findCoord(nipple.position, dist, angle);
     }
 
     var xPosition = pos.x - nipple.position.x;
     var yPosition = pos.y - nipple.position.y;
 
-    if (opts.lockX){
+    if (opts.lockX) {
         yPosition = 0;
     }
     if (opts.lockY) {
@@ -412,6 +426,7 @@ Collection.prototype.processOnMove = function (evt) {
 
     if (!opts.dataOnly) {
         u.applyPosition(nipple.ui.front, nipple.frontPosition);
+        u.applyImgStyle(nipple.ui.front, opts.frontMoveImg || opts.frontImg || opts.color);
     }
 
     // Prepare event's datas.
@@ -433,6 +448,14 @@ Collection.prototype.processOnMove = function (evt) {
 
     // Compute the direction's datas.
     toSend = nipple.computeDirection(toSend);
+    if (toSend.direction && opts.arrows) {
+        const angleUi = toSend.direction.angle;
+        u.applyImgStyle(nipple.ui[angleUi], opts[`${angleUi}Img`]);
+    }
+
+
+
+
 
     // Offset angles to follow units circle.
     toSend.angle = {
@@ -508,7 +531,7 @@ Collection.prototype.processOnEnd = function (evt) {
 };
 
 // Remove destroyed nipple from the lists
-Collection.prototype.onDestroyed = function(evt, nipple) {
+Collection.prototype.onDestroyed = function (evt, nipple) {
     var self = this;
     if (self.nipples.indexOf(nipple) >= 0) {
         self.nipples.splice(self.nipples.indexOf(nipple), 1);
@@ -536,7 +559,7 @@ Collection.prototype.destroy = function () {
     self.unbindEvt(self.options.zone, 'start');
 
     // Destroy nipples.
-    self.nipples.forEach(function(nipple) {
+    self.nipples.forEach(function (nipple) {
         nipple.destroy();
     });
 

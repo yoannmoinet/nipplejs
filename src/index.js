@@ -1,4 +1,5 @@
 import Manager from './manager';
+import './style/nipple.css';
 
 const factory = new Manager();
 export default {

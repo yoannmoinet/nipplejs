@@ -12,7 +12,9 @@
     "rules": {
         "no-unused-vars": [
             "error",
-            { "args": "none" }
+            {
+                "args": "none"
+            }
         ],
         "indent": [
             "error",
@@ -29,6 +31,7 @@
         "semi": [
             "error",
             "always"
-        ]
+        ],
+        "no-console": "off"
     }
 }
