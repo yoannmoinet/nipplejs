@@ -2,7 +2,7 @@
     "version": "0.8.2",
     "name": "@xylink/nipplejs",
     "description": "A virtual joystick for touch capable interfaces",
-    "author": "Yoann Moinet <yo@nnmoi.net> (https://yoannmoi.net)",
+    "author": "jiaoyingying@xylink.com",
     "license": "MIT",
     "repository": {
         "type": "git",
