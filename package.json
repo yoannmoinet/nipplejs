@@ -1,63 +1,63 @@
 {
-  "version": "0.8.2",
-  "name": "nipplejs",
-  "description": "A virtual joystick for touch capable interfaces",
-  "author": "Yoann Moinet <yo@nnmoi.net> (https://yoannmoi.net)",
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/yoannmoinet/nipplejs.git"
-  },
-  "bugs": {
-    "url": "https://github.com/yoannmoinet/nipplejs/issues"
-  },
-  "files": [
-    "dist/*",
-    "src/*",
-    "types/*"
-  ],
-  "homepage": "https://github.com/yoannmoinet/nipplejs",
-  "main": "./dist/nipplejs.js",
-  "browser": "./dist/nipplejs.js",
-  "module": "./src/index.js",
-  "types": "./types/index.d.ts",
-  "directories": {
-    "lib": "src",
-    "test": "test",
-    "example": "example"
-  },
-  "scripts": {
-    "postversion": "npm run changelog",
-    "prepare": "NODE_ENV=production npm run build",
-    "build": "webpack --config webpack.config.js",
-    "build:dev": "webpack-dev-server --config webpack.config.js",
-    "test": "casperjs test ./test/nipplejs.casper.js",
-    "changelog": "node ./bin/changelog.js",
-    "start": "npm run build:dev -- --progress --watch",
-    "toc": "markdown-toc -i README.md",
-    "copyGh": "node ./bin/copyToGhPages.js"
-  },
-  "dependencies": {},
-  "devDependencies": {
-    "@babel/core": "7.2.0",
-    "@babel/preset-env": "7.2.0",
-    "babel-loader": "8.0.4",
-    "babel-plugin-add-module-exports": "1.0.0",
-    "casperjs": "1.1.4",
-    "concat-cli": "4.0.0",
-    "conventional-changelog": "1.1.0",
-    "css-loader": "^3.0.0",
-    "eslint": "5.10.0",
-    "eslint-loader": "2.1.1",
-    "expect.js": "0.3.1",
-    "markdown-toc": "1.2.0",
-    "mini-css-extract-plugin": "^0.7.0",
-    "mocha": "5.2.0",
-    "phantomjs-prebuilt": "2.1.16",
-    "style-loader": "^0.23.1",
-    "url-loader": "^2.0.1",
-    "webpack": "4.27.1",
-    "webpack-cli": "3.1.2",
-    "webpack-dev-server": "3.3.1"
-  }
+    "version": "0.8.2",
+    "name": "@xylink/nipplejs",
+    "description": "A virtual joystick for touch capable interfaces",
+    "author": "Yoann Moinet <yo@nnmoi.net> (https://yoannmoi.net)",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/yoannmoinet/nipplejs.git"
+    },
+    "bugs": {
+        "url": "https://github.com/yoannmoinet/nipplejs/issues"
+    },
+    "files": [
+        "dist/*",
+        "src/*",
+        "types/*"
+    ],
+    "homepage": "https://github.com/yoannmoinet/nipplejs",
+    "main": "./dist/nipplejs.js",
+    "browser": "./dist/nipplejs.js",
+    "module": "./src/index.js",
+    "types": "./types/index.d.ts",
+    "directories": {
+        "lib": "src",
+        "test": "test",
+        "example": "example"
+    },
+    "scripts": {
+        "postversion": "npm run changelog",
+        "prepare": "NODE_ENV=production npm run build",
+        "build": "webpack --config webpack.config.js",
+        "build:dev": "webpack-dev-server --config webpack.config.js",
+        "test": "casperjs test ./test/nipplejs.casper.js",
+        "changelog": "node ./bin/changelog.js",
+        "start": "npm run build:dev -- --progress --watch",
+        "toc": "markdown-toc -i README.md",
+        "copyGh": "node ./bin/copyToGhPages.js"
+    },
+    "dependencies": {},
+    "devDependencies": {
+        "@babel/core": "7.2.0",
+        "@babel/preset-env": "7.2.0",
+        "babel-loader": "8.0.4",
+        "babel-plugin-add-module-exports": "1.0.0",
+        "casperjs": "1.1.4",
+        "concat-cli": "4.0.0",
+        "conventional-changelog": "1.1.0",
+        "css-loader": "^3.0.0",
+        "eslint": "5.10.0",
+        "eslint-loader": "2.1.1",
+        "expect.js": "0.3.1",
+        "markdown-toc": "1.2.0",
+        "mini-css-extract-plugin": "^0.7.0",
+        "mocha": "5.2.0",
+        "phantomjs-prebuilt": "2.1.16",
+        "style-loader": "^0.23.1",
+        "url-loader": "^2.0.1",
+        "webpack": "4.27.1",
+        "webpack-cli": "3.1.2",
+        "webpack-dev-server": "3.3.1"
+    }
 }
