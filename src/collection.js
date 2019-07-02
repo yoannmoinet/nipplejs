@@ -7,6 +7,8 @@ import * as u from './utils';
 ///   THE COLLECTION    ///
 ///////////////////////////
 
+const arrowsArr = ['up', 'down', 'left', 'right'];
+
 function Collection(manager, options) {
     var self = this;
     self.nipples = [];
@@ -182,7 +184,7 @@ Collection.prototype.createNipple = function (position, identifier) {
         },
         frontImg: opts.frontImg,
         frontMoveImg: opts.frontMoveImg,
-        arrows: opts.arrows
+        arrows: opts.arrows ? arrowsArr : []
     });
 
     if (!opts.dataOnly) {
@@ -450,7 +452,13 @@ Collection.prototype.processOnMove = function (evt) {
     toSend = nipple.computeDirection(toSend);
     if (toSend.direction && opts.arrows) {
         const angleUi = toSend.direction.angle;
-        u.applyImgStyle(nipple.ui[angleUi], opts[`${angleUi}Img`]);
+        arrowsArr.forEach(arrow => {
+            if (arrow === toSend.direction.angle) {
+                u.applyImgStyle(nipple.ui[arrow], opts[`${angleUi}Img`]);
+            } else {
+                u.applyImgStyle(nipple.ui[arrow], opts[`${angleUi}Img`]);
+            }
+        });
     }
 
 

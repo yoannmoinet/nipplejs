@@ -1,8 +1,7 @@
 {
     "version": "0.8.2",
-    "name": "@xylink/nipplejs",
+    "name": "xy-nipplejs",
     "description": "A virtual joystick for touch capable interfaces",
-    "author": "jiaoyingying@xylink.com",
     "license": "MIT",
     "repository": {
         "type": "git",

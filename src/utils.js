@@ -98,7 +98,9 @@ export const applyPosition = (el, pos) => {
 
 export const applyImgStyle = (el, bgImg) => {
 
+
     el.style.background = bgImg;
+    el.style.backgroundSize = 'contain';
 
 };
 

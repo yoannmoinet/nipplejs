@@ -160,8 +160,8 @@ export interface JoystickOutputData {
         y: string;
     };
     raw: {
-      distance: number;
-      position: Position;
+        distance: number;
+        position: Position;
     };
     distance: number;
     force: number;
@@ -335,7 +335,7 @@ declare module 'nipplejs' {
      * @param options for creating a manager instance
      * @return manager instance
      */
-    function create(options: JoystickManagerOptions): JoystickManager;
+    export function create(options: JoystickManagerOptions): JoystickManager;
 
     /**
      * Library's root manger instance.

@@ -15,7 +15,7 @@ function Nipple(collection, options) {
     this.collection = collection;
     this.frontImg = options.frontImg;
     this.frontMoveImg = options.frontMoveImg;
-    this.arrows = options.arrows ? ['up', 'down', 'left', 'right'] : [];
+    this.arrows = options.arrows;
 
 
     // console.log('Nipple==>>>', this.options);
@@ -98,6 +98,8 @@ Nipple.prototype.buildEl = function (options) {
     this.arrows.forEach((item) => {
         this.ui[item] = document.createElement('span');
         this.ui[item].setAttribute('class', item);
+        this.ui[item].setAttribute('style', 'width:' + this.options.size + 'px;height:' + this.options.size + 'px;');
+
         this.ui.back.appendChild(this.ui[item]);
     });
 
@@ -144,6 +146,7 @@ Nipple.prototype.stylize = function () {
         marginLeft: -this.options.size / 4 + 'px',
         marginTop: -this.options.size / 4 + 'px',
         background: this.frontImg || this.options.color,
+        backgroundSize: 'contain',
         'opacity': '.5'
     };
 
