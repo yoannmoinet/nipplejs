@@ -15,7 +15,7 @@ function Nipple(collection, options) {
     this.collection = collection;
     this.frontImg = options.frontImg;
     this.frontMoveImg = options.frontMoveImg;
-    this.arrows = options.arrows;
+    this.directionActive = options.directionActive;
 
 
     // console.log('Nipple==>>>', this.options);
@@ -93,15 +93,6 @@ Nipple.prototype.buildEl = function (options) {
     this.ui.front.className = 'front';
     this.ui.el.setAttribute('id', 'nipple_' + this.collection.id +
         '_' + this.id);
-
-
-    this.arrows.forEach((item) => {
-        this.ui[item] = document.createElement('span');
-        this.ui[item].setAttribute('class', item);
-        this.ui[item].setAttribute('style', 'width:' + this.options.size + 'px;height:' + this.options.size + 'px;');
-
-        this.ui.back.appendChild(this.ui[item]);
-    });
 
     this.ui.el.appendChild(this.ui.back);
     this.ui.el.appendChild(this.ui.front);
@@ -241,9 +232,6 @@ Nipple.prototype.hide = function (cb) {
 
     self.ui.el.style.opacity = self.options.restOpacity;
     u.applyImgStyle(self.ui.front, self.frontImg || self.color);
-    this.arrows.forEach(item => {
-        u.applyImgStyle(self.ui[item], '');
-    });
 
 
     clearTimeout(self.removeTimeout);
@@ -324,6 +312,7 @@ Nipple.prototype.computeDirection = function (obj) {
     var angle90 = Math.PI / 2;
     var direction, directionX, directionY;
 
+
     // Angular direction
     //     \  UP /
     //      \   /
@@ -331,6 +320,7 @@ Nipple.prototype.computeDirection = function (obj) {
     //      /   \
     //     /DOWN \
     //
+
     if (
         rAngle > angle45 &&
         rAngle < (angle45 * 3) &&
@@ -359,10 +349,13 @@ Nipple.prototype.computeDirection = function (obj) {
     //                  LEFT |
     //   DOWN                |
     if (!obj.lockY) {
+
         if (rAngle > -angle90 && rAngle < angle90) {
             directionX = 'left';
+            direction = 'left';
         } else {
             directionX = 'right';
+            direction = 'right';
         }
     }
 

@@ -18,7 +18,7 @@
     background: url('../assets/imgs/lt_active.png') center center no-repeat;
 } */
 
-.right::after,.left::after {
+/* .right::after,.left::after {
     display: block;
     width: 16px;
     height: 28px;
@@ -58,6 +58,6 @@
     left: 10px;
     margin-top: -8px;
     content: url('../imgs/lt.png');
-}
+} */
 
 

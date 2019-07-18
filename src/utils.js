@@ -10,8 +10,11 @@ export const distance = (p1, p2) => {
 };
 
 export const angle = (p1, p2) => {
+
+
     const dx = p2.x - p1.x;
     const dy = p2.y - p1.y;
+
 
     return degrees(Math.atan2(dy, dx));
 };

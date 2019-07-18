@@ -7,7 +7,6 @@ import * as u from './utils';
 ///   THE COLLECTION    ///
 ///////////////////////////
 
-const arrowsArr = ['up', 'down', 'left', 'right'];
 
 function Collection(manager, options) {
     var self = this;
@@ -38,7 +37,7 @@ function Collection(manager, options) {
         lockX: false,
         lockY: false,
         limitIn: false,
-        arrows: false,
+        directionActive: false,
         centerRest: 0,
         frontImg: '',
         frontMoveImg: '',
@@ -183,8 +182,7 @@ Collection.prototype.createNipple = function (position, identifier) {
             y: 0
         },
         frontImg: opts.frontImg,
-        frontMoveImg: opts.frontMoveImg,
-        arrows: opts.arrows ? arrowsArr : []
+        frontMoveImg: opts.frontMoveImg
     });
 
     if (!opts.dataOnly) {
@@ -450,20 +448,6 @@ Collection.prototype.processOnMove = function (evt) {
 
     // Compute the direction's datas.
     toSend = nipple.computeDirection(toSend);
-    if (toSend.direction && opts.arrows) {
-        const angleUi = toSend.direction.angle;
-        arrowsArr.forEach(arrow => {
-            if (arrow === toSend.direction.angle) {
-                u.applyImgStyle(nipple.ui[arrow], opts[`${angleUi}Img`]);
-            } else {
-                u.applyImgStyle(nipple.ui[arrow], opts[`${angleUi}Img`]);
-            }
-        });
-    }
-
-
-
-
 
     // Offset angles to follow units circle.
     toSend.angle = {
