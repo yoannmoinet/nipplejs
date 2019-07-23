@@ -352,10 +352,10 @@ Nipple.prototype.computeDirection = function (obj) {
 
         if (rAngle > -angle90 && rAngle < angle90) {
             directionX = 'left';
-            direction = 'left';
+
         } else {
             directionX = 'right';
-            direction = 'right';
+
         }
     }
 
