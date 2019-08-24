@@ -385,6 +385,13 @@ Collection.prototype.processOnMove = function (evt) {
         y: evt.pageY
     };
 
+    if (opts.lockX){
+        pos.y = nipple.position.y;
+    }
+    if (opts.lockY) {
+        pos.x = nipple.position.x;
+    }
+
     var dist = u.distance(pos, nipple.position);
     var angle = u.angle(pos, nipple.position);
     var rAngle = u.radians(angle);
@@ -404,13 +411,6 @@ Collection.prototype.processOnMove = function (evt) {
 
     var xPosition = pos.x - nipple.position.x;
     var yPosition = pos.y - nipple.position.y;
-
-    if (opts.lockX){
-        yPosition = 0;
-    }
-    if (opts.lockY) {
-        xPosition = 0;
-    }
 
     nipple.frontPosition = {
         x: xPosition,
