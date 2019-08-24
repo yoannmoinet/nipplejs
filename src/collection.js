@@ -361,6 +361,13 @@ Collection.prototype.processOnMove = function (evt) {
     var identifier = self.manager.getIdentifier(evt);
     var nipple = self.nipples.get(identifier);
 
+    // If we're moving without pressing
+    // it's that we went out the active zone
+    if (!u.isPressed(evt)) {
+        this.processOnEnd(evt);
+        return;
+    }
+
     if (!nipple) {
         // This is here just for safety.
         // It shouldn't happen.

@@ -32,6 +32,13 @@ export const degrees = (a) => {
     return a * (180 / Math.PI);
 };
 
+export const isPressed = (evt) => {
+    if (isNaN(evt.buttons)) {
+        return evt.pressure !== 0;
+    }
+    return evt.buttons !== 0;
+};
+
 export const bindEvt = (el, arg, handler) => {
     const types = arg.split(/[ ,]+/g);
     let type;
