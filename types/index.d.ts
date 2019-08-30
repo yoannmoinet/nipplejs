@@ -159,6 +159,10 @@ export interface JoystickOutputData {
         x: string;
         y: string;
     };
+    vector: {
+        x: number;
+        y: number;
+    };
     raw: {
       distance: number;
       position: Position;
