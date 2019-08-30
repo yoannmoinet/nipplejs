@@ -526,6 +526,10 @@ Comes with data :
         radian: 1.5707963268,   // angle in radian
         degree: 90
     },
+    vector: {                   // force unit vector
+      x: 0.508,
+      y: 3.110602869834277e-17
+    },
     raw: {                      // note: angle is the same, beyond the 50 pixel limit
         distance: 25.4,         // distance which continues beyond the 50 pixel limit
         position: {             // position of the finger/mouse in pixels, beyond joystick limits

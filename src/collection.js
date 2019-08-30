@@ -432,6 +432,10 @@ Collection.prototype.processOnMove = function (evt) {
             radian: rAngle,
             degree: angle
         },
+        vector: {
+            x: xPosition / size,
+            y: - yPosition / size
+        },
         raw: raw,
         instance: nipple,
         lockX: opts.lockX,
