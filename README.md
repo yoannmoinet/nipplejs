@@ -155,7 +155,7 @@ The dom element in which all your joysticks will be injected.
 <script type="text/javascript" src="./nipplejs.js"></script>
 <script type="text/javascript">
     var options = {
-        zone: document.getElementById('zone_joystick');
+        zone: document.getElementById('zone_joystick'),
     };
     var manager = nipplejs.create(options);
 </script>
