@@ -33,7 +33,8 @@ function Collection (manager, options) {
         restJoystick: true,
         restOpacity: 0.5,
         lockX: false,
-        lockY: false
+        lockY: false,
+        dynamic_page: false
     };
 
     self.config(options);
@@ -375,6 +376,15 @@ Collection.prototype.processOnMove = function (evt) {
         console.error('Found zombie joystick with ID ' + identifier);
         self.manager.removeIdentifier(identifier);
         return;
+    }
+
+    if (opts.dynamic_page) {
+        var scroll = u.getScroll();
+        pos = nipple.el.getBoundingClientRect();
+        nipple.position = {
+            x: scroll.x + pos.left,
+            y: scroll.y + pos.top
+        };
     }
 
     nipple.identifier = identifier;
