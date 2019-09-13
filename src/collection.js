@@ -34,7 +34,7 @@ function Collection (manager, options) {
         restOpacity: 0.5,
         lockX: false,
         lockY: false,
-        dynamic_page: false
+        dynamicPage: false
     };
 
     self.config(options);
@@ -378,7 +378,7 @@ Collection.prototype.processOnMove = function (evt) {
         return;
     }
 
-    if (opts.dynamic_page) {
+    if (opts.dynamicPage) {
         var scroll = u.getScroll();
         pos = nipple.el.getBoundingClientRect();
         nipple.position = {

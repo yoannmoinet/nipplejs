@@ -141,7 +141,7 @@ var options = {
     lockY: Boolean,                 // only move on the Y axis
     catchDistance: Number,          // distance to recycle previous joystick in
                                     // 'semi' mode
-    dynamic_page: Boolean,          // Enable if the page has dynamically visible elements
+    dynamicPage: Boolean,          // Enable if the page has dynamically visible elements
 };
 ```
 
@@ -253,7 +253,7 @@ Locks joystick's movement to the x (horizontal) axis
 ### `options.lockY` defaults to false
 Locks joystick's movement to the y (vertical) axis
 
-### `options.dynamic_page` defaults to true
+### `options.dynamicPage` defaults to true
 Enable if the page has dynamically visible elements such as for Vue, React, Angular or simply some CSS hiding or showing some DOM.
 
 ----
