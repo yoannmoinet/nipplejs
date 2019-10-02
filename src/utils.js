@@ -33,6 +33,9 @@ export const degrees = (a) => {
 };
 
 export const isPressed = (evt) => {
+    if (evt.type === 'pointerdown' || evt.type === 'pointermove') {
+        return true;
+    }
     if (isNaN(evt.buttons)) {
         return evt.pressure !== 0;
     }
