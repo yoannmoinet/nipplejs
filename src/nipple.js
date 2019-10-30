@@ -13,7 +13,10 @@ function Nipple (collection, options) {
 
     // Defaults
     this.defaults = {
-        size: 100,
+        size: {
+            val: 100,
+            unit: 'px'
+        },
         threshold: 0.1,
         color: 'white',
         fadeTime: 250,
@@ -110,21 +113,21 @@ Nipple.prototype.stylize = function () {
     styles.back = {
         position: 'absolute',
         display: 'block',
-        width: this.options.size + 'px',
-        height: this.options.size + 'px',
-        marginLeft: -this.options.size / 2 + 'px',
-        marginTop: -this.options.size / 2 + 'px',
+        width: this.options.size.val + this.options.size.unit ,
+        height: this.options.size.val + this.options.size.unit,
+        marginLeft: -this.options.size.val / 2 + this.options.size.unit,
+        marginTop: -this.options.size.val / 2 + this.options.size.unit,
         background: this.options.color,
         'opacity': '.5'
     };
 
     styles.front = {
-        width: this.options.size / 2 + 'px',
-        height: this.options.size / 2 + 'px',
+        width: this.options.size.val / 2 + this.options.size.unit,
+        height: this.options.size.val / 2 + this.options.size.unit,
         position: 'absolute',
         display: 'block',
-        marginLeft: -this.options.size / 4 + 'px',
-        marginTop: -this.options.size / 4 + 'px',
+        marginLeft: -this.options.size.val / 4 + this.options.size.unit,
+        marginTop: -this.options.size.val / 4 + this.options.size.unit,
         background: this.options.color,
         'opacity': '.5'
     };
