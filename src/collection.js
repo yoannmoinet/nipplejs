@@ -34,7 +34,8 @@ function Collection (manager, options) {
         restOpacity: 0.5,
         lockX: false,
         lockY: false,
-        shape: 'circle'
+        shape: 'circle',
+        dynamicPage: false
     };
 
     self.config(options);
@@ -363,6 +364,13 @@ Collection.prototype.processOnMove = function (evt) {
     var identifier = self.manager.getIdentifier(evt);
     var nipple = self.nipples.get(identifier);
 
+    // If we're moving without pressing
+    // it's that we went out the active zone
+    if (!u.isPressed(evt)) {
+        this.processOnEnd(evt);
+        return;
+    }
+
     if (!nipple) {
         // This is here just for safety.
         // It shouldn't happen.
@@ -372,6 +380,15 @@ Collection.prototype.processOnMove = function (evt) {
         return;
     }
 
+    if (opts.dynamicPage) {
+        var scroll = u.getScroll();
+        pos = nipple.el.getBoundingClientRect();
+        nipple.position = {
+            x: scroll.x + pos.left,
+            y: scroll.y + pos.top
+        };
+    }
+
     nipple.identifier = identifier;
 
     var size = nipple.options.size / 2;
@@ -379,6 +396,13 @@ Collection.prototype.processOnMove = function (evt) {
         x: evt.pageX,
         y: evt.pageY
     };
+
+    if (opts.lockX){
+        pos.y = nipple.position.y;
+    }
+    if (opts.lockY) {
+        pos.x = nipple.position.x;
+    }
 
     var dist = u.distance(pos, nipple.position);
     var angle = u.angle(pos, nipple.position);
@@ -418,13 +442,6 @@ Collection.prototype.processOnMove = function (evt) {
         break;
     }
 
-    if (opts.lockX){
-        yPosition = 0;
-    }
-    if (opts.lockY) {
-        xPosition = 0;
-    }
-
     nipple.frontPosition = {
         x: xPosition,
         y: yPosition
@@ -444,6 +461,10 @@ Collection.prototype.processOnMove = function (evt) {
         angle: {
             radian: rAngle,
             degree: angle
+        },
+        vector: {
+            x: xPosition / size,
+            y: - yPosition / size
         },
         raw: raw,
         instance: nipple,

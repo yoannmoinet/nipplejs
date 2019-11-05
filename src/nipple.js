@@ -398,7 +398,10 @@ Nipple.prototype.computeDirection = function (obj) {
         if (!same.angle) {
             this.trigger('dir dir:' + direction, obj);
         }
+    } else {
+        this.resetDirection();
     }
+
     return obj;
 };
 

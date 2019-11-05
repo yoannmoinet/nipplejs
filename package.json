@@ -1,5 +1,5 @@
 {
-  "version": "0.8.2",
+  "version": "0.8.3",
   "name": "nipplejs",
   "description": "A virtual joystick for touch capable interfaces",
   "author": "Yoann Moinet <yo@nnmoi.net> (https://yoannmoi.net)",
@@ -39,21 +39,21 @@
   },
   "dependencies": {},
   "devDependencies": {
-    "@babel/core": "7.2.0",
-    "@babel/preset-env": "7.2.0",
-    "babel-loader": "8.0.4",
-    "babel-plugin-add-module-exports": "1.0.0",
+    "@babel/core": "7.5.5",
+    "@babel/preset-env": "7.5.5",
+    "babel-loader": "8.0.6",
+    "babel-plugin-add-module-exports": "1.0.2",
     "casperjs": "1.1.4",
     "concat-cli": "4.0.0",
     "conventional-changelog": "1.1.0",
     "eslint": "5.10.0",
-    "eslint-loader": "2.1.1",
+    "eslint-loader": "2.2.1",
     "expect.js": "0.3.1",
     "markdown-toc": "1.2.0",
     "mocha": "5.2.0",
     "phantomjs-prebuilt": "2.1.16",
-    "webpack": "4.27.1",
-    "webpack-cli": "3.1.2",
-    "webpack-dev-server": "3.3.1"
+    "webpack": "4.39.2",
+    "webpack-cli": "3.3.7",
+    "webpack-dev-server": "3.8.0"
   }
 }
