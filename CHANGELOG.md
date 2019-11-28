@@ -1,37 +1,21 @@
-<a name="0.8.3"></a>
-## [0.8.3](https://github.com/yoannmoinet/nipplejs/compare/v0.8.2...v0.8.3) (2019-08-24)
-
-
-### Bug Fixes
-
-* better lockX and lockY mecanism ([8355fb8](https://github.com/yoannmoinet/nipplejs/commit/8355fb8)), closes [#111](https://github.com/yoannmoinet/nipplejs/issues/111)
-* released outside will be considered inside ([9a8a7b4](https://github.com/yoannmoinet/nipplejs/commit/9a8a7b4)), closes [#109](https://github.com/yoannmoinet/nipplejs/issues/109)
-* reset direction when below the threshold ([6f41b38](https://github.com/yoannmoinet/nipplejs/commit/6f41b38)), closes [#110](https://github.com/yoannmoinet/nipplejs/issues/110)
-
-
-
-<a name="0.8.2"></a>
-## [0.8.2](https://github.com/yoannmoinet/nipplejs/compare/v0.8.1...v0.8.2) (2019-05-08)
+<a name="0.8.4"></a>
+## [0.8.4](https://github.com/yoannmoinet/nipplejs/compare/v0.7.3...v0.8.4) (2019-11-28)
 
 
 ### Bug Fixes
 
 * allow older typescript ([c164597](https://github.com/yoannmoinet/nipplejs/commit/c164597))
+* better lockX and lockY mecanism ([8355fb8](https://github.com/yoannmoinet/nipplejs/commit/8355fb8)), closes [#111](https://github.com/yoannmoinet/nipplejs/issues/111)
 * joystick in 'dynamic' mode gets stuck on iOS ([94bb784](https://github.com/yoannmoinet/nipplejs/commit/94bb784)), closes [#94](https://github.com/yoannmoinet/nipplejs/issues/94)
+* released outside will be considered inside ([9a8a7b4](https://github.com/yoannmoinet/nipplejs/commit/9a8a7b4)), closes [#109](https://github.com/yoannmoinet/nipplejs/issues/109)
+* reset direction when below the threshold ([6f41b38](https://github.com/yoannmoinet/nipplejs/commit/6f41b38)), closes [#110](https://github.com/yoannmoinet/nipplejs/issues/110)
 
 
 ### Features
 
+* add an options to use with dynamic pages ([8258501](https://github.com/yoannmoinet/nipplejs/commit/8258501))
 * add raw data on move for data-only usage ([c818fb2](https://github.com/yoannmoinet/nipplejs/commit/c818fb2)), closes [#54](https://github.com/yoannmoinet/nipplejs/issues/54)
-
-
-
-<a name="0.8.1"></a>
-## [0.8.1](https://github.com/yoannmoinet/nipplejs/compare/v0.7.3...v0.8.1) (2019-02-17)
-
-
-### Features
-
+* add unit vector representation to move event output ([a4496fe](https://github.com/yoannmoinet/nipplejs/commit/a4496fe))
 * upgrade dev experience with webpack and es6 ([cc1e824](https://github.com/yoannmoinet/nipplejs/commit/cc1e824))
 
 
@@ -93,9 +77,9 @@
 
 ### Bug Fixes
 
+* update dependencies ([73bcda9](https://github.com/yoannmoinet/nipplejs/commit/73bcda9))
 * **events:** trigger events with the correct id and not identifier ([17f0fe6](https://github.com/yoannmoinet/nipplejs/commit/17f0fe6))
 * **identifier:** better identifier management ([ff44916](https://github.com/yoannmoinet/nipplejs/commit/ff44916))
-* update dependencies ([73bcda9](https://github.com/yoannmoinet/nipplejs/commit/73bcda9))
 
 
 
@@ -170,15 +154,15 @@
 
 ### Bug Fixes
 
+* **nipple:** call off() after triggering ([bf8e5c3](https://github.com/yoannmoinet/nipplejs/commit/bf8e5c3))
+* **nipple:** only trigger itself, not its manager ([6b39786](https://github.com/yoannmoinet/nipplejs/commit/6b39786))
+* **super:** move internal declarations where needed ([a4c79c2](https://github.com/yoannmoinet/nipplejs/commit/a4c79c2))
+* **utils:** return object on u.extend ([9197c00](https://github.com/yoannmoinet/nipplejs/commit/9197c00))
 * clean identifier if not found in any collection ([3496395](https://github.com/yoannmoinet/nipplejs/commit/3496395))
 * handle scrolling offset by resetting zone's box ([6ccd0b5](https://github.com/yoannmoinet/nipplejs/commit/6ccd0b5))
 * remove useless injections ([a0b1d7e](https://github.com/yoannmoinet/nipplejs/commit/a0b1d7e))
 * return the found nipple in `get()` ([439aa69](https://github.com/yoannmoinet/nipplejs/commit/439aa69))
 * unbind document when collection is manually destroyed ([6e66b62](https://github.com/yoannmoinet/nipplejs/commit/6e66b62))
-* **nipple:** call off() after triggering ([bf8e5c3](https://github.com/yoannmoinet/nipplejs/commit/bf8e5c3))
-* **nipple:** only trigger itself, not its manager ([6b39786](https://github.com/yoannmoinet/nipplejs/commit/6b39786))
-* **super:** move internal declarations where needed ([a4c79c2](https://github.com/yoannmoinet/nipplejs/commit/a4c79c2))
-* **utils:** return object on u.extend ([9197c00](https://github.com/yoannmoinet/nipplejs/commit/9197c00))
 
 
 ### Features
@@ -265,22 +249,22 @@
 
 ### Bug Fixes
 
+* remove useless rimraf ([26db70f](https://github.com/yoannmoinet/nipplejs/commit/26db70f))
 * **manager:** add default pressure at 0 ([1cb31d0](https://github.com/yoannmoinet/nipplejs/commit/1cb31d0))
 * **nipple:** control dom presence before add or remove ([7cc1d8c](https://github.com/yoannmoinet/nipplejs/commit/7cc1d8c))
 * **nipple:** return the manager's known object in event triggers ([2deb42c](https://github.com/yoannmoinet/nipplejs/commit/2deb42c))
-* remove useless rimraf ([26db70f](https://github.com/yoannmoinet/nipplejs/commit/26db70f))
 * **npm:** add rimraf as a dev dependency ([deb7acc](https://github.com/yoannmoinet/nipplejs/commit/deb7acc)), closes [#12](https://github.com/yoannmoinet/nipplejs/issues/12)
 
 
 ### Features
 
-* **manager:** handle resize and reinit positions ([261fb59](https://github.com/yoannmoinet/nipplejs/commit/261fb59))
-* **nipple:** remove position offset ([be59bc4](https://github.com/yoannmoinet/nipplejs/commit/be59bc4))
-* add dataOnly option ([2f527b1](https://github.com/yoannmoinet/nipplejs/commit/2f527b1))
-* add two modes, static and semi ([347feaa](https://github.com/yoannmoinet/nipplejs/commit/347feaa))
 * **manager:** add destroy method ([295654f](https://github.com/yoannmoinet/nipplejs/commit/295654f))
 * **manager:** expose nippleOptions ([968103c](https://github.com/yoannmoinet/nipplejs/commit/968103c))
+* add dataOnly option ([2f527b1](https://github.com/yoannmoinet/nipplejs/commit/2f527b1))
+* add two modes, static and semi ([347feaa](https://github.com/yoannmoinet/nipplejs/commit/347feaa))
+* **manager:** handle resize and reinit positions ([261fb59](https://github.com/yoannmoinet/nipplejs/commit/261fb59))
 * **nipple:** add destroy method ([713e505](https://github.com/yoannmoinet/nipplejs/commit/713e505))
+* **nipple:** remove position offset ([be59bc4](https://github.com/yoannmoinet/nipplejs/commit/be59bc4))
 * **off:** allow unsubscribing on all events at once ([c30bfad](https://github.com/yoannmoinet/nipplejs/commit/c30bfad))
 
 
@@ -316,16 +300,16 @@
 
 ### Features
 
-* **nipple:** add a callback after show and hide ([5b24124](https://github.com/yoannmoinet/nipplejs/commit/5b24124))
-* **nipple:** add the positions to the instance ([fac981b](https://github.com/yoannmoinet/nipplejs/commit/fac981b))
-* **off:** allow unsubscribing of a type at once ([cbbefca](https://github.com/yoannmoinet/nipplejs/commit/cbbefca))
-* **on:** pass the target in the event ([bc0630d](https://github.com/yoannmoinet/nipplejs/commit/bc0630d))
 * add more events for both nipple and manager ([f7966b9](https://github.com/yoannmoinet/nipplejs/commit/f7966b9))
 * add support for both mouse and touch at the same time ([e8fcba2](https://github.com/yoannmoinet/nipplejs/commit/e8fcba2))
 * add support for pressure ([80e7770](https://github.com/yoannmoinet/nipplejs/commit/80e7770)), closes [#10](https://github.com/yoannmoinet/nipplejs/issues/10)
 * attach values to each instance of nipple ([c5bf9ab](https://github.com/yoannmoinet/nipplejs/commit/c5bf9ab))
 * limit the number of simultaneous nipples ([801e91d](https://github.com/yoannmoinet/nipplejs/commit/801e91d))
 * support multitouch correctly ([33bbe23](https://github.com/yoannmoinet/nipplejs/commit/33bbe23)), closes [#2](https://github.com/yoannmoinet/nipplejs/issues/2) [#6](https://github.com/yoannmoinet/nipplejs/issues/6)
+* **nipple:** add a callback after show and hide ([5b24124](https://github.com/yoannmoinet/nipplejs/commit/5b24124))
+* **nipple:** add the positions to the instance ([fac981b](https://github.com/yoannmoinet/nipplejs/commit/fac981b))
+* **off:** allow unsubscribing of a type at once ([cbbefca](https://github.com/yoannmoinet/nipplejs/commit/cbbefca))
+* **on:** pass the target in the event ([bc0630d](https://github.com/yoannmoinet/nipplejs/commit/bc0630d))
 
 
 
