@@ -46,7 +46,7 @@
   * [`joystick.add()`](#joystickadd)
   * [`joystick.remove()`](#joystickremove)
   * [`joystick.destroy()`](#joystickdestroy)
-  * [`joystick.setPosition(cb, [{ x, y }])`](#joysticksetpositioncb--x-y-)
+  * [`joystick.setPosition(cb, { x, y })`](#joysticksetpositioncb--x-y-)
   * [`joystick.identifier`](#joystickidentifier)
   * [`joystick.trigger(type [, data])`](#joysticktriggertype--data)
   * [`joystick.position`](#joystickposition)
@@ -419,7 +419,7 @@ Remove the joystick's element from the dom.
 
 Gently remove this nipple from the DOM and unbind all related events.
 
-### `joystick.setPosition(cb, [{ x, y }])`
+### `joystick.setPosition(cb, { x, y })`
 
 Set the joystick to the specified position, where x and y are distances away from the center in pixels. This does not trigger joystick events.
 

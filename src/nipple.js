@@ -212,7 +212,7 @@ Nipple.prototype.show = function (cb) {
 };
 
 // Fade out the Nipple instance.
-Nipple.prototype.hide = function (cb =  null) {
+Nipple.prototype.hide = function (cb) {
     var self = this;
 
     if (self.options.dataOnly) {
