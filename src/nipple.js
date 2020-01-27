@@ -48,6 +48,7 @@ function Nipple (collection, options) {
         add: this.addToDom.bind(this),
         remove: this.removeFromDom.bind(this),
         destroy: this.destroy.bind(this),
+        setPosition:this.setPosition.bind(this),
         resetDirection: this.resetDirection.bind(this),
         computeDirection: this.computeDirection.bind(this),
         trigger: this.trigger.bind(this),
@@ -237,17 +238,18 @@ Nipple.prototype.hide = function (cb) {
         self.options.fadeTime
     );
     if (self.options.restJoystick) {
-        self.restPosition();
+        self.setPosition(cb, { x: 0, y: 0 });
     }
 
     return self;
 };
 
-Nipple.prototype.restPosition = function (cb) {
+// Set the nipple to the specified position
+Nipple.prototype.setPosition = function (cb, position) {
     var self = this;
     self.frontPosition = {
-        x: 0,
-        y: 0
+        x: position.x,
+        y: position.y
     };
     var animTime = self.options.fadeTime + 'ms';
 
