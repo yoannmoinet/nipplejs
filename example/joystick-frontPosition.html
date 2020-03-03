@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>NippleJS</title>
+        <meta name="viewport" content="width=device-width, initial-scale=0.5, maximum-scale=0.5">
+        <style>
+        html, body {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            padding: 0;
+            margin: 0;
+        }
+
+        #left {
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 100%;
+            background: rgba(1,77,129, 0.1);
+        }
+        </style>
+    </head>
+    <body>
+        <div id="left"></div>
+        <script src="/dist/nipplejs.js"></script>
+        <script>
+            var joystickL = nipplejs.create({
+                zone: document.getElementById('left'),
+                mode: 'static',
+                position: { left: '50%', top: '50%' },
+                color: '#014d81',
+                size: 200,
+                restJoystick: false,
+                frontPosition: {x: 25, y: -35},
+                restJoystick: false
+            });
+        </script>
+    </body>
+</html>

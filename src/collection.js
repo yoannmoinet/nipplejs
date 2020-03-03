@@ -34,7 +34,8 @@ function Collection (manager, options) {
         restOpacity: 0.5,
         lockX: false,
         lockY: false,
-        dynamicPage: false
+        dynamicPage: false,
+        frontPosition: {x: 0, y: 0}
     };
 
     self.config(options);
@@ -154,6 +155,20 @@ Collection.prototype.createNipple = function (position, identifier) {
         };
     }
 
+    //limit the position of the front to the size of the joystick.
+    var size = opts.size / 2;
+    var frontPosition = opts.frontPosition;
+    var defaultFrontPostion =  self.defaults.frontPosition;
+    var dist = u.distance(frontPosition, defaultFrontPostion);
+    var angle = u.angle(frontPosition, defaultFrontPostion);
+    
+    // If distance is bigger than nipple's size
+    // we clamp the position.
+    if (dist > size) {
+        dist = size;
+        frontPosition = u.findCoord(defaultFrontPostion, dist, angle);
+    }
+
     var nipple = new Nipple(self, {
         color: opts.color,
         size: opts.size,
@@ -166,10 +181,7 @@ Collection.prototype.createNipple = function (position, identifier) {
         identifier: identifier,
         position: position,
         zone: opts.zone,
-        frontPosition: {
-            x: 0,
-            y: 0
-        }
+        frontPosition: frontPosition
     });
 
     if (!opts.dataOnly) {
