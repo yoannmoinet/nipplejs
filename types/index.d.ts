@@ -18,12 +18,12 @@ export interface JoystickManagerOptions {
     color?: string;
 
     /**
-     * Defaults to `100`
-     * The size in pixel of the outer circle.
+     * Defaults to { val: `100`, unit: px}
+     * The size of the outer circle.
      *
      * The inner circle is 50% of this size.
      */
-    size?: number;
+    size?: {val: number, unit: string};
 
     /**
      * This is the strength needed to trigger a directional event.

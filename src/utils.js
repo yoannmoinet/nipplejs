@@ -91,15 +91,15 @@ export const getScroll = () => {
     };
 };
 
-export const applyPosition = (el, pos) => {
+export const applyPosition = (el, pos, unit) => {
     if (pos.top || pos.right || pos.bottom || pos.left) {
         el.style.top = pos.top;
         el.style.right = pos.right;
         el.style.bottom = pos.bottom;
         el.style.left = pos.left;
     } else {
-        el.style.left = pos.x + 'px';
-        el.style.top = pos.y + 'px';
+        el.style.left = pos.x + unit;
+        el.style.top = pos.y + unit;
     }
 };
 

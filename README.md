@@ -16,7 +16,7 @@
 - [Options](#options)
   * [`options.zone` defaults to 'body'](#optionszone-defaults-to-body)
   * [`options.color` defaults to 'white'](#optionscolor-defaults-to-white)
-  * [`options.size` defaults to 100](#optionssize-defaults-to-100)
+  * [`options.size` defaults to {val: 100, unit: "px"}](#optionssize-defaults-to-val-100-unit-px)
   * [`options.threshold` defaults to 0.1](#optionsthreshold-defaults-to-01)
   * [`options.fadeTime` defaults to 250](#optionsfadetime-defaults-to-250)
   * [`options.multitouch` defaults to false](#optionsmultitouch-defaults-to-false)
@@ -128,7 +128,7 @@ You can configure your joystick in different ways :
 var options = {
     zone: Element,                  // active zone
     color: String,
-    size: Integer,
+    size: {val: Integer, unit: String},
     threshold: Float,               // before triggering a directional event
     fadeTime: Integer,              // transition time
     multitouch: Boolean,
@@ -172,8 +172,12 @@ The background color of your joystick's elements.
 
 Can be any valid CSS color.
 
-### `options.size` defaults to 100
-The size in pixel of the outer circle.
+### `options.size` defaults to `{val: 100, unit: "px"}`
+An object that determine the size of the outer circle.
+
+You can pass css unit like : `px`, `vh`, `vmin`
+
+`%` doesn't work if you doesn't set `nipple collection` height and width before
 
 The inner circle is 50% of this size.
 
@@ -280,7 +284,7 @@ Your manager has the following signature :
         mode: String,
         position: Object,
         catchDistance: Number,
-        size: Number,
+        size: {val: Number, unit: String},
         threshold: Number,
         color: String,
         fadeTime: Number,
@@ -373,7 +377,7 @@ Each joystick has the following signature :
     },
     options: {
         color: String,
-        size: Number,
+        size: {val: Number, unit: String},
         threshold: Number,
         fadeTime: Number
     }

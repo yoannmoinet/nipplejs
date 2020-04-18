@@ -25,7 +25,10 @@ function Collection (manager, options) {
         mode: 'dynamic',
         position: {top: 0, left: 0},
         catchDistance: 200,
-        size: 100,
+        size: {
+            val: 100,
+            unit: 'px'
+        },
         threshold: 0.1,
         color: 'white',
         fadeTime: 250,
@@ -173,8 +176,8 @@ Collection.prototype.createNipple = function (position, identifier) {
     });
 
     if (!opts.dataOnly) {
-        u.applyPosition(nipple.ui.el, toPutOn);
-        u.applyPosition(nipple.ui.front, nipple.frontPosition);
+        u.applyPosition(nipple.ui.el, toPutOn, opts.size.unit);
+        u.applyPosition(nipple.ui.front, nipple.frontPosition, opts.size.unit);
     }
     self.nipples.push(nipple);
     self.trigger('added ' + nipple.identifier + ':added', nipple);
@@ -389,7 +392,7 @@ Collection.prototype.processOnMove = function (evt) {
 
     nipple.identifier = identifier;
 
-    var size = nipple.options.size / 2;
+    var size = nipple.options.size.val / 2;
     var pos = {
         x: evt.pageX,
         y: evt.pageY
@@ -428,7 +431,7 @@ Collection.prototype.processOnMove = function (evt) {
     };
 
     if (!opts.dataOnly) {
-        u.applyPosition(nipple.ui.front, nipple.frontPosition);
+        u.applyPosition(nipple.ui.front, nipple.frontPosition, opts.size.unit);
     }
 
     // Prepare event's datas.
