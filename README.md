@@ -30,6 +30,7 @@
   * [`options.restJoystick` defaults to true](#optionsrestjoystick-defaults-to-true)
   * [`options.restOpacity` defaults to 0.5](#optionsrestopacity-defaults-to-05)
   * [`options.catchDistance` defaults to 200](#optionscatchdistance-defaults-to-200)
+  * [`options.displayBeforeTouch` defaults to true](#optionsdisplaybeforetouch-defaults-to-true)
 - [API](#api)
   * [NippleJS instance (manager)](#nipplejs-instance-manager)
     + [`manager.on(type, handler)`](#managerontype-handler)
@@ -142,7 +143,8 @@ var options = {
     lockY: Boolean,                 // only move on the Y axis
     catchDistance: Number,          // distance to recycle previous joystick in
                                     // 'semi' mode
-    dynamicPage: Boolean,          // Enable if the page has dynamically visible elements
+    dynamicPage: Boolean,           // Enable if the page has dynamically visible elements
+    displayBeforeTouch: Boolean     // Enable joystick display before any touch event
 };
 ```
 
@@ -256,6 +258,9 @@ Locks joystick's movement to the y (vertical) axis
 
 ### `options.dynamicPage` defaults to true
 Enable if the page has dynamically visible elements such as for Vue, React, Angular or simply some CSS hiding or showing some DOM.
+
+### `options.displayBeforeTouch` defaults to true
+Enable joystick display before any touch event. In `semi` mode, make sure `position` option has been overridden. 
 
 ----
 
