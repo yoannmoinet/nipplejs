@@ -254,7 +254,7 @@ Locks joystick's movement to the x (horizontal) axis
 ### `options.lockY` defaults to false
 Locks joystick's movement to the y (vertical) axis
 
-### `options.dynamicPage` defaults to true
+### `options.dynamicPage` defaults to false
 Enable if the page has dynamically visible elements such as for Vue, React, Angular or simply some CSS hiding or showing some DOM.
 
 ----
