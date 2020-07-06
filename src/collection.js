@@ -34,7 +34,8 @@ function Collection (manager, options) {
         restOpacity: 0.5,
         lockX: false,
         lockY: false,
-        dynamicPage: false
+        dynamicPage: false,
+        displayBeforeTouch: true,
     };
 
     self.config(options);
@@ -101,7 +102,9 @@ Collection.prototype.begin = function () {
 
     // We place our static nipple
     // if needed.
-    if (opts.mode === 'static') {
+    var isModeReadyForDisplay = opts.mode === 'static' ||
+        opts.mode === 'semi' && opts.position !== self.defaults.position;
+    if (opts.displayBeforeTouch === true && isModeReadyForDisplay === true) {
         var nipple = self.createNipple(
             opts.position,
             self.manager.getIdentifier()
