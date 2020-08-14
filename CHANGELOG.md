@@ -1,37 +1,26 @@
-<a name="0.8.3"></a>
-## [0.8.3](https://github.com/yoannmoinet/nipplejs/compare/v0.8.2...v0.8.3) (2019-08-24)
-
-
-### Bug Fixes
-
-* better lockX and lockY mecanism ([8355fb8](https://github.com/yoannmoinet/nipplejs/commit/8355fb8)), closes [#111](https://github.com/yoannmoinet/nipplejs/issues/111)
-* released outside will be considered inside ([9a8a7b4](https://github.com/yoannmoinet/nipplejs/commit/9a8a7b4)), closes [#109](https://github.com/yoannmoinet/nipplejs/issues/109)
-* reset direction when below the threshold ([6f41b38](https://github.com/yoannmoinet/nipplejs/commit/6f41b38)), closes [#110](https://github.com/yoannmoinet/nipplejs/issues/110)
+<a name="0.8.5"></a>
+## [0.8.5](https://github.com/yoannmoinet/nipplejs/compare/v0.8.4...v0.8.5) (2020-01-27)
 
 
 
-<a name="0.8.2"></a>
-## [0.8.2](https://github.com/yoannmoinet/nipplejs/compare/v0.8.1...v0.8.2) (2019-05-08)
+<a name="0.8.4"></a>
+## [0.8.4](https://github.com/yoannmoinet/nipplejs/compare/v0.7.3...v0.8.4) (2019-11-28)
 
 
 ### Bug Fixes
 
 * allow older typescript ([c164597](https://github.com/yoannmoinet/nipplejs/commit/c164597))
+* better lockX and lockY mecanism ([8355fb8](https://github.com/yoannmoinet/nipplejs/commit/8355fb8)), closes [#111](https://github.com/yoannmoinet/nipplejs/issues/111)
 * joystick in 'dynamic' mode gets stuck on iOS ([94bb784](https://github.com/yoannmoinet/nipplejs/commit/94bb784)), closes [#94](https://github.com/yoannmoinet/nipplejs/issues/94)
+* released outside will be considered inside ([9a8a7b4](https://github.com/yoannmoinet/nipplejs/commit/9a8a7b4)), closes [#109](https://github.com/yoannmoinet/nipplejs/issues/109)
+* reset direction when below the threshold ([6f41b38](https://github.com/yoannmoinet/nipplejs/commit/6f41b38)), closes [#110](https://github.com/yoannmoinet/nipplejs/issues/110)
 
 
 ### Features
 
+* add an options to use with dynamic pages ([8258501](https://github.com/yoannmoinet/nipplejs/commit/8258501))
 * add raw data on move for data-only usage ([c818fb2](https://github.com/yoannmoinet/nipplejs/commit/c818fb2)), closes [#54](https://github.com/yoannmoinet/nipplejs/issues/54)
-
-
-
-<a name="0.8.1"></a>
-## [0.8.1](https://github.com/yoannmoinet/nipplejs/compare/v0.7.3...v0.8.1) (2019-02-17)
-
-
-### Features
-
+* add unit vector representation to move event output ([a4496fe](https://github.com/yoannmoinet/nipplejs/commit/a4496fe))
 * upgrade dev experience with webpack and es6 ([cc1e824](https://github.com/yoannmoinet/nipplejs/commit/cc1e824))
 
 

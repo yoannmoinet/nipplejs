@@ -142,6 +142,14 @@ export interface JoystickManagerOptions {
      * Locks joystick’s movement to the y (vertical) axis
      */
     lockY?: boolean;
+
+    /**
+     * Defaults to `false`
+     *
+     * Enable if the page has dynamically visible elements such as for Vue, React, Angular or simply some CSS hiding or
+     * showing some DOM.
+     */
+    dynamicPage?: boolean;
 }
 
 export interface Position {
