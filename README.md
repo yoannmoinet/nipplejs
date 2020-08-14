@@ -35,7 +35,7 @@
   * [`options.shape` defaults to 'circle'](#optionsshape-defaults-to-circle)
     + [`'circle'`](#circle)
     + [`'square'`](#square)
-  * [`options.dynamicPage` defaults to true](#optionsdynamicpage-defaults-to-true)
+  * [`options.dynamicPage` defaults to false](#optionsdynamicpage-defaults-to-false)
 - [API](#api)
   * [NippleJS instance (manager)](#nipplejs-instance-manager)
     + [`manager.on(type, handler)`](#managerontype-handler)
