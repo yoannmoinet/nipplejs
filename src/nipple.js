@@ -99,8 +99,7 @@ Nipple.prototype.stylize = function () {
         return this;
     }
     var animTime = this.options.fadeTime + 'ms';
-    var squareBorderStyle = u.getVendorStyle('borderRadius', '0%');
-    var circleBorderStyle = u.getVendorStyle('borderRadius', '50%');
+    var borderStyle = u.getVendorStyle('borderRadius', '50%');
     var transitStyle = u.getTransitionStyle('transition', 'opacity', animTime);
     var styles = {};
     styles.el = {
@@ -133,11 +132,10 @@ Nipple.prototype.stylize = function () {
     };
 
     u.extend(styles.el, transitStyle);
-    u.extend(
-        styles.back,
-        this.options.shape === 'circle' ? circleBorderStyle : squareBorderStyle
-    );
-    u.extend(styles.front, circleBorderStyle);
+    if(this.options.shape === 'circle'){
+        u.extend(styles.back, borderStyle);
+    }
+    u.extend(styles.front, borderStyle);
 
     this.applyStyles(styles);
 
