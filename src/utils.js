@@ -173,3 +173,11 @@ export const map = (ar, fn) => {
         fn(ar);
     }
 };
+
+// Clamp position within the range
+export const clamp = (pos, boxPos, size) => ({
+    //                          left-clamping     right-clamping
+    x: Math.min(Math.max(pos.x, boxPos.x - size), boxPos.x + size),
+    //                          top-clamping      bottom-clamping
+    y: Math.min(Math.max(pos.y, boxPos.y - size), boxPos.y + size)
+});
