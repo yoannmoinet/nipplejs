@@ -175,9 +175,9 @@ export const map = (ar, fn) => {
 };
 
 // Clamp position within the range
-export const clamp = (pos, boxPos, size) => ({
+export const clamp = (pos, nipplePos, size) => ({
     //                          left-clamping     right-clamping
-    x: Math.min(Math.max(pos.x, boxPos.x - size), boxPos.x + size),
+    x: Math.min(Math.max(pos.x, nipplePos.x - size), nipplePos.x + size),
     //                          top-clamping      bottom-clamping
-    y: Math.min(Math.max(pos.y, boxPos.y - size), boxPos.y + size)
+    y: Math.min(Math.max(pos.y, nipplePos.y - size), nipplePos.y + size)
 });
