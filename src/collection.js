@@ -414,33 +414,19 @@ Collection.prototype.processOnMove = function (evt) {
         position: pos
     };
 
-    // If distance is bigger than nipple's size
-    // we clamp the position.
-    var xPosition, yPosition;
-    switch (nipple.options.shape) {
-    case 'square':
-        // Clamping for x-axis
-        xPosition = pos.x - nipple.position.x;
-        yPosition = pos.y - nipple.position.y;
-        if (Math.abs(xPosition) >= size) {
-            xPosition = Math.sign(xPosition) * size;
-        }
-
-        //Clamping for y-axis
-        if (Math.abs(yPosition) >= size) {
-            yPosition = Math.sign(yPosition) * size;
-        }
-        break;
-    default:
-        if (dist > size) {
-            dist = size;
-            pos = u.findCoord(nipple.position, dist, angle);
-        }
-
-        xPosition = pos.x - nipple.position.x;
-        yPosition = pos.y - nipple.position.y;
-        break;
+    // Clamp the position
+    if(nipple.options.shape === 'circle'){
+        // Clamp to a circle
+        dist = Math.min(dist,size);
+        pos = u.findCoord(nipple.position, dist, angle);
+    }else{
+        // Clamp to a square
+        pos = u.clamp(pos,nipple.position,size);
+        dist = u.distance(pos, nipple.position);
     }
+
+    var xPosition = pos.x - nipple.position.x;
+    var yPosition = pos.y - nipple.position.y;
 
     nipple.frontPosition = {
         x: xPosition,
