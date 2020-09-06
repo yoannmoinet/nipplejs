@@ -150,6 +150,13 @@ export interface JoystickManagerOptions {
      * showing some DOM.
      */
     dynamicPage?: boolean;
+
+    /**
+     * Defaults to `circle`
+     * 
+     * Sets the shape of the joystick
+     */
+    shape?: 'circle' | 'square';
 }
 
 export interface Position {

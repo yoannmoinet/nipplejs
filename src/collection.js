@@ -34,6 +34,7 @@ function Collection (manager, options) {
         restOpacity: 0.5,
         lockX: false,
         lockY: false,
+        shape: 'circle',
         dynamicPage: false
     };
 
@@ -169,7 +170,8 @@ Collection.prototype.createNipple = function (position, identifier) {
         frontPosition: {
             x: 0,
             y: 0
-        }
+        },
+        shape: opts.shape
     });
 
     if (!opts.dataOnly) {
@@ -412,11 +414,15 @@ Collection.prototype.processOnMove = function (evt) {
         position: pos
     };
 
-    // If distance is bigger than nipple's size
-    // we clamp the position.
-    if (dist > size) {
-        dist = size;
+    // Clamp the position
+    if(nipple.options.shape === 'circle'){
+        // Clamp to a circle
+        dist = Math.min(dist,size);
         pos = u.findCoord(nipple.position, dist, angle);
+    }else{
+        // Clamp to a square
+        pos = u.clamp(pos, nipple.position, size);
+        dist = u.distance(pos, nipple.position);
     }
 
     var xPosition = pos.x - nipple.position.x;

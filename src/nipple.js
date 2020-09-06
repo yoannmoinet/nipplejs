@@ -23,7 +23,8 @@ function Nipple (collection, options) {
         mode: 'dynamic',
         zone: document.body,
         lockX: false,
-        lockY: false
+        lockY: false,
+        shape: 'circle'
     };
 
     this.config(options);
@@ -131,7 +132,9 @@ Nipple.prototype.stylize = function () {
     };
 
     u.extend(styles.el, transitStyle);
-    u.extend(styles.back, borderStyle);
+    if(this.options.shape === 'circle'){
+        u.extend(styles.back, borderStyle);
+    }
     u.extend(styles.front, borderStyle);
 
     this.applyStyles(styles);

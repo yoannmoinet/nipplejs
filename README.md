@@ -30,6 +30,12 @@
   * [`options.restJoystick` defaults to true](#optionsrestjoystick-defaults-to-true)
   * [`options.restOpacity` defaults to 0.5](#optionsrestopacity-defaults-to-05)
   * [`options.catchDistance` defaults to 200](#optionscatchdistance-defaults-to-200)
+  * [`options.lockX` defaults to false](#optionslockx-defaults-to-false)
+  * [`options.lockY` defaults to false](#optionslocky-defaults-to-false)
+  * [`options.shape` defaults to 'circle'](#optionsshape-defaults-to-circle)
+    + [`'circle'`](#circle)
+    + [`'square'`](#square)
+  * [`options.dynamicPage` defaults to false](#optionsdynamicpage-defaults-to-false)
 - [API](#api)
   * [NippleJS instance (manager)](#nipplejs-instance-manager)
     + [`manager.on(type, handler)`](#managerontype-handler)
@@ -67,12 +73,9 @@
     + [`destroyed`](#destroyed)
     + [`pressure`](#pressure)
 - [Contributing](#contributing)
-    + [Commits](#commits)
-    + [Style](#style)
-    + [Workflow](#workflow)
-    + [Build](#build)
 
 <!-- tocstop -->
+
 </details>
 
 ## Install
@@ -142,7 +145,8 @@ var options = {
     lockY: Boolean,                 // only move on the Y axis
     catchDistance: Number,          // distance to recycle previous joystick in
                                     // 'semi' mode
-    dynamicPage: Boolean,          // Enable if the page has dynamically visible elements
+    shape: String,                  // 'circle' or 'square'
+    dynamicPage: Boolean,           // Enable if the page has dynamically visible elements
 };
 ```
 
@@ -253,6 +257,15 @@ Locks joystick's movement to the x (horizontal) axis
 
 ### `options.lockY` defaults to false
 Locks joystick's movement to the y (vertical) axis
+
+### `options.shape` defaults to 'circle'
+The shape of region within which joystick can move.
+
+#### `'circle'`
+Creates circle region for joystick movement
+
+#### `'square'`
+Creates square region for joystick movement
 
 ### `options.dynamicPage` defaults to false
 Enable if the page has dynamically visible elements such as for Vue, React, Angular or simply some CSS hiding or showing some DOM.
