@@ -36,6 +36,7 @@
     + [`'circle'`](#circle)
     + [`'square'`](#square)
   * [`options.dynamicPage` defaults to false](#optionsdynamicpage-defaults-to-false)
+  * [`options.follow` defaults to false](#optionsfollow-defaults-to-false)
 - [API](#api)
   * [NippleJS instance (manager)](#nipplejs-instance-manager)
     + [`manager.on(type, handler)`](#managerontype-handler)
@@ -147,6 +148,7 @@ var options = {
                                     // 'semi' mode
     shape: String,                  // 'circle' or 'square'
     dynamicPage: Boolean,           // Enable if the page has dynamically visible elements
+    follow: Boolean,                // Enable if the joystick must follow the pointer
 };
 ```
 
@@ -269,6 +271,9 @@ Creates square region for joystick movement
 
 ### `options.dynamicPage` defaults to false
 Enable if the page has dynamically visible elements such as for Vue, React, Angular or simply some CSS hiding or showing some DOM.
+
+### `options.follow` defaults to false
+Enable if the joystick must follow the thumbstick when it reaches the border.
 
 ----
 

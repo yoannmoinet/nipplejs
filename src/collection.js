@@ -35,7 +35,8 @@ function Collection (manager, options) {
         lockX: false,
         lockY: false,
         shape: 'circle',
-        dynamicPage: false
+        dynamicPage: false,
+        follow: false
     };
 
     self.config(options);
@@ -415,14 +416,34 @@ Collection.prototype.processOnMove = function (evt) {
     };
 
     // Clamp the position
-    if(nipple.options.shape === 'circle'){
+    var clamped_dist;
+    var clamped_pos;
+    if (nipple.options.shape === 'circle') {
         // Clamp to a circle
-        dist = Math.min(dist,size);
-        pos = u.findCoord(nipple.position, dist, angle);
-    }else{
+        clamped_dist = Math.min(dist, size);
+        clamped_pos = u.findCoord(nipple.position, clamped_dist, angle);
+    } else {
         // Clamp to a square
-        pos = u.clamp(pos, nipple.position, size);
-        dist = u.distance(pos, nipple.position);
+        clamped_pos = u.clamp(pos, nipple.position, size);
+        clamped_dist = u.distance(clamped_pos, nipple.position);
+    }
+
+    if (opts.follow) {
+        // follow behaviour
+        if (dist > size) {
+            let delta_x = pos.x - clamped_pos.x;
+            let delta_y = pos.y - clamped_pos.y;
+            nipple.position.x += delta_x;
+            nipple.position.y += delta_y;
+            nipple.el.style.top = nipple.position.y + 'px';
+            nipple.el.style.left = nipple.position.x + 'px';
+
+            dist = u.distance(pos, nipple.position);
+        }
+    } else {
+        // clamp behaviour
+        pos = clamped_pos;
+        dist = clamped_dist;
     }
 
     var xPosition = pos.x - nipple.position.x;
