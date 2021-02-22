@@ -148,7 +148,7 @@ var options = {
                                     // 'semi' mode
     shape: String,                  // 'circle' or 'square'
     dynamicPage: Boolean,           // Enable if the page has dynamically visible elements
-    follow: Boolean,                // Enable if the joystick must follow the pointer
+    follow: Boolean,                // Makes the joystick follow the thumbstick
 };
 ```
 
@@ -273,7 +273,7 @@ Creates square region for joystick movement
 Enable if the page has dynamically visible elements such as for Vue, React, Angular or simply some CSS hiding or showing some DOM.
 
 ### `options.follow` defaults to false
-Enable if the joystick must follow the thumbstick when it reaches the border.
+Makes the joystick follow the thumbstick when it reaches the border.
 
 ----
 
