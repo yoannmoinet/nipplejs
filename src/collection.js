@@ -118,7 +118,7 @@ Collection.prototype.begin = function () {
 // Nipple Factory
 Collection.prototype.createNipple = function (position, identifier) {
     var self = this;
-    var scroll = u.getScroll();
+    var scroll = self.manager.scroll;
     var toPutOn = {};
     var opts = self.options;
 
@@ -364,6 +364,7 @@ Collection.prototype.processOnMove = function (evt) {
     var opts = self.options;
     var identifier = self.manager.getIdentifier(evt);
     var nipple = self.nipples.get(identifier);
+    var scroll = self.manager.scroll;
 
     // If we're moving without pressing
     // it's that we went out the active zone
@@ -382,11 +383,10 @@ Collection.prototype.processOnMove = function (evt) {
     }
 
     if (opts.dynamicPage) {
-        var scroll = u.getScroll();
-        pos = nipple.el.getBoundingClientRect();
+        var elBox = nipple.el.getBoundingClientRect();
         nipple.position = {
-            x: scroll.x + pos.left,
-            y: scroll.y + pos.top
+            x: scroll.x + elBox.left,
+            y: scroll.y + elBox.top
         };
     }
 
