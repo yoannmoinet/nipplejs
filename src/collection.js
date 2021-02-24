@@ -435,8 +435,8 @@ Collection.prototype.processOnMove = function (evt) {
             let delta_y = pos.y - clamped_pos.y;
             nipple.position.x += delta_x;
             nipple.position.y += delta_y;
-            nipple.el.style.top = nipple.position.y + 'px';
-            nipple.el.style.left = nipple.position.x + 'px';
+            nipple.el.style.top = (nipple.position.y - (self.box.top + scroll.y)) + 'px';
+            nipple.el.style.left = (nipple.position.x - (self.box.left + scroll.x)) + 'px';
 
             dist = u.distance(pos, nipple.position);
         }
