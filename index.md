@@ -30,6 +30,13 @@ layout: index
   * [`options.restJoystick` defaults to true](#optionsrestjoystick-defaults-to-true)
   * [`options.restOpacity` defaults to 0.5](#optionsrestopacity-defaults-to-05)
   * [`options.catchDistance` defaults to 200](#optionscatchdistance-defaults-to-200)
+  * [`options.lockX` defaults to false](#optionslockx-defaults-to-false)
+  * [`options.lockY` defaults to false](#optionslocky-defaults-to-false)
+  * [`options.shape` defaults to 'circle'](#optionsshape-defaults-to-circle)
+    + [`'circle'`](#circle)
+    + [`'square'`](#square)
+  * [`options.dynamicPage` defaults to false](#optionsdynamicpage-defaults-to-false)
+  * [`options.follow` defaults to false](#optionsfollow-defaults-to-false)
 - [API](#api)
   * [NippleJS instance (manager)](#nipplejs-instance-manager)
     + [`manager.on(type, handler)`](#managerontype-handler)
@@ -46,6 +53,7 @@ layout: index
   * [`joystick.add()`](#joystickadd)
   * [`joystick.remove()`](#joystickremove)
   * [`joystick.destroy()`](#joystickdestroy)
+  * [`joystick.setPosition(cb, { x, y })`](#joysticksetpositioncb--x-y-)
   * [`joystick.identifier`](#joystickidentifier)
   * [`joystick.trigger(type [, data])`](#joysticktriggertype--data)
   * [`joystick.position`](#joystickposition)
@@ -66,12 +74,9 @@ layout: index
     + [`destroyed`](#destroyed)
     + [`pressure`](#pressure)
 - [Contributing](#contributing)
-    + [Commits](#commits)
-    + [Style](#style)
-    + [Workflow](#workflow)
-    + [Build](#build)
 
 <!-- tocstop -->
+
 </details>
 
 ## Install
@@ -139,8 +144,11 @@ var options = {
     restOpacity: Number,            // opacity when not 'dynamic' and rested
     lockX: Boolean,                 // only move on the X axis
     lockY: Boolean,                 // only move on the Y axis
-    catchDistance: Number           // distance to recycle previous joystick in
+    catchDistance: Number,          // distance to recycle previous joystick in
                                     // 'semi' mode
+    shape: String,                  // 'circle' or 'square'
+    dynamicPage: Boolean,           // Enable if the page has dynamically visible elements
+    follow: Boolean,                // Makes the joystick follow the thumbstick
 };
 ```
 
@@ -155,7 +163,7 @@ The dom element in which all your joysticks will be injected.
 <script type="text/javascript" src="./nipplejs.js"></script>
 <script type="text/javascript">
     var options = {
-        zone: document.getElementById('zone_joystick');
+        zone: document.getElementById('zone_joystick'),
     };
     var manager = nipplejs.create(options);
 </script>
@@ -188,14 +196,14 @@ The time it takes for joystick to fade-out and fade-in when activated or de-acti
 ### `options.multitouch` defaults to false
 Enable the multitouch capabilities.
 
-If, for reasons, you need to have multiple nipples into the same zone.
+If, for reasons, you need to have multiple nipples in the same zone.
 
-Otherwise it will only get one, and all new touches won't do a thing.
+Otherwise, it will only get one, and all new touches won't do a thing.
 
 Please note that multitouch is off when in `static` or `semi` modes.
 
 ### `options.maxNumberOfNipples` defaults to 1
-If you need to, you can also control the maximum number of instance that could be created.
+If you need to, you can also control the maximum number of instances that could be created.
 
 Obviously in a multitouch configuration.
 
@@ -225,11 +233,11 @@ Three modes are possible :
 - new joystick is created at each new touch farther than `options.catchDistance` of any previously created joystick.
 - the joystick is faded-out when released but not destroyed.
 - when touch is made **inside** the `options.catchDistance` a new direction is triggered immediately.
-- when touch is made **oustide** the `options.catchDistance` the previous joystick is destroyed and a new one is created.
+- when touch is made **outside** the `options.catchDistance` the previous joystick is destroyed and a new one is created.
 - **cannot** be multitouch.
 
 #### `'static'`
-- a joystick is positionned immediately at `options.position`.
+- a joystick is positioned immediately at `options.position`.
 - one joystick per zone.
 - each new touch triggers a new direction.
 - **cannot** be multitouch.
@@ -252,6 +260,20 @@ Locks joystick's movement to the x (horizontal) axis
 ### `options.lockY` defaults to false
 Locks joystick's movement to the y (vertical) axis
 
+### `options.shape` defaults to 'circle'
+The shape of region within which joystick can move.
+
+#### `'circle'`
+Creates circle region for joystick movement
+
+#### `'square'`
+Creates square region for joystick movement
+
+### `options.dynamicPage` defaults to false
+Enable if the page has dynamically visible elements such as for Vue, React, Angular or simply some CSS hiding or showing some DOM.
+
+### `options.follow` defaults to false
+Makes the joystick follow the thumbstick when it reaches the border.
 
 ----
 
@@ -289,7 +311,7 @@ Your manager has the following signature :
 
 #### `manager.on(type, handler)`
 
-If you whish to listen to internal events like :
+If you wish to listen to internal events like :
 
 ```javascript
 manager.on('event#1 event#2', function (evt, data) {
@@ -314,10 +336,10 @@ If you don't specify the handler but just a type, all handlers for that type wil
 
 #### `manager.get(identifier)`
 
-An helper to get an instance via its identifier.
+A helper to get an instance via its identifier.
 
 ```javascript
-// Will return the nipple instanciated by the touch identified by 0
+// Will return the nipple instantiated by the touch identified by 0
 manager.get(0);
 ```
 
@@ -351,6 +373,7 @@ Each joystick has the following signature :
     add: Function,          // inject into dom
     remove: Function,       // remove from dom
     destroy: Function,
+    setPosition: Function,
     identifier: Number,
     trigger: Function,
     position: {             // position of the center
@@ -413,6 +436,10 @@ Remove the joystick's element from the dom.
 ### `joystick.destroy()`
 
 Gently remove this nipple from the DOM and unbind all related events.
+
+### `joystick.setPosition(cb, { x, y })`
+
+Set the joystick to the specified position, where x and y are distances away from the center in pixels. This does not trigger joystick events.
 
 ### `joystick.identifier`
 
@@ -525,6 +552,17 @@ Comes with data :
     angle: {
         radian: 1.5707963268,   // angle in radian
         degree: 90
+    },
+    vector: {                   // force unit vector
+      x: 0.508,
+      y: 3.110602869834277e-17
+    },
+    raw: {                      // note: angle is the same, beyond the 50 pixel limit
+        distance: 25.4,         // distance which continues beyond the 50 pixel limit
+        position: {             // position of the finger/mouse in pixels, beyond joystick limits
+            x: 125,
+            y: 95
+        }
     },
     instance: Nipple            // the nipple instance that triggered the event
 }
