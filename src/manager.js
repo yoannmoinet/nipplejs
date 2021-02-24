@@ -11,27 +11,35 @@ function Manager (options) {
     self.ids = {};
     self.index = 0;
     self.collections = [];
+    self.scroll = u.getScroll();
 
     self.config(options);
     self.prepareCollections();
 
     // Listen for resize, to reposition every joysticks
-    var resizeTimer;
-    u.bindEvt(window, 'resize', function (evt) {
-        clearTimeout(resizeTimer);
-        resizeTimer = setTimeout(function () {
-            var pos;
-            var scroll = u.getScroll();
-            self.collections.forEach(function (collection) {
-                collection.forEach(function (nipple) {
-                    pos = nipple.el.getBoundingClientRect();
-                    nipple.position = {
-                        x: scroll.x + pos.left,
-                        y: scroll.y + pos.top
-                    };
-                });
+    var resizeHandler = function () {
+        var pos;
+        self.collections.forEach(function (collection) {
+            collection.forEach(function (nipple) {
+                pos = nipple.el.getBoundingClientRect();
+                nipple.position = {
+                    x: self.scroll.x + pos.left,
+                    y: self.scroll.y + pos.top
+                };
             });
-        }, 100);
+        });
+    };
+    u.bindEvt(window, 'resize', function () {
+        u.throttle(resizeHandler);
+    });
+
+    // Listen for scrolls, so we have a global scroll value
+    // without having to request it all the time.
+    var scrollHandler = function () {
+        self.scroll = u.getScroll();
+    };
+    u.bindEvt(window, 'scroll', function () {
+        u.throttle(scrollHandler);
     });
 
     return self.collections;

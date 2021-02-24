@@ -39,6 +39,14 @@ export const isPressed = (evt) => {
     return evt.buttons !== 0;
 };
 
+const timers = new Map();
+export const throttle = (cb) => {
+    if (timers.has(cb)) {
+        clearTimeout(timers.get(cb));
+    }
+    timers.set(cb, setTimeout(cb, 100));
+};
+
 export const bindEvt = (el, arg, handler) => {
     const types = arg.split(/[ ,]+/g);
     let type;

@@ -153,10 +153,17 @@ export interface JoystickManagerOptions {
 
     /**
      * Defaults to `circle`
-     * 
+     *
      * Sets the shape of the joystick
      */
     shape?: 'circle' | 'square';
+
+    /**
+     * Defaults to `false`
+     *
+     * Make the joystick follow the cursor beyond its limits.
+     */
+    follow?: boolean;
 }
 
 export interface Position {

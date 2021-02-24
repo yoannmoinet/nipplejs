@@ -35,7 +35,8 @@ function Collection (manager, options) {
         lockX: false,
         lockY: false,
         shape: 'circle',
-        dynamicPage: false
+        dynamicPage: false,
+        follow: false
     };
 
     self.config(options);
@@ -117,7 +118,7 @@ Collection.prototype.begin = function () {
 // Nipple Factory
 Collection.prototype.createNipple = function (position, identifier) {
     var self = this;
-    var scroll = u.getScroll();
+    var scroll = self.manager.scroll;
     var toPutOn = {};
     var opts = self.options;
 
@@ -363,6 +364,7 @@ Collection.prototype.processOnMove = function (evt) {
     var opts = self.options;
     var identifier = self.manager.getIdentifier(evt);
     var nipple = self.nipples.get(identifier);
+    var scroll = self.manager.scroll;
 
     // If we're moving without pressing
     // it's that we went out the active zone
@@ -381,11 +383,10 @@ Collection.prototype.processOnMove = function (evt) {
     }
 
     if (opts.dynamicPage) {
-        var scroll = u.getScroll();
-        pos = nipple.el.getBoundingClientRect();
+        var elBox = nipple.el.getBoundingClientRect();
         nipple.position = {
-            x: scroll.x + pos.left,
-            y: scroll.y + pos.top
+            x: scroll.x + elBox.left,
+            y: scroll.y + elBox.top
         };
     }
 
@@ -415,14 +416,34 @@ Collection.prototype.processOnMove = function (evt) {
     };
 
     // Clamp the position
-    if(nipple.options.shape === 'circle'){
+    var clamped_dist;
+    var clamped_pos;
+    if (nipple.options.shape === 'circle') {
         // Clamp to a circle
-        dist = Math.min(dist,size);
-        pos = u.findCoord(nipple.position, dist, angle);
-    }else{
+        clamped_dist = Math.min(dist, size);
+        clamped_pos = u.findCoord(nipple.position, clamped_dist, angle);
+    } else {
         // Clamp to a square
-        pos = u.clamp(pos, nipple.position, size);
-        dist = u.distance(pos, nipple.position);
+        clamped_pos = u.clamp(pos, nipple.position, size);
+        clamped_dist = u.distance(clamped_pos, nipple.position);
+    }
+
+    if (opts.follow) {
+        // follow behaviour
+        if (dist > size) {
+            let delta_x = pos.x - clamped_pos.x;
+            let delta_y = pos.y - clamped_pos.y;
+            nipple.position.x += delta_x;
+            nipple.position.y += delta_y;
+            nipple.el.style.top = (nipple.position.y - (self.box.top + scroll.y)) + 'px';
+            nipple.el.style.left = (nipple.position.x - (self.box.left + scroll.x)) + 'px';
+
+            dist = u.distance(pos, nipple.position);
+        }
+    } else {
+        // clamp behaviour
+        pos = clamped_pos;
+        dist = clamped_dist;
     }
 
     var xPosition = pos.x - nipple.position.x;
