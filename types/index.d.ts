@@ -107,7 +107,7 @@ export interface JoystickManagerOptions {
      * each new touch triggers a new direction.
      * cannot be multitouch.
      */
-    mode?: 'dynamic' | 'semi' | 'static';
+    mode?: string;
 
     /**
      * Defaults to `true`
@@ -156,7 +156,7 @@ export interface JoystickManagerOptions {
      *
      * Sets the shape of the joystick
      */
-    shape?: 'circle' | 'square';
+    shape?: string;
 
     /**
      * Defaults to `false`
