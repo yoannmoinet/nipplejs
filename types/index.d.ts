@@ -114,7 +114,7 @@ export interface JoystickManagerOptions {
      *
      * Reset the joystick’s position when it enters the rest state.
      */
-    restJoystick?: boolean;
+    restJoystick?: boolean | RestJoystickOption;
 
     /**
      * Defaults to `0.5`
@@ -164,6 +164,17 @@ export interface JoystickManagerOptions {
      * Make the joystick follow the cursor beyond its limits.
      */
     follow?: boolean;
+}
+
+export interface RestJoystickOption {
+    /**
+     * Defaults to `true`
+     */
+    x?: boolean,
+    /**
+     * Defaults to `true`
+     */
+    y?: boolean,
 }
 
 export interface Position {

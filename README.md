@@ -140,7 +140,7 @@ var options = {
     dataOnly: Boolean,              // no dom element whatsoever
     position: Object,               // preset position for 'static' mode
     mode: String,                   // 'dynamic', 'static' or 'semi'
-    restJoystick: Boolean,
+    restJoystick: Boolean|Object,   // Re-center joystick on rest state
     restOpacity: Number,            // opacity when not 'dynamic' and rested
     lockX: Boolean,                 // only move on the X axis
     lockY: Boolean,                 // only move on the Y axis
@@ -244,6 +244,29 @@ Three modes are possible :
 
 ### `options.restJoystick` defaults to true
 Reset the joystick's position when it enters the rest state.
+
+You can pass a boolean value to reset the joystick's position for both the axis.
+```js
+var joystick = nipplejs.create({
+    restJoystick: true,
+    // This is converted to {x: true, y: true}
+
+    // OR
+    restJoystick: false,
+    // This is converted to {x: false, y: false}
+});
+```
+
+Or you can pass an object to specify which axis should be reset.
+```js
+var joystick = nipplejs.create({
+    restJoystick: {x: false},
+    // This is converted to {x: false, y: true}
+
+    // OR
+    restJoystick: {x: false, y: true},
+});
+```
 
 ### `options.restOpacity` defaults to 0.5
 The opacity to apply when the joystick is in a rest position.
