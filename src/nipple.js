@@ -34,19 +34,6 @@ function Nipple (collection, options) {
         this.options.restOpacity = 0;
     }
 
-    // Convert this.option.restJoystick 
-    // to `RestJoystickOption` type.
-    const restJoystick = this.options.restJoystick;
-
-    if(typeof restJoystick === 'boolean'){
-        this.options.restJoystick = {
-            x: restJoystick,
-            y: restJoystick,
-        };
-    }else if(typeof restJoystick === 'object'){
-        this.options.restJoystick = u.safeExtend({x:true,y:true},restJoystick);
-    }
-
     this.id = Nipple.id;
     Nipple.id += 1;
     this.buildEl()
@@ -254,11 +241,15 @@ Nipple.prototype.hide = function (cb) {
         self.options.fadeTime
     );
 
+    if (self.options.restJoystick) {
+        const rest = self.options.restJoystick;
+        const newPosition = {};
 
-    self.setPosition(cb, { 
-        x: self.options.restJoystick.x ?0 :self.instance.frontPosition.x, 
-        y: self.options.restJoystick.y ?0 :self.instance.frontPosition.y 
-    });
+        newPosition.x = rest === true || rest.x !== false ? 0 : self.instance.frontPosition.x;
+        newPosition.y = rest === true || rest.y !== false ? 0 : self.instance.frontPosition.y;
+
+        self.setPosition(cb, newPosition);
+    }
 
     return self;
 };

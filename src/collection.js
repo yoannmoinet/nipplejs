@@ -50,19 +50,6 @@ function Collection (manager, options) {
         self.options.maxNumberOfNipples = 1;
     }
 
-    // Convert this.option.restJoystick 
-    // to `RestJoystickOption` type.
-    const restJoystick = this.options.restJoystick;
-
-    if(typeof restJoystick === 'boolean'){
-        this.options.restJoystick = {
-            x: restJoystick,
-            y: restJoystick,
-        };
-    }else if(typeof restJoystick === 'object'){
-        this.options.restJoystick = u.safeExtend({x:true,y:true},restJoystick);
-    }
-
     self.updateBox();
     self.prepareNipples();
     self.bindings();
