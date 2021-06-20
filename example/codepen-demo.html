@@ -239,7 +239,7 @@
             createNipple('dynamic');
 
             function bindNipple () {
-                joystick.on('start end', function (evt, data) {
+                joystick.on(['start', 'end'], function (evt, data) {
                     dump(evt.type);
                     debug(data);
                 }).on('move', function (evt, data) {
