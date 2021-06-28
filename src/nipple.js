@@ -240,8 +240,15 @@ Nipple.prototype.hide = function (cb) {
         },
         self.options.fadeTime
     );
+
     if (self.options.restJoystick) {
-        self.setPosition(cb, { x: 0, y: 0 });
+        const rest = self.options.restJoystick;
+        const newPosition = {};
+
+        newPosition.x = rest === true || rest.x !== false ? 0 : self.instance.frontPosition.x;
+        newPosition.y = rest === true || rest.y !== false ? 0 : self.instance.frontPosition.y;
+
+        self.setPosition(cb, newPosition);
     }
 
     return self;
