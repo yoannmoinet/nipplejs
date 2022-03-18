@@ -49,6 +49,10 @@ function Collection (manager, options) {
     if (!self.options.multitouch) {
         self.options.maxNumberOfNipples = 1;
     }
+    const computedStyle = getComputedStyle(self.options.zone.parentElement);
+    if (computedStyle && computedStyle.display === 'flex') {
+        self.parentIsFlex = true;
+    }
 
     self.updateBox();
     self.prepareNipples();
@@ -121,13 +125,15 @@ Collection.prototype.createNipple = function (position, identifier) {
     var scroll = self.manager.scroll;
     var toPutOn = {};
     var opts = self.options;
+    var offset = {
+        x: self.parentIsFlex ? scroll.x : (scroll.x + self.box.left),
+        y: self.parentIsFlex ? scroll.y : (scroll.y + self.box.top)
+    };
 
     if (position.x && position.y) {
         toPutOn = {
-            x: position.x -
-                (scroll.x + self.box.left),
-            y: position.y -
-                (scroll.y + self.box.top)
+            x: position.x - offset.x,
+            y: position.y - offset.y
         };
     } else if (
         position.top ||

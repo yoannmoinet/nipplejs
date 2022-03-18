@@ -331,6 +331,7 @@ export interface Collection {
     manager: JoystickManager;
     id: number;
     defaults: JoystickManagerOptions;
+    parentIsFlex: boolean;
 }
 
 export interface Joystick {
