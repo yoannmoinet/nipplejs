@@ -1,3 +1,17 @@
+## [0.9.1](https://github.com/yoannmoinet/nipplejs/compare/v0.9.0...v0.9.1) (2022-03-26)
+
+
+### Bug Fixes
+
+* **zone:** handle offset when parent is flex ([#182](https://github.com/yoannmoinet/nipplejs/issues/182)) ([ef9ec5a](https://github.com/yoannmoinet/nipplejs/commit/ef9ec5a7ca2680ad233b4d7fccc71f6c025aca50))
+
+
+### Features
+
+* **improvement:** restJoystick now accepts an object ([#162](https://github.com/yoannmoinet/nipplejs/issues/162)) ([ce3a67d](https://github.com/yoannmoinet/nipplejs/commit/ce3a67dbfa7b64c5de9ff4a74c008d46e42f5194))
+
+
+
 # [0.9.0](https://github.com/yoannmoinet/nipplejs/compare/v0.8.7...v0.9.0) (2021-02-24)
 
 
