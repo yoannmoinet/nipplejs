@@ -129,7 +129,7 @@ Nipple.prototype.stylize = function () {
         marginTop: -this.options.size / 4 + 'px',
         background: this.options.color,
         'opacity': '.5',
-        transform: undefined,
+        transform: 'translate(0px, 0px)'
     };
 
     u.extend(styles.el, transitStyle);
@@ -270,7 +270,7 @@ Nipple.prototype.setPosition = function (cb, position) {
 
     var styles = {front: {}};
     styles.front = {
-        transform: 'translate(' + self.frontPosition.x + 'px,' + self.frontPosition.y + 'px)',
+        transform: 'translate(' + self.frontPosition.x + 'px,' + self.frontPosition.y + 'px)'
     };
 
     self.applyStyles(transitStyle);
