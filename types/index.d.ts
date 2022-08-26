@@ -349,6 +349,7 @@ export interface Joystick {
     add(): void;
     remove(): void;
     destroy(): void;
+    setPosition(cb: (joystick: Joystick) => void, position: Position): void;
     identifier: number;
     trigger(
         type: JoystickEventTypes | JoystickEventTypes[],
