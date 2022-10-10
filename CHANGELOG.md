@@ -1,3 +1,13 @@
+# [0.10.0](https://github.com/yoannmoinet/nipplejs/compare/v0.9.1...v0.10.0) (2022-10-10)
+
+
+### Bug Fixes
+
+* missing type for `setPosition` ([#194](https://github.com/yoannmoinet/nipplejs/issues/194)) ([3a2e495](https://github.com/yoannmoinet/nipplejs/commit/3a2e495873ae786d1502e759b2dcaa17a3bc0835))
+* use transform translate for nipple front ([#187](https://github.com/yoannmoinet/nipplejs/issues/187)) ([52e5bd2](https://github.com/yoannmoinet/nipplejs/commit/52e5bd2c5498328478ab2e5db2c65714f5a93f53))
+
+
+
 ## [0.9.1](https://github.com/yoannmoinet/nipplejs/compare/v0.9.0...v0.9.1) (2022-03-26)
 
 
