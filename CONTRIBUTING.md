@@ -19,4 +19,4 @@ You can use the available scripts if needed.
         - [./example/codepen-demo.html](http://localhost:9000/example/codepen-demo.html)
         - [./example/dual-joysticks.html](http://localhost:9000/example/dual-joysticks.html)
         - [./example/lock-axes.html](http://localhost:9000/example/lock-axes.html)
-- `npm test` will test using CasperJS, you have to run `npm start` in another window to have a local server available to CasperJS.
+- `npm test` will test using CasperJS, you have to run `npm start` in another window to have a local server available to CasperJS. You need to install CasperJS and PhantomJS globally for it to run `npm install -g casperjs phantomjs`
