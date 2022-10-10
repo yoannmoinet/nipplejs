@@ -5,7 +5,7 @@ var u = require('utils');
 var NB_TESTS = 10;
 var nippleIndex = 0;
 var collectionIndex = 0;
-var showClientLog = false;
+var showClientLog = true;
 
 /*
     CONFIGURE CASPER
