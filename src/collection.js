@@ -461,7 +461,7 @@ Collection.prototype.processOnMove = function (evt) {
     };
 
     if (!opts.dataOnly) {
-        u.applyPosition(nipple.ui.front, nipple.frontPosition);
+        nipple.ui.front.style.transform = 'translate(' + xPosition + 'px,' + yPosition + 'px)';
     }
 
     // Prepare event's datas.
