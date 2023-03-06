@@ -320,6 +320,8 @@ export class JoystickManager {
     ): void;
     get(identifier: number): Joystick;
     destroy(): void;
+    ids: number[];
+    id: number;
 }
 
 export interface Collection {
