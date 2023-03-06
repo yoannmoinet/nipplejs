@@ -182,16 +182,18 @@ export interface Position {
     y: number;
 }
 
+export interface Direction {
+    angle: 'up' | 'down' | 'right' | 'left';
+    x: 'left' | 'right';
+    y: 'up' | 'down';
+}
+
 export interface JoystickOutputData {
     angle: {
         degree: number;
         radian: number;
     };
-    direction: {
-        angle: string;
-        x: string;
-        y: string;
-    };
+    direction: Direction;
     vector: {
         x: number;
         y: number;
