@@ -1,3 +1,12 @@
+## [0.10.1](https://github.com/yoannmoinet/nipplejs/compare/v0.10.0...v0.10.1) (2023-03-06)
+
+
+### Bug Fixes
+
+* **manager:** add `ids` & `id` to types ([#207](https://github.com/yoannmoinet/nipplejs/issues/207)) ([6b7b6dc](https://github.com/yoannmoinet/nipplejs/commit/6b7b6dceb7e876fbc0f3c12b8e7e9069353079cf))
+
+
+
 # [0.10.0](https://github.com/yoannmoinet/nipplejs/compare/v0.9.1...v0.10.0) (2022-10-10)
 
 
