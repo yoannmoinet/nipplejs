@@ -47,7 +47,7 @@ function Super () {}
 // Basic event system.
 Super.prototype.on = function (arg, cb) {
     var self = this;
-    var types = arg.split(/[ ,]+/g);
+    var types = Array.isArray(arg) ? arg: arg.split(/[ ,]+/g);
     var type;
     self._handlers_ = self._handlers_ || {};
 
