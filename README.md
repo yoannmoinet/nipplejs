@@ -345,6 +345,13 @@ manager.on('event#1 event#2', function (evt, data) {
 Note that you can listen to multiple events at once by separating
 them either with a space or a comma (or both, I don't care).
 
+You can also separate events in an array.
+```javascript
+manager.on(['event#1', 'event#2'], function (evt, data) {
+    // Do something.
+});
+```
+
 #### `manager.off([type, handler])`
 
 To remove an event handler :
