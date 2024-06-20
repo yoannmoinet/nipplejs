@@ -266,6 +266,16 @@ Collection.prototype.onstart = function (evt) {
                 self.processOnStart(touch);
             }
         }
+        else if (opts.maxNumberOfNipples === 1 && origEvt.type.match(/^pointer/)) {
+            Object.keys(self.manager.ids).forEach(function(k){
+                var e = [evt[0]];
+                e.pointerId = k;
+                self.processOnEnd(e);
+            });
+            if(self.actives.length < opts.maxNumberOfNipples){
+                self.processOnStart(touch);
+            }
+        }
     };
 
     u.map(evt, process);
