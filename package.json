@@ -1,53 +1,53 @@
 {
-  "version": "0.10.2",
-  "name": "nipplejs",
-  "description": "A virtual joystick for touch capable interfaces",
-  "author": "Yoann Moinet <yo@nnmoi.net> (https://yoannmoi.net)",
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/yoannmoinet/nipplejs.git"
-  },
-  "bugs": {
-    "url": "https://github.com/yoannmoinet/nipplejs/issues"
-  },
-  "files": [
-    "dist/*",
-    "src/*",
-    "types/*"
-  ],
-  "homepage": "https://github.com/yoannmoinet/nipplejs",
-  "main": "./dist/nipplejs.js",
-  "browser": "./dist/nipplejs.js",
-  "module": "./src/index.js",
-  "types": "./types/index.d.ts",
-  "directories": {
-    "lib": "src",
-    "test": "test",
-    "example": "example"
-  },
-  "scripts": {
-    "postversion": "npm run changelog",
-    "prepack": "NODE_ENV=production npm run build",
-    "build": "webpack --config webpack.config.js",
-    "build:dev": "webpack-dev-server --config webpack.config.js",
-    "test": "casperjs test ./test/nipplejs.casper.js",
-    "changelog": "node ./bin/changelog.js",
-    "start": "npm run build:dev -- --progress --watch",
-    "toc": "markdown-toc -i README.md",
-    "copyGh": "node ./bin/copyToGhPages.js"
-  },
-  "devDependencies": {
-    "@babel/core": "7.5.5",
-    "@babel/preset-env": "7.5.5",
-    "babel-loader": "8.0.6",
-    "babel-plugin-add-module-exports": "1.0.2",
-    "conventional-changelog": "3.1.24",
-    "eslint": "5.10.0",
-    "eslint-loader": "2.2.1",
-    "markdown-toc": "1.2.0",
-    "webpack": "4.39.2",
-    "webpack-cli": "3.3.7",
-    "webpack-dev-server": "4.11.1"
-  }
+    "name": "@nipple/root",
+    "private": true,
+    "version": "0.0.0",
+    "description": "Root of NippleJS.",
+    "author": "Yoann Moinet <yo@nnmoi.net> (https://yoannmoi.net)",
+    "license": "MIT",
+    "homepage": "https://yoannmoinet.github.io/nipplejs",
+    "repository": "git://github.com/yoannmoinet/nipplejs.git",
+    "bugs": {
+        "url": "https://github.com/yoannmoinet/nipplejs/issues"
+    },
+    "workspaces": [
+        "packages/*"
+    ],
+    "volta": {
+        "node": "22.14.0",
+        "yarn": "1.22.19"
+    },
+    "scripts": {
+        "build:all": "yarn loop run build",
+        "clean:all": "yarn loop run clean",
+        "cli": "yarn workspace @nipple/tools cli",
+        "format": "yarn lint --fix",
+        "lint": "eslint ./packages/**/*.{ts,js} --quiet",
+        "loop": "yarn workspaces foreach -Apti --exclude \"@nipple/root\"",
+        "typecheck:all": "yarn workspaces foreach -Apti run typecheck",
+        "version:all": "yarn loop version --deferred ${0} && yarn version apply --all",
+        "watch:all": "yarn loop run watch"
+    },
+    "husky": {
+        "hooks": {
+            "pre-commit": "DISABLE_SPINNER=true lint-staged"
+        }
+    },
+    "devDependencies": {
+        "@types/node": "^22",
+        "@typescript-eslint/eslint-plugin": "7.5.0",
+        "@typescript-eslint/parser": "7.5.0",
+        "eslint": "8.57.0",
+        "eslint-config-prettier": "9.1.0",
+        "eslint-import-resolver-node": "0.3.9",
+        "eslint-import-resolver-typescript": "3.6.1",
+        "eslint-plugin-arca": "0.16.0",
+        "eslint-plugin-import": "2.29.1",
+        "eslint-plugin-prettier": "5.1.3",
+        "husky": "4.2.5",
+        "lint-staged": "10.2.0",
+        "prettier": "3.2.5",
+        "typescript": "5.4.3"
+    },
+    "packageManager": "yarn@4.6.0"
 }

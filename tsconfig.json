@@ -1,0 +1,22 @@
+{
+    "compilerOptions": {
+        "allowImportingTsExtensions": true,
+        "allowSyntheticDefaultImports": true,
+        "baseUrl": "./",
+        "declaration": true,
+        "esModuleInterop": true,
+        "lib": ["es2022"],
+        "module": "preserve",
+        "moduleResolution": "bundler",
+        "noEmit": true,
+        "noImplicitAny": true,
+        "resolveJsonModule": true,
+        "rootDir": "./",
+        "skipLibCheck": true,
+        "sourceMap": true,
+        "strict": true,
+        "target": "es6"
+    },
+    "include": ["**/*"],
+    "exclude": ["dist", "node_modules"]
+}

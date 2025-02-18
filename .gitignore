@@ -1,4 +1,11 @@
+yarn-error.log
+.yarn/*
+!.yarn/cache
+!.yarn/patches
+!.yarn/releases
+!.yarn/plugins
+!.vscode
+
+.DS_Store
 node_modules/
 dist/
-.vscode
-.DS_Store

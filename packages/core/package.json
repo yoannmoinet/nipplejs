@@ -1,0 +1,33 @@
+{
+    "name": "@nipple/core",
+    "packageManager": "yarn@4.0.2",
+    "private": true,
+    "license": "MIT",
+    "author": "yoannmoinet",
+    "description": "Core modules for NippleJS.",
+    "homepage": "https://github.com/yoannmoinet/nipplejs/tree/main/packages/core#readme",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/yoannmoinet/nipplejs",
+        "directory": "packages/core"
+    },
+    "exports": {
+        "./*": "./src/*.ts"
+    },
+    "scripts": {
+        "build": "yarn clean && tsc",
+        "clean": "rm -rf dist",
+        "typecheck": "tsc --noEmit"
+    },
+    "dependencies": {
+        "async-retry": "1.3.3",
+        "chalk": "2.3.1",
+        "glob": "11.0.0"
+    },
+    "devDependencies": {
+        "@types/async-retry": "1.4.8",
+        "@types/chalk": "2.2.0",
+        "@types/node": "^22",
+        "typescript": "5.4.3"
+    }
+}

@@ -1,0 +1,17 @@
+{
+    "name": "@nipple/examples",
+    "packageManager": "yarn@4.0.2",
+    "private": true,
+    "license": "MIT",
+    "author": "Yoann Moinet <yo@nnmoi.net> (https://yoannmoi.net)",
+    "description": "Examples for NippleJS.",
+    "homepage": "https://github.com/yoannmoinet/nipplejs/tree/main/packages/examples#readme",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/yoannmoinet/nipplejs",
+        "directory": "packages/examples"
+    },
+    "exports": {
+        "./*": "./src/*.ts"
+    }
+}
