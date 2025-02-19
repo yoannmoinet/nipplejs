@@ -1,0 +1,52 @@
+# https://aider.chat/docs/config/aider_conf.html
+
+## Use colors suitable for a dark terminal background (default: False)
+dark-mode: true
+
+## Specify the model to use for the main chat
+model: mistral/codestral-latest
+
+alias:
+- "mistral:mistral/codestral-latest"
+
+## Enable/disable pretty, colorized output (default: True)
+pretty: true
+
+## Enable/disable streaming responses (default: True)
+stream: true
+
+# https://pygments.org/styles
+code-theme: one-dark
+
+## Show diffs when committing changes (default: False)
+show-diffs: true
+
+## Enable/disable auto commit of LLM changes (default: True)
+auto-commits: false
+
+## Enable/disable watching files for ai coding comments (default: False)
+watch-files: true
+
+## Specify lint commands to run for different languages, eg: "python: flake8 --select=..." (can be used multiple times)
+lint-cmd: yarn format
+
+## Enable/disable automatic linting after changes (default: True)
+auto-lint: true
+
+## Specify command to run tests
+test-cmd: yarn test:unit
+
+## Permanently disable analytics
+analytics-disable: true
+
+## Run aider in your browser (default: False)
+# gui: true
+
+## Specify the language for voice using ISO 639-1 code (default: auto)
+voice-language: fr
+
+## Specify the language to use in the chat (default: None, uses system settings)
+chat-language: fr
+
+## Enable/disable multi-line input mode with Meta-Enter to submit (default: False)
+# multiline: true
