@@ -202,7 +202,7 @@ module.exports = {
                 allowAfterThis: true,
                 allowAfterSuper: false,
                 enforceInMethodNames: false,
-                allow: ['_chunks'],
+                allow: ['_handlers_', '_domHandlers_', '_found_'],
             },
         ],
         'no-unneeded-ternary': [

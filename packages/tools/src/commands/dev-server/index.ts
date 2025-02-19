@@ -19,8 +19,7 @@ const MIME_TYPES = {
 } as const;
 
 // Some context to use for templating content with {{something}}.
-const CONTEXT: Record<string, readonly string[]> = {
-};
+const CONTEXT: Record<string, readonly string[]> = {};
 
 // Templating regex.
 const INTERPOLATE_RX = /{{([\s\S]+?)}}/g;

@@ -5,5 +5,5 @@ export default {
     create: function (options) {
         return factory.create(options);
     },
-    factory: factory
+    factory: factory,
 };

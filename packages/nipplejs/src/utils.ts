@@ -1,12 +1,12 @@
-///////////////////////
-///      UTILS      ///
-///////////////////////
+// /////////////////////
+// /      UTILS      ///
+// /////////////////////
 
 export const distance = (p1, p2) => {
     const dx = p2.x - p1.x;
     const dy = p2.y - p1.y;
 
-    return Math.sqrt((dx * dx) + (dy * dy));
+    return Math.sqrt(dx * dx + dy * dy);
 };
 
 export const angle = (p1, p2) => {
@@ -17,7 +17,7 @@ export const angle = (p1, p2) => {
 };
 
 export const findCoord = (p, d, a) => {
-    const b = {x: 0, y: 0};
+    const b = { x: 0, y: 0 };
     a = radians(a);
     b.x = p.x - d * Math.cos(a);
     b.y = p.y - d * Math.sin(a);
@@ -84,18 +84,18 @@ export const prepareEvent = (evt) => {
 };
 
 export const getScroll = () => {
-    const x = (window.pageXOffset !== undefined) ?
-        window.pageXOffset :
-        (document.documentElement || document.body.parentNode || document.body)
-            .scrollLeft;
+    const x =
+        window.pageXOffset !== undefined
+            ? window.pageXOffset
+            : (document.documentElement || document.body.parentNode || document.body).scrollLeft;
 
-    const y = (window.pageYOffset !== undefined) ?
-        window.pageYOffset :
-        (document.documentElement || document.body.parentNode || document.body)
-            .scrollTop;
+    const y =
+        window.pageYOffset !== undefined
+            ? window.pageYOffset
+            : (document.documentElement || document.body.parentNode || document.body).scrollTop;
     return {
-        x: x,
-        y: y
+        x,
+        y,
     };
 };
 
@@ -106,21 +106,21 @@ export const applyPosition = (el, pos) => {
         el.style.bottom = pos.bottom;
         el.style.left = pos.left;
     } else {
-        el.style.left = pos.x + 'px';
-        el.style.top = pos.y + 'px';
+        el.style.left = `${pos.x}px`;
+        el.style.top = `${pos.y}px`;
     }
 };
 
 export const getTransitionStyle = (property, values, time) => {
     const obj = configStylePropertyObject(property);
-    for (let i in obj) {
+    for (const i in obj) {
         if (obj.hasOwnProperty(i)) {
             if (typeof values === 'string') {
-                obj[i] = values + ' ' + time;
+                obj[i] = `${values} ${time}`;
             } else {
                 let st = '';
                 for (let j = 0, max = values.length; j < max; j += 1) {
-                    st += values[j] + ' ' + time + ', ';
+                    st += `${values[j]} ${time}, `;
                 }
                 obj[i] = st.slice(0, -2);
             }
@@ -131,7 +131,7 @@ export const getTransitionStyle = (property, values, time) => {
 
 export const getVendorStyle = (property, value) => {
     const obj = configStylePropertyObject(property);
-    for (let i in obj) {
+    for (const i in obj) {
         if (obj.hasOwnProperty(i)) {
             obj[i] = value;
         }
@@ -150,7 +150,7 @@ export const configStylePropertyObject = (prop) => {
 };
 
 export const extend = (objA, objB) => {
-    for (let i in objB) {
+    for (const i in objB) {
         if (objB.hasOwnProperty(i)) {
             objA[i] = objB[i];
         }
@@ -161,7 +161,7 @@ export const extend = (objA, objB) => {
 // Overwrite only what's already present
 export const safeExtend = (objA, objB) => {
     const obj = {};
-    for (let i in objA) {
+    for (const i in objA) {
         if (objA.hasOwnProperty(i) && objB.hasOwnProperty(i)) {
             obj[i] = objB[i];
         } else if (objA.hasOwnProperty(i)) {
@@ -187,5 +187,5 @@ export const clamp = (pos, nipplePos, size) => ({
     //                          left-clamping        right-clamping
     x: Math.min(Math.max(pos.x, nipplePos.x - size), nipplePos.x + size),
     //                          top-clamping         bottom-clamping
-    y: Math.min(Math.max(pos.y, nipplePos.y - size), nipplePos.y + size)
+    y: Math.min(Math.max(pos.y, nipplePos.y - size), nipplePos.y + size),
 });

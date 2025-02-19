@@ -5,17 +5,9 @@ const fs = require('fs');
 const isWin = /^win/.test(process.platform);
 const mv = isWin ? 'move' : 'mv';
 
-queue([
-    stash,
-    checkoutPage,
-    importReadme,
-    modifyFile,
-    commit,
-    push,
-    checkoutMaster
-]);
+queue([stash, checkoutPage, importReadme, modifyFile, commit, push, checkoutMaster]);
 
-function queue (fns) {
+function queue(fns) {
     // Execute and remove the first function.
     const fn = fns.shift();
     fn((err) => {
@@ -30,32 +22,35 @@ function queue (fns) {
             }
         } else {
             // We log if we have an error.
-            console.error(fn.name + ': ', err);
+            console.error(`${fn.name}: `, err);
             process.exit(1);
         }
     });
 }
 
-function stash (next) {
+function stash(next) {
     console.log('- stash changes');
     exec('git stash', next);
 }
 
-function checkoutPage (next) {
+function checkoutPage(next) {
     console.log(' - checkout gh-pages.');
     exec('git checkout gh-pages', next);
 }
 
-function importReadme (next) {
+function importReadme(next) {
     console.log(' - checkout README from master and rename it to index.md');
-    exec(`
+    exec(
+        `
 git checkout master -- README.md &&
 git reset README.md &&
 ${mv} README.md index.md
-    `, next);
+    `,
+        next,
+    );
 }
 
-function modifyFile (next) {
+function modifyFile(next) {
     console.log(' - reading the new index.md');
     fs.readFile('index.md', (err, data) => {
         if (err) {
@@ -69,20 +64,23 @@ function modifyFile (next) {
     });
 }
 
-function commit (next) {
+function commit(next) {
     console.log(' - commit latest doc to gh-pages');
-    exec(`
+    exec(
+        `
 git add index.md &&
 git commit -m "chore: sync from master"
-    `, next);
+    `,
+        next,
+    );
 }
 
-function push (next) {
+function push(next) {
     console.log(' - push latest doc to gh-pages');
     exec('git push origin gh-pages', next);
 }
 
-function checkoutMaster (next) {
+function checkoutMaster(next) {
     console.log(' - checkout master.');
     exec('git checkout master', next);
 }

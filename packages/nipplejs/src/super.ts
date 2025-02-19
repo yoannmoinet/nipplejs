@@ -1,36 +1,37 @@
-///////////////////////
-///   SUPER CLASS   ///
-///////////////////////
+// /////////////////////
+// /   SUPER CLASS   ///
+// /////////////////////
 import * as u from './utils';
 
 // Constants
-var isTouch = !!('ontouchstart' in window);
-var isPointer = window.PointerEvent ? true : false;
-var isMSPointer = window.MSPointerEvent ? true : false;
-var events = {
+const isTouch = !!('ontouchstart' in window);
+const isPointer = !!window.PointerEvent;
+// @ts-expect-error - TS doesn't know about MSPointerEvent
+const isMSPointer = !!window.MSPointerEvent;
+const events = {
     touch: {
         start: 'touchstart',
         move: 'touchmove',
-        end: 'touchend, touchcancel'
+        end: 'touchend, touchcancel',
     },
     mouse: {
         start: 'mousedown',
         move: 'mousemove',
-        end: 'mouseup'
+        end: 'mouseup',
     },
     pointer: {
         start: 'pointerdown',
         move: 'pointermove',
-        end: 'pointerup, pointercancel'
+        end: 'pointerup, pointercancel',
     },
     MSPointer: {
         start: 'MSPointerDown',
         move: 'MSPointerMove',
-        end: 'MSPointerUp'
-    }
+        end: 'MSPointerUp',
+    },
 };
-var toBind;
-var secondBind = {};
+let toBind;
+let secondBind = {};
 if (isPointer) {
     toBind = events.pointer;
 } else if (isMSPointer) {
@@ -42,16 +43,16 @@ if (isPointer) {
     toBind = events.mouse;
 }
 
-function Super () {}
+function Super() {}
 
 // Basic event system.
 Super.prototype.on = function (arg, cb) {
-    var self = this;
-    var types = arg.split(/[ ,]+/g);
-    var type;
+    const self = this;
+    const types = arg.split(/[ ,]+/g);
+    let type;
     self._handlers_ = self._handlers_ || {};
 
-    for (var i = 0; i < types.length; i += 1) {
+    for (let i = 0; i < types.length; i += 1) {
         type = types[i];
         self._handlers_[type] = self._handlers_[type] || [];
         self._handlers_[type].push(cb);
@@ -60,15 +61,14 @@ Super.prototype.on = function (arg, cb) {
 };
 
 Super.prototype.off = function (type, cb) {
-    var self = this;
+    const self = this;
     self._handlers_ = self._handlers_ || {};
 
     if (type === undefined) {
         self._handlers_ = {};
     } else if (cb === undefined) {
         self._handlers_[type] = null;
-    } else if (self._handlers_[type] &&
-            self._handlers_[type].indexOf(cb) >= 0) {
+    } else if (self._handlers_[type] && self._handlers_[type].indexOf(cb) >= 0) {
         self._handlers_[type].splice(self._handlers_[type].indexOf(cb), 1);
     }
 
@@ -76,19 +76,23 @@ Super.prototype.off = function (type, cb) {
 };
 
 Super.prototype.trigger = function (arg, data) {
-    var self = this;
-    var types = arg.split(/[ ,]+/g);
-    var type;
+    const self = this;
+    const types = arg.split(/[ ,]+/g);
+    let type;
     self._handlers_ = self._handlers_ || {};
 
-    for (var i = 0; i < types.length; i += 1) {
+    for (let i = 0; i < types.length; i += 1) {
         type = types[i];
         if (self._handlers_[type] && self._handlers_[type].length) {
             self._handlers_[type].forEach(function (handler) {
-                handler.call(self, {
-                    type: type,
-                    target: self
-                }, data);
+                handler.call(
+                    self,
+                    {
+                        type,
+                        target: self,
+                    },
+                    data,
+                );
             });
         }
     }
@@ -96,7 +100,7 @@ Super.prototype.trigger = function (arg, data) {
 
 // Configuration
 Super.prototype.config = function (options) {
-    var self = this;
+    const self = this;
     self.options = self.defaults || {};
     if (options) {
         self.options = u.safeExtend(self.options, options);
@@ -105,15 +109,15 @@ Super.prototype.config = function (options) {
 
 // Bind internal events.
 Super.prototype.bindEvt = function (el, type) {
-    var self = this;
+    const self = this;
     self._domHandlers_ = self._domHandlers_ || {};
 
     self._domHandlers_[type] = function () {
-        if (typeof self['on' + type] === 'function') {
-            self['on' + type].apply(self, arguments);
+        if (typeof self[`on${type}`] === 'function') {
+            self[`on${type}`].apply(self, arguments);
         } else {
             // eslint-disable-next-line no-console
-            console.warn('[WARNING] : Missing "on' + type + '" handler.');
+            console.warn(`[WARNING] : Missing "on${type}" handler.`);
         }
     };
 
@@ -129,7 +133,7 @@ Super.prototype.bindEvt = function (el, type) {
 
 // Unbind dom events.
 Super.prototype.unbindEvt = function (el, type) {
-    var self = this;
+    const self = this;
     self._domHandlers_ = self._domHandlers_ || {};
 
     u.unbindEvt(el, toBind[type], self._domHandlers_[type]);

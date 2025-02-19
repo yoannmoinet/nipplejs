@@ -92,7 +92,7 @@ export const runAutoFixes = async () => {
         {
             cmd: 'yarn',
             args: ['format'],
-        }
+        },
     ];
 
     for (const { cmd, args } of commands) {

@@ -1,15 +1,14 @@
 // Unless explicitly stated otherwise all files in this repository are licensed under the MIT License.
 // This product includes software developed at Datadog (https://www.datadoghq.com/).
 // Copyright 2019-Present Datadog, Inc.
-
 import { mkdir, rm } from '@nipple/core/helpers';
 import { dim } from '@nipple/tools/helpers';
 import commonjs from '@rollup/plugin-commonjs';
 import { nodeResolve } from '@rollup/plugin-node-resolve';
 import fs from 'fs';
 import path from 'path';
-import { RollupOptions, RollupOutput } from 'rollup';
 import esbuild from 'rollup-plugin-esbuild';
+import type { RollupOptions, RollupOutput } from 'rollup';
 
 type BundlerConfig = {
     workingDir: string;
@@ -28,11 +27,7 @@ const configRollup = (config: BundlerConfig): RollupOptions => {
 
     return {
         input,
-        plugins: [
-            esbuild(),
-            commonjs(),
-            nodeResolve({ preferBuiltins: true, browser: true }),
-        ],
+        plugins: [esbuild(), commonjs(), nodeResolve({ preferBuiltins: true, browser: true })],
         onwarn: (warning, handler) => {
             if (
                 !/Circular dependency:/.test(warning.message) &&
@@ -152,10 +147,7 @@ const waitForBuild = async (projectDir: string): Promise<{ built: boolean; error
 // Wait for the build to be done.
 // Note: This is to be used in a beforeAll hook,
 // so all the workers can use the same build of a given suite.
-export const verifyProjectBuild = async (
-    source: string,
-    destination: string,
-) => {
+export const verifyProjectBuild = async (source: string, destination: string) => {
     // Wait a random time to avoid conflicts.
     await new Promise<void>((resolve) => setTimeout(resolve, Math.floor(Math.random() * 500)));
 

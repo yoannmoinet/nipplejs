@@ -2,12 +2,12 @@ import Nipple from './nipple';
 import Super from './super';
 import * as u from './utils';
 
-///////////////////////////
-///   THE COLLECTION    ///
-///////////////////////////
+// /////////////////////////
+// /   THE COLLECTION    ///
+// /////////////////////////
 
-function Collection (manager, options) {
-    var self = this;
+function Collection(manager, options) {
+    const self = this;
     self.nipples = [];
     self.idles = [];
     self.actives = [];
@@ -23,7 +23,7 @@ function Collection (manager, options) {
         multitouch: false,
         maxNumberOfNipples: 10,
         mode: 'dynamic',
-        position: {top: 0, left: 0},
+        position: { top: 0, left: 0 },
         catchDistance: 200,
         size: 100,
         threshold: 0.1,
@@ -36,7 +36,7 @@ function Collection (manager, options) {
         lockY: false,
         shape: 'circle',
         dynamicPage: false,
-        follow: false
+        follow: false,
     };
 
     self.config(options);
@@ -67,8 +67,8 @@ Collection.constructor = Collection;
 Collection.id = 0;
 
 Collection.prototype.prepareNipples = function () {
-    var self = this;
-    var nips = self.nipples;
+    const self = this;
+    const nips = self.nipples;
 
     // Public API Preparation.
     nips.on = self.on.bind(self);
@@ -83,7 +83,7 @@ Collection.prototype.prepareNipples = function () {
         if (id === undefined) {
             return nips[0];
         }
-        for (var i = 0, max = nips.length; i < max; i += 1) {
+        for (let i = 0, max = nips.length; i < max; i += 1) {
             if (nips[i].identifier === id) {
                 return nips[i];
             }
@@ -93,7 +93,7 @@ Collection.prototype.prepareNipples = function () {
 };
 
 Collection.prototype.bindings = function () {
-    var self = this;
+    const self = this;
     // Touch start event.
     self.bindEvt(self.options.zone, 'start');
     // Avoid native touch actions (scroll, zoom etc...) on the zone.
@@ -102,16 +102,13 @@ Collection.prototype.bindings = function () {
 };
 
 Collection.prototype.begin = function () {
-    var self = this;
-    var opts = self.options;
+    const self = this;
+    const opts = self.options;
 
     // We place our static nipple
     // if needed.
     if (opts.mode === 'static') {
-        var nipple = self.createNipple(
-            opts.position,
-            self.manager.getIdentifier()
-        );
+        const nipple = self.createNipple(opts.position, self.manager.getIdentifier());
         // Add it to the dom.
         nipple.add();
         // Store it in idles.
@@ -121,29 +118,23 @@ Collection.prototype.begin = function () {
 
 // Nipple Factory
 Collection.prototype.createNipple = function (position, identifier) {
-    var self = this;
-    var scroll = self.manager.scroll;
-    var toPutOn = {};
-    var opts = self.options;
-    var offset = {
-        x: self.parentIsFlex ? scroll.x : (scroll.x + self.box.left),
-        y: self.parentIsFlex ? scroll.y : (scroll.y + self.box.top)
+    const self = this;
+    const scroll = self.manager.scroll;
+    let toPutOn = {};
+    const opts = self.options;
+    const offset = {
+        x: self.parentIsFlex ? scroll.x : scroll.x + self.box.left,
+        y: self.parentIsFlex ? scroll.y : scroll.y + self.box.top,
     };
 
     if (position.x && position.y) {
         toPutOn = {
             x: position.x - offset.x,
-            y: position.y - offset.y
+            y: position.y - offset.y,
         };
-    } else if (
-        position.top ||
-        position.right ||
-        position.bottom ||
-        position.left
-    ) {
-
+    } else if (position.top || position.right || position.bottom || position.left) {
         // We need to compute the position X / Y of the joystick.
-        var dumb = document.createElement('DIV');
+        const dumb = document.createElement('DIV');
         dumb.style.display = 'hidden';
         dumb.style.top = position.top;
         dumb.style.right = position.right;
@@ -152,17 +143,17 @@ Collection.prototype.createNipple = function (position, identifier) {
         dumb.style.position = 'absolute';
 
         opts.zone.appendChild(dumb);
-        var dumbBox = dumb.getBoundingClientRect();
+        const dumbBox = dumb.getBoundingClientRect();
         opts.zone.removeChild(dumb);
 
         toPutOn = position;
         position = {
             x: dumbBox.left + scroll.x,
-            y: dumbBox.top + scroll.y
+            y: dumbBox.top + scroll.y,
         };
     }
 
-    var nipple = new Nipple(self, {
+    const nipple = new Nipple(self, {
         color: opts.color,
         size: opts.size,
         threshold: opts.threshold,
@@ -171,14 +162,14 @@ Collection.prototype.createNipple = function (position, identifier) {
         restJoystick: opts.restJoystick,
         restOpacity: opts.restOpacity,
         mode: opts.mode,
-        identifier: identifier,
-        position: position,
+        identifier,
+        position,
         zone: opts.zone,
         frontPosition: {
             x: 0,
-            y: 0
+            y: 0,
         },
-        shape: opts.shape
+        shape: opts.shape,
     });
 
     if (!opts.dataOnly) {
@@ -186,8 +177,8 @@ Collection.prototype.createNipple = function (position, identifier) {
         u.applyPosition(nipple.ui.front, nipple.frontPosition);
     }
     self.nipples.push(nipple);
-    self.trigger('added ' + nipple.identifier + ':added', nipple);
-    self.manager.trigger('added ' + nipple.identifier + ':added', nipple);
+    self.trigger(`added ${nipple.identifier}:added`, nipple);
+    self.manager.trigger(`added ${nipple.identifier}:added`, nipple);
 
     self.bindNipple(nipple);
 
@@ -195,17 +186,17 @@ Collection.prototype.createNipple = function (position, identifier) {
 };
 
 Collection.prototype.updateBox = function () {
-    var self = this;
+    const self = this;
     self.box = self.options.zone.getBoundingClientRect();
 };
 
 Collection.prototype.bindNipple = function (nipple) {
-    var self = this;
-    var type;
+    const self = this;
+    let type;
     // Bubble up identified events.
-    var handler = function (evt, data) {
+    const handler = function (evt, data) {
         // Identify the event type with the nipple's id.
-        type = evt.type + ' ' + data.id + ':' + evt.type;
+        type = `${evt.type} ${data.id}:${evt.type}`;
         self.trigger(type, data);
     };
 
@@ -219,50 +210,51 @@ Collection.prototype.bindNipple = function (nipple) {
 };
 
 Collection.prototype.pressureFn = function (touch, nipple, identifier) {
-    var self = this;
-    var previousPressure = 0;
+    const self = this;
+    let previousPressure = 0;
     clearInterval(self.pressureIntervals[identifier]);
     // Create an interval that will read the pressure every 100ms
     self.pressureIntervals[identifier] = setInterval(function () {
-        var pressure = touch.force || touch.pressure ||
-            touch.webkitForce || 0;
+        const pressure = touch.force || touch.pressure || touch.webkitForce || 0;
         if (pressure !== previousPressure) {
             nipple.trigger('pressure', pressure);
-            self.trigger('pressure ' +
-                nipple.identifier + ':pressure', pressure);
+            self.trigger(`pressure ${nipple.identifier}:pressure`, pressure);
             previousPressure = pressure;
         }
-    }.bind(self), 100);
+    }, 100);
 };
 
 Collection.prototype.onstart = function (evt) {
-    var self = this;
-    var opts = self.options;
-    var origEvt = evt;
+    const self = this;
+    const opts = self.options;
+    const origEvt = evt;
     evt = u.prepareEvent(evt);
 
     // Update the box position
     self.updateBox();
 
-    var process = function (touch) {
+    const process = function (touch) {
         // If we can create new nipples
         // meaning we don't have more active nipples than we should.
         if (self.actives.length < opts.maxNumberOfNipples) {
             self.processOnStart(touch);
-        }
-        else if(origEvt.type.match(/^touch/)){
+        } else if (origEvt.type.match(/^touch/)) {
             // zombies occur when end event is not received on Safari
             // first touch removed before second touch, we need to catch up...
             // so remove where touches in manager that no longer exist
-            Object.keys(self.manager.ids).forEach(function(k){
-                if(Object.values(origEvt.touches).findIndex(function(t){return t.identifier===k;}) < 0){
+            Object.keys(self.manager.ids).forEach(function (k) {
+                if (
+                    Object.values(origEvt.touches).findIndex(function (t) {
+                        return t.identifier === k;
+                    }) < 0
+                ) {
                     // manager has id that doesn't exist in touches
-                    var e = [evt[0]];
+                    const e = [evt[0]];
                     e.identifier = k;
                     self.processOnEnd(e);
                 }
             });
-            if(self.actives.length < opts.maxNumberOfNipples){
+            if (self.actives.length < opts.maxNumberOfNipples) {
                 self.processOnStart(touch);
             }
         }
@@ -277,17 +269,17 @@ Collection.prototype.onstart = function (evt) {
 };
 
 Collection.prototype.processOnStart = function (evt) {
-    var self = this;
-    var opts = self.options;
-    var indexInIdles;
-    var identifier = self.manager.getIdentifier(evt);
-    var pressure = evt.force || evt.pressure || evt.webkitForce || 0;
-    var position = {
+    const self = this;
+    const opts = self.options;
+    let indexInIdles;
+    const identifier = self.manager.getIdentifier(evt);
+    const pressure = evt.force || evt.pressure || evt.webkitForce || 0;
+    const position = {
         x: evt.pageX,
-        y: evt.pageY
+        y: evt.pageY,
     };
 
-    var nipple = self.getOrCreate(identifier, position);
+    const nipple = self.getOrCreate(identifier, position);
 
     // Update its touch identifier
     if (nipple.identifier !== identifier) {
@@ -295,10 +287,10 @@ Collection.prototype.processOnStart = function (evt) {
     }
     nipple.identifier = identifier;
 
-    var process = function (nip) {
+    const process = function (nip) {
         // Trigger the start.
         nip.trigger('start', nip);
-        self.trigger('start ' + nip.id + ':start', nip);
+        self.trigger(`start ${nip.id}:start`, nip);
 
         nip.show();
         if (pressure > 0) {
@@ -322,7 +314,7 @@ Collection.prototype.processOnStart = function (evt) {
     } else {
         // In semi we check the distance of the touch
         // to decide if we have to reset the nipple
-        var distance = u.distance(position, nipple.position);
+        const distance = u.distance(position, nipple.position);
         if (distance <= opts.catchDistance) {
             process(nipple);
         } else {
@@ -336,9 +328,9 @@ Collection.prototype.processOnStart = function (evt) {
 };
 
 Collection.prototype.getOrCreate = function (identifier, position) {
-    var self = this;
-    var opts = self.options;
-    var nipple;
+    const self = this;
+    const opts = self.options;
+    let nipple;
 
     // If we're in static or semi, we might already have an active.
     if (/(semi|static)/.test(opts.mode)) {
@@ -357,7 +349,7 @@ Collection.prototype.getOrCreate = function (identifier, position) {
         }
 
         // eslint-disable-next-line no-console
-        console.warn('Coudln\'t find the needed nipple.');
+        console.warn("Coudln't find the needed nipple.");
         return false;
     }
     // In dynamic, we create a new one.
@@ -366,11 +358,11 @@ Collection.prototype.getOrCreate = function (identifier, position) {
 };
 
 Collection.prototype.processOnMove = function (evt) {
-    var self = this;
-    var opts = self.options;
-    var identifier = self.manager.getIdentifier(evt);
-    var nipple = self.nipples.get(identifier);
-    var scroll = self.manager.scroll;
+    const self = this;
+    const opts = self.options;
+    const identifier = self.manager.getIdentifier(evt);
+    const nipple = self.nipples.get(identifier);
+    const scroll = self.manager.scroll;
 
     // If we're moving without pressing
     // it's that we went out the active zone
@@ -383,47 +375,47 @@ Collection.prototype.processOnMove = function (evt) {
         // This is here just for safety.
         // It shouldn't happen.
         // eslint-disable-next-line no-console
-        console.error('Found zombie joystick with ID ' + identifier);
+        console.error(`Found zombie joystick with ID ${identifier}`);
         self.manager.removeIdentifier(identifier);
         return;
     }
 
     if (opts.dynamicPage) {
-        var elBox = nipple.el.getBoundingClientRect();
+        const elBox = nipple.el.getBoundingClientRect();
         nipple.position = {
             x: scroll.x + elBox.left,
-            y: scroll.y + elBox.top
+            y: scroll.y + elBox.top,
         };
     }
 
     nipple.identifier = identifier;
 
-    var size = nipple.options.size / 2;
-    var pos = {
+    const size = nipple.options.size / 2;
+    let pos = {
         x: evt.pageX,
-        y: evt.pageY
+        y: evt.pageY,
     };
 
-    if (opts.lockX){
+    if (opts.lockX) {
         pos.y = nipple.position.y;
     }
     if (opts.lockY) {
         pos.x = nipple.position.x;
     }
 
-    var dist = u.distance(pos, nipple.position);
-    var angle = u.angle(pos, nipple.position);
-    var rAngle = u.radians(angle);
-    var force = dist / size;
+    let dist = u.distance(pos, nipple.position);
+    const angle = u.angle(pos, nipple.position);
+    const rAngle = u.radians(angle);
+    const force = dist / size;
 
-    var raw = {
+    const raw = {
         distance: dist,
-        position: pos
+        position: pos,
     };
 
     // Clamp the position
-    var clamped_dist;
-    var clamped_pos;
+    let clamped_dist;
+    let clamped_pos;
     if (nipple.options.shape === 'circle') {
         // Clamp to a circle
         clamped_dist = Math.min(dist, size);
@@ -437,12 +429,12 @@ Collection.prototype.processOnMove = function (evt) {
     if (opts.follow) {
         // follow behaviour
         if (dist > size) {
-            let delta_x = pos.x - clamped_pos.x;
-            let delta_y = pos.y - clamped_pos.y;
+            const delta_x = pos.x - clamped_pos.x;
+            const delta_y = pos.y - clamped_pos.y;
             nipple.position.x += delta_x;
             nipple.position.y += delta_y;
-            nipple.el.style.top = (nipple.position.y - (self.box.top + scroll.y)) + 'px';
-            nipple.el.style.left = (nipple.position.x - (self.box.left + scroll.x)) + 'px';
+            nipple.el.style.top = `${nipple.position.y - (self.box.top + scroll.y)}px`;
+            nipple.el.style.left = `${nipple.position.x - (self.box.left + scroll.x)}px`;
 
             dist = u.distance(pos, nipple.position);
         }
@@ -452,37 +444,37 @@ Collection.prototype.processOnMove = function (evt) {
         dist = clamped_dist;
     }
 
-    var xPosition = pos.x - nipple.position.x;
-    var yPosition = pos.y - nipple.position.y;
+    const xPosition = pos.x - nipple.position.x;
+    const yPosition = pos.y - nipple.position.y;
 
     nipple.frontPosition = {
         x: xPosition,
-        y: yPosition
+        y: yPosition,
     };
 
     if (!opts.dataOnly) {
-        nipple.ui.front.style.transform = 'translate(' + xPosition + 'px,' + yPosition + 'px)';
+        nipple.ui.front.style.transform = `translate(${xPosition}px,${yPosition}px)`;
     }
 
     // Prepare event's datas.
-    var toSend = {
+    let toSend = {
         identifier: nipple.identifier,
         position: pos,
-        force: force,
+        force,
         pressure: evt.force || evt.pressure || evt.webkitForce || 0,
         distance: dist,
         angle: {
             radian: rAngle,
-            degree: angle
+            degree: angle,
         },
         vector: {
             x: xPosition / size,
-            y: - yPosition / size
+            y: -yPosition / size,
         },
-        raw: raw,
+        raw,
         instance: nipple,
         lockX: opts.lockX,
-        lockY: opts.lockY
+        lockY: opts.lockY,
     };
 
     // Compute the direction's datas.
@@ -491,20 +483,20 @@ Collection.prototype.processOnMove = function (evt) {
     // Offset angles to follow units circle.
     toSend.angle = {
         radian: u.radians(180 - angle),
-        degree: 180 - angle
+        degree: 180 - angle,
     };
 
     // Send everything to everyone.
     nipple.trigger('move', toSend);
-    self.trigger('move ' + nipple.id + ':move', toSend);
+    self.trigger(`move ${nipple.id}:move`, toSend);
 };
 
 Collection.prototype.processOnEnd = function (evt) {
-    var self = this;
-    var opts = self.options;
-    var identifier = self.manager.getIdentifier(evt);
-    var nipple = self.nipples.get(identifier);
-    var removedIdentifier = self.manager.removeIdentifier(nipple.identifier);
+    const self = this;
+    const opts = self.options;
+    const identifier = self.manager.getIdentifier(evt);
+    const nipple = self.nipples.get(identifier);
+    const removedIdentifier = self.manager.removeIdentifier(nipple.identifier);
 
     if (!nipple) {
         return;
@@ -514,9 +506,8 @@ Collection.prototype.processOnEnd = function (evt) {
         nipple.hide(function () {
             if (opts.mode === 'dynamic') {
                 nipple.trigger('removed', nipple);
-                self.trigger('removed ' + nipple.id + ':removed', nipple);
-                self.manager
-                    .trigger('removed ' + nipple.id + ':removed', nipple);
+                self.trigger(`removed ${nipple.id}:removed`, nipple);
+                self.manager.trigger(`removed ${nipple.id}:removed`, nipple);
                 nipple.destroy();
             }
         });
@@ -530,7 +521,7 @@ Collection.prototype.processOnEnd = function (evt) {
     nipple.resetDirection();
 
     nipple.trigger('end', nipple);
-    self.trigger('end ' + nipple.id + ':end', nipple);
+    self.trigger(`end ${nipple.id}:end`, nipple);
 
     // Remove identifier from our bank.
     if (self.ids.indexOf(nipple.identifier) >= 0) {
@@ -562,8 +553,8 @@ Collection.prototype.processOnEnd = function (evt) {
 };
 
 // Remove destroyed nipple from the lists
-Collection.prototype.onDestroyed = function(evt, nipple) {
-    var self = this;
+Collection.prototype.onDestroyed = function (evt, nipple) {
+    const self = this;
     if (self.nipples.indexOf(nipple) >= 0) {
         self.nipples.splice(self.nipples.indexOf(nipple), 1);
     }
@@ -586,16 +577,16 @@ Collection.prototype.onDestroyed = function(evt, nipple) {
 
 // Cleanly destroy the manager
 Collection.prototype.destroy = function () {
-    var self = this;
+    const self = this;
     self.unbindEvt(self.options.zone, 'start');
 
     // Destroy nipples.
-    self.nipples.forEach(function(nipple) {
+    self.nipples.forEach(function (nipple) {
         nipple.destroy();
     });
 
     // Clean 3DTouch intervals.
-    for (var i in self.pressureIntervals) {
+    for (const i in self.pressureIntervals) {
         if (self.pressureIntervals.hasOwnProperty(i)) {
             clearInterval(self.pressureIntervals[i]);
         }

@@ -170,11 +170,11 @@ export interface RestJoystickOption {
     /**
      * Defaults to `true`
      */
-    x?: boolean,
+    x?: boolean;
     /**
      * Defaults to `true`
      */
-    y?: boolean,
+    y?: boolean;
 }
 
 export interface Position {
@@ -199,8 +199,8 @@ export interface JoystickOutputData {
         y: number;
     };
     raw: {
-      distance: number;
-      position: Position;
+        distance: number;
+        position: Position;
     };
     distance: number;
     force: number;
@@ -314,11 +314,11 @@ export class JoystickManager {
 
     on(
         type: JoystickManagerEventTypes | JoystickManagerEventTypes[],
-        handler: (evt: EventData, data: JoystickOutputData) => void
+        handler: (evt: EventData, data: JoystickOutputData) => void,
     ): void;
     off(
         type: JoystickManagerEventTypes | JoystickManagerEventTypes[],
-        handler: (evt: EventData, data: JoystickOutputData) => void
+        handler: (evt: EventData, data: JoystickOutputData) => void,
     ): void;
     get(identifier: number): Joystick;
     destroy(): void;
@@ -341,11 +341,11 @@ export interface Collection {
 export interface Joystick {
     on(
         type: JoystickEventTypes | JoystickEventTypes[],
-        handler: (evt: EventData, data: JoystickOutputData) => void
+        handler: (evt: EventData, data: JoystickOutputData) => void,
     ): void;
     off(
         type: JoystickEventTypes | JoystickEventTypes[],
-        handler: (evt: EventData, data: JoystickOutputData) => void
+        handler: (evt: EventData, data: JoystickOutputData) => void,
     ): void;
     el: HTMLElement;
     show(cb?: () => void): void;
@@ -357,7 +357,7 @@ export interface Joystick {
     identifier: number;
     trigger(
         type: JoystickEventTypes | JoystickEventTypes[],
-        handler: (evt: EventData, data: any) => void
+        handler: (evt: EventData, data: any) => void,
     ): void;
     position: Position;
     frontPosition: Position;

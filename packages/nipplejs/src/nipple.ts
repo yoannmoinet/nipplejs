@@ -1,11 +1,11 @@
 import Super from './super';
 import * as u from './utils';
 
-///////////////////////
-///   THE NIPPLE    ///
-///////////////////////
+// /////////////////////
+// /   THE NIPPLE    ///
+// /////////////////////
 
-function Nipple (collection, options) {
+function Nipple(collection, options) {
     this.identifier = options.identifier;
     this.position = options.position;
     this.frontPosition = options.frontPosition;
@@ -24,7 +24,7 @@ function Nipple (collection, options) {
         zone: document.body,
         lockX: false,
         lockY: false,
-        shape: 'circle'
+        shape: 'circle',
     };
 
     this.config(options);
@@ -36,8 +36,7 @@ function Nipple (collection, options) {
 
     this.id = Nipple.id;
     Nipple.id += 1;
-    this.buildEl()
-        .stylize();
+    this.buildEl().stylize();
 
     // Nipple's API.
     this.instance = {
@@ -49,7 +48,7 @@ function Nipple (collection, options) {
         add: this.addToDom.bind(this),
         remove: this.removeFromDom.bind(this),
         destroy: this.destroy.bind(this),
-        setPosition:this.setPosition.bind(this),
+        setPosition: this.setPosition.bind(this),
         resetDirection: this.resetDirection.bind(this),
         computeDirection: this.computeDirection.bind(this),
         trigger: this.trigger.bind(this),
@@ -58,7 +57,7 @@ function Nipple (collection, options) {
         ui: this.ui,
         identifier: this.identifier,
         id: this.id,
-        options: this.options
+        options: this.options,
     };
 
     return this.instance;
@@ -80,12 +79,11 @@ Nipple.prototype.buildEl = function (options) {
     this.ui.back = document.createElement('div');
     this.ui.front = document.createElement('div');
 
-    this.ui.el.className = 'nipple collection_' + this.collection.id;
+    this.ui.el.className = `nipple collection_${this.collection.id}`;
     this.ui.back.className = 'back';
     this.ui.front.className = 'front';
 
-    this.ui.el.setAttribute('id', 'nipple_' + this.collection.id +
-        '_' + this.id);
+    this.ui.el.setAttribute('id', `nipple_${this.collection.id}_${this.id}`);
 
     this.ui.el.appendChild(this.ui.back);
     this.ui.el.appendChild(this.ui.front);
@@ -98,44 +96,44 @@ Nipple.prototype.stylize = function () {
     if (this.options.dataOnly) {
         return this;
     }
-    var animTime = this.options.fadeTime + 'ms';
-    var borderStyle = u.getVendorStyle('borderRadius', '50%');
-    var transitStyle = u.getTransitionStyle('transition', 'opacity', animTime);
-    var styles = {};
+    const animTime = `${this.options.fadeTime}ms`;
+    const borderStyle = u.getVendorStyle('borderRadius', '50%');
+    const transitStyle = u.getTransitionStyle('transition', 'opacity', animTime);
+    const styles = {};
     styles.el = {
         position: 'absolute',
         opacity: this.options.restOpacity,
         display: 'block',
-        'zIndex': 999
+        zIndex: 999,
     };
 
     styles.back = {
         position: 'absolute',
         display: 'block',
-        width: this.options.size + 'px',
-        height: this.options.size + 'px',
+        width: `${this.options.size}px`,
+        height: `${this.options.size}px`,
         left: 0,
-        marginLeft: -this.options.size / 2 + 'px',
-        marginTop: -this.options.size / 2 + 'px',
+        marginLeft: `${-this.options.size / 2}px`,
+        marginTop: `${-this.options.size / 2}px`,
         background: this.options.color,
-        'opacity': '.5'
+        opacity: '.5',
     };
 
     styles.front = {
-        width: this.options.size / 2 + 'px',
-        height: this.options.size / 2 + 'px',
+        width: `${this.options.size / 2}px`,
+        height: `${this.options.size / 2}px`,
         position: 'absolute',
         display: 'block',
         left: 0,
-        marginLeft: -this.options.size / 4 + 'px',
-        marginTop: -this.options.size / 4 + 'px',
+        marginLeft: `${-this.options.size / 4}px`,
+        marginTop: `${-this.options.size / 4}px`,
         background: this.options.color,
-        'opacity': '.5',
-        transform: 'translate(0px, 0px)'
+        opacity: '.5',
+        transform: 'translate(0px, 0px)',
     };
 
     u.extend(styles.el, transitStyle);
-    if(this.options.shape === 'circle'){
+    if (this.options.shape === 'circle') {
         u.extend(styles.back, borderStyle);
     }
     u.extend(styles.front, borderStyle);
@@ -147,9 +145,9 @@ Nipple.prototype.stylize = function () {
 
 Nipple.prototype.applyStyles = function (styles) {
     // Apply styles
-    for (var i in this.ui) {
+    for (const i in this.ui) {
         if (this.ui.hasOwnProperty(i)) {
-            for (var j in styles[i]) {
+            for (const j in styles[i]) {
                 this.ui[i].style[j] = styles[i][j];
             }
         }
@@ -189,7 +187,7 @@ Nipple.prototype.destroy = function () {
 
 // Fade in the Nipple instance.
 Nipple.prototype.show = function (cb) {
-    var self = this;
+    const self = this;
 
     if (self.options.dataOnly) {
         return self;
@@ -219,7 +217,7 @@ Nipple.prototype.show = function (cb) {
 
 // Fade out the Nipple instance.
 Nipple.prototype.hide = function (cb) {
-    var self = this;
+    const self = this;
 
     if (self.options.dataOnly) {
         return self;
@@ -231,18 +229,15 @@ Nipple.prototype.hide = function (cb) {
     clearTimeout(self.showTimeout);
     clearTimeout(self.restTimeout);
 
-    self.removeTimeout = setTimeout(
-        function () {
-            var display = self.options.mode === 'dynamic' ? 'none' : 'block';
-            self.ui.el.style.display = display;
-            if (typeof cb === 'function') {
-                cb.call(self);
-            }
+    self.removeTimeout = setTimeout(function () {
+        const display = self.options.mode === 'dynamic' ? 'none' : 'block';
+        self.ui.el.style.display = display;
+        if (typeof cb === 'function') {
+            cb.call(self);
+        }
 
-            self.trigger('hidden', self.instance);
-        },
-        self.options.fadeTime
-    );
+        self.trigger('hidden', self.instance);
+    }, self.options.fadeTime);
 
     if (self.options.restJoystick) {
         const rest = self.options.restJoystick;
@@ -259,39 +254,35 @@ Nipple.prototype.hide = function (cb) {
 
 // Set the nipple to the specified position
 Nipple.prototype.setPosition = function (cb, position) {
-    var self = this;
+    const self = this;
     self.frontPosition = {
         x: position.x,
-        y: position.y
+        y: position.y,
     };
-    var animTime = self.options.fadeTime + 'ms';
+    const animTime = `${self.options.fadeTime}ms`;
 
-    var transitStyle = {};
-    transitStyle.front = u.getTransitionStyle('transition',
-        ['transform'], animTime);
+    const transitStyle = {};
+    transitStyle.front = u.getTransitionStyle('transition', ['transform'], animTime);
 
-    var styles = {front: {}};
+    const styles = { front: {} };
     styles.front = {
-        transform: 'translate(' + self.frontPosition.x + 'px,' + self.frontPosition.y + 'px)'
+        transform: `translate(${self.frontPosition.x}px,${self.frontPosition.y}px)`,
     };
 
     self.applyStyles(transitStyle);
     self.applyStyles(styles);
 
-    self.restTimeout = setTimeout(
-        function () {
-            if (typeof cb === 'function') {
-                cb.call(self);
-            }
-            self.restCallback();
-        },
-        self.options.fadeTime
-    );
+    self.restTimeout = setTimeout(function () {
+        if (typeof cb === 'function') {
+            cb.call(self);
+        }
+        self.restCallback();
+    }, self.options.fadeTime);
 };
 
 Nipple.prototype.restCallback = function () {
-    var self = this;
-    var transitStyle = {};
+    const self = this;
+    const transitStyle = {};
     transitStyle.front = u.getTransitionStyle('transition', 'none', '');
     self.applyStyles(transitStyle);
     self.trigger('rested', self.instance);
@@ -302,15 +293,17 @@ Nipple.prototype.resetDirection = function () {
     this.direction = {
         x: false,
         y: false,
-        angle: false
+        angle: false,
     };
 };
 
 Nipple.prototype.computeDirection = function (obj) {
-    var rAngle = obj.angle.radian;
-    var angle45 = Math.PI / 4;
-    var angle90 = Math.PI / 2;
-    var direction, directionX, directionY;
+    const rAngle = obj.angle.radian;
+    const angle45 = Math.PI / 4;
+    const angle90 = Math.PI / 2;
+    let direction;
+    let directionX;
+    let directionY;
 
     // Angular direction
     //     \  UP /
@@ -319,23 +312,11 @@ Nipple.prototype.computeDirection = function (obj) {
     //      /   \
     //     /DOWN \
     //
-    if (
-        rAngle > angle45 &&
-        rAngle < (angle45 * 3) &&
-        !obj.lockX
-    ) {
+    if (rAngle > angle45 && rAngle < angle45 * 3 && !obj.lockX) {
         direction = 'up';
-    } else if (
-        rAngle > -angle45 &&
-        rAngle <= angle45 &&
-        !obj.lockY
-    ) {
+    } else if (rAngle > -angle45 && rAngle <= angle45 && !obj.lockY) {
         direction = 'left';
-    } else if (
-        rAngle > (-angle45 * 3) &&
-        rAngle <= -angle45 &&
-        !obj.lockX
-    ) {
+    } else if (rAngle > -angle45 * 3 && rAngle <= -angle45 && !obj.lockX) {
         direction = 'down';
     } else if (!obj.lockY) {
         direction = 'right';
@@ -363,20 +344,20 @@ Nipple.prototype.computeDirection = function (obj) {
     }
 
     if (obj.force > this.options.threshold) {
-        var oldDirection = {};
-        var i;
+        const oldDirection = {};
+        let i;
         for (i in this.direction) {
             if (this.direction.hasOwnProperty(i)) {
                 oldDirection[i] = this.direction[i];
             }
         }
 
-        var same = {};
+        const same = {};
 
         this.direction = {
             x: directionX,
             y: directionY,
-            angle: direction
+            angle: direction,
         };
 
         obj.direction = this.direction;
@@ -397,15 +378,15 @@ Nipple.prototype.computeDirection = function (obj) {
         }
 
         if (!same.x) {
-            this.trigger('plain:' + directionX, obj);
+            this.trigger(`plain:${directionX}`, obj);
         }
 
         if (!same.y) {
-            this.trigger('plain:' + directionY, obj);
+            this.trigger(`plain:${directionY}`, obj);
         }
 
         if (!same.angle) {
-            this.trigger('dir dir:' + direction, obj);
+            this.trigger(`dir dir:${direction}`, obj);
         }
     } else {
         this.resetDirection();

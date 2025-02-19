@@ -4,9 +4,7 @@ import fs from 'fs';
 import path from 'path';
 import type { RequestInit } from 'undici-types';
 
-import type {
-    RequestOpts,
-} from './types';
+import type { RequestOpts } from './types';
 
 // Format a duration 0h 0m 0s 0ms
 export const formatDuration = (duration: number) => {

@@ -1,13 +1,5 @@
-import {
-    MD_TOC_KEY,
-    MD_TOC_OMIT_KEY,
-    ROOT,
-} from '@nipple/tools/constants';
-import {
-    green,
-    replaceInBetween,
-    slugify,
-} from '@nipple/tools/helpers';
+import { MD_TOC_KEY, MD_TOC_OMIT_KEY, ROOT } from '@nipple/tools/constants';
+import { green, replaceInBetween, slugify } from '@nipple/tools/helpers';
 import fs from 'fs';
 import { glob } from 'glob';
 

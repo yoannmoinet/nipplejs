@@ -1,13 +1,14 @@
 import Collection from './collection';
 import Super from './super';
+import type { JoystickManagerOptions } from './types';
 import * as u from './utils';
 
-///////////////////////
-///     MANAGER     ///
-///////////////////////
+// /////////////////////
+// /     MANAGER     ///
+// /////////////////////
 
-function Manager (options) {
-    var self = this;
+function Manager(options: JoystickManagerOptions = {}) {
+    const self = this;
     self.ids = {};
     self.index = 0;
     self.collections = [];
@@ -17,14 +18,13 @@ function Manager (options) {
     self.prepareCollections();
 
     // Listen for resize, to reposition every joysticks
-    var resizeHandler = function () {
-        var pos;
+    const resizeHandler = function () {
         self.collections.forEach(function (collection) {
             collection.forEach(function (nipple) {
-                pos = nipple.el.getBoundingClientRect();
+                const pos = nipple.el.getBoundingClientRect();
                 nipple.position = {
                     x: self.scroll.x + pos.left,
-                    y: self.scroll.y + pos.top
+                    y: self.scroll.y + pos.top,
                 };
             });
         });
@@ -35,7 +35,7 @@ function Manager (options) {
 
     // Listen for scrolls, so we have a global scroll value
     // without having to request it all the time.
-    var scrollHandler = function () {
+    const scrollHandler = function () {
         self.scroll = u.getScroll();
     };
     u.bindEvt(window, 'scroll', function () {
@@ -49,7 +49,7 @@ Manager.prototype = new Super();
 Manager.constructor = Manager;
 
 Manager.prototype.prepareCollections = function () {
-    var self = this;
+    const self = this;
     // Public API Preparation.
     self.collections.create = self.create.bind(self);
     // Listen to anything
@@ -60,11 +60,11 @@ Manager.prototype.prepareCollections = function () {
     self.collections.destroy = self.destroy.bind(self);
     // Get any nipple
     self.collections.get = function (id) {
-        var nipple;
+        let nipple;
         // Use .every() to break the loop as soon as found.
         self.collections.every(function (collection) {
             nipple = collection.get(id);
-            return nipple ? false : true;
+            return !nipple;
         });
         return nipple;
     };
@@ -76,8 +76,8 @@ Manager.prototype.create = function (options) {
 
 // Collection Factory
 Manager.prototype.createCollection = function (options) {
-    var self = this;
-    var collection = new Collection(self, options);
+    const self = this;
+    const collection = new Collection(self, options);
 
     self.bindCollection(collection);
     self.collections.push(collection);
@@ -86,12 +86,12 @@ Manager.prototype.createCollection = function (options) {
 };
 
 Manager.prototype.bindCollection = function (collection) {
-    var self = this;
-    var type;
+    const self = this;
+    let type;
     // Bubble up identified events.
-    var handler = function (evt, data) {
+    const handler = function (evt, data) {
         // Identify the event type with the nipple's identifier.
-        type = evt.type + ' ' + data.id + ':' + evt.type;
+        type = `${evt.type} ${data.id}:${evt.type}`;
         self.trigger(type, data);
     };
 
@@ -105,28 +105,26 @@ Manager.prototype.bindCollection = function (collection) {
 };
 
 Manager.prototype.bindDocument = function () {
-    var self = this;
+    const self = this;
     // Bind only if not already binded
     if (!self.binded) {
-        self.bindEvt(document, 'move')
-            .bindEvt(document, 'end');
+        self.bindEvt(document, 'move').bindEvt(document, 'end');
         self.binded = true;
     }
 };
 
 Manager.prototype.unbindDocument = function (force) {
-    var self = this;
+    const self = this;
     // If there are no touch left
     // unbind the document.
     if (!Object.keys(self.ids).length || force === true) {
-        self.unbindEvt(document, 'move')
-            .unbindEvt(document, 'end');
+        self.unbindEvt(document, 'move').unbindEvt(document, 'end');
         self.binded = false;
     }
 };
 
 Manager.prototype.getIdentifier = function (evt) {
-    var id;
+    let id;
     // If no event, simple increment
     if (!evt) {
         id = this.index;
@@ -150,8 +148,8 @@ Manager.prototype.getIdentifier = function (evt) {
 };
 
 Manager.prototype.removeIdentifier = function (identifier) {
-    var removed = {};
-    for (var id in this.ids) {
+    const removed = {};
+    for (const id in this.ids) {
         if (this.ids[id] === identifier) {
             removed.id = id;
             removed.identifier = this.ids[id];
@@ -163,37 +161,36 @@ Manager.prototype.removeIdentifier = function (identifier) {
 };
 
 Manager.prototype.onmove = function (evt) {
-    var self = this;
+    const self = this;
     self.onAny('move', evt);
     return false;
 };
 
 Manager.prototype.onend = function (evt) {
-    var self = this;
+    const self = this;
     self.onAny('end', evt);
     return false;
 };
 
 Manager.prototype.oncancel = function (evt) {
-    var self = this;
+    const self = this;
     self.onAny('end', evt);
     return false;
 };
 
 Manager.prototype.onAny = function (which, evt) {
-    var self = this;
-    var id;
-    var processFn = 'processOn' + which.charAt(0).toUpperCase() +
-        which.slice(1);
+    const self = this;
+    let id;
+    const processFn = `processOn${which.charAt(0).toUpperCase()}${which.slice(1)}`;
     evt = u.prepareEvent(evt);
-    var processColl = function (e, id, coll) {
+    const processColl = function (e, id, coll) {
         if (coll.ids.indexOf(id) >= 0) {
             coll[processFn](e);
             // Mark the event to avoid cleaning it later.
             e._found_ = true;
         }
     };
-    var processEvt = function (e) {
+    const processEvt = function (e) {
         id = self.getIdentifier(e);
         u.map(self.collections, processColl.bind(null, e, id));
         // If the event isn't handled by any collection,
@@ -210,11 +207,11 @@ Manager.prototype.onAny = function (which, evt) {
 
 // Cleanly destroy the manager
 Manager.prototype.destroy = function () {
-    var self = this;
+    const self = this;
     self.unbindDocument(true);
     self.ids = {};
     self.index = 0;
-    self.collections.forEach(function(collection) {
+    self.collections.forEach(function (collection) {
         collection.destroy();
     });
     self.off();
@@ -223,7 +220,7 @@ Manager.prototype.destroy = function () {
 // When a collection gets destroyed
 // we clean behind.
 Manager.prototype.onDestroyed = function (evt, coll) {
-    var self = this;
+    const self = this;
     if (self.collections.indexOf(coll) < 0) {
         return false;
     }
