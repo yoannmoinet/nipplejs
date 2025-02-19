@@ -126,7 +126,7 @@ module.exports = {
             {
                 allowShortCircuit: false,
                 allowTernary: false,
-                allowTaggedNippleJSs: false,
+                allowTaggedTemplates: false,
             },
         ],
         'no-unused-labels': 'error',
@@ -349,6 +349,12 @@ module.exports = {
         node: true,
     },
     overrides: [
+        {
+            files: ['packages/nipplejs/src/**/*.*'],
+            env: {
+                browser: true,
+            },
+        },
         {
             files: ['packages/tests/**/*.*'],
             env: {
