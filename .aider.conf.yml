@@ -1,0 +1,5 @@
+## Specify command to run tests
+test-cmd: yarn test:unit
+
+## Specify lint commands to run for different languages, eg: "python: flake8 --select=..." (can be used multiple times)
+lint-cmd: yarn format-files

@@ -22,6 +22,7 @@
         "clean:all": "yarn loop run clean",
         "cli": "yarn workspace @nipple/tools cli",
         "format": "yarn lint --fix",
+        "format-files": "eslint ${0} --quiet --fix",
         "lint": "eslint ./packages/**/*.{ts,js} --quiet",
         "loop": "yarn workspaces foreach -Apti --exclude \"@nipple/root\"",
         "typecheck:all": "yarn workspaces foreach -Apti run typecheck",
