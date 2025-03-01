@@ -26,5 +26,6 @@
         "**/.yarnrc.yml": true,
         "**/yarn.lock": true
     },
-    "typescript.tsdk": "node_modules/typescript/lib"
+    "typescript.tsdk": "node_modules/typescript/lib",
+    "git-blame.gitWebUrl": "https://github.com/yoannmoinet/nipplejs/commit/$ID"
 }
