@@ -1,24 +1,13 @@
-export interface JoystickManagerOptions {
-    /**
-     * Defaults to `'body'`
-     * The dom element in which all your joysticks will be injected.
-     *
-     * This zone also serve as the mouse/touch events handler.
-     *
-     * It represents the zone where all your joysticks will be active.
-     */
-    zone?: HTMLElement;
+import type Collection from './Collection';
+import type Factory from './Factory';
+import type Nipple from './Nipple';
+import type Super from './Super';
+import type { MODES } from './constants';
 
+export interface CommonOptions {
     /**
-     * Defaults to `'white'`
-     * The background color of your joystick’s elements.
+     * ### Defaults to `100`
      *
-     * Can be any valid CSS color.
-     */
-    color?: string;
-
-    /**
-     * Defaults to `100`
      * The size in pixel of the outer circle.
      *
      * The inner circle is 50% of this size.
@@ -26,6 +15,8 @@ export interface JoystickManagerOptions {
     size?: number;
 
     /**
+     * ### Defaults to `0.1`
+     *
      * This is the strength needed to trigger a directional event.
      *
      * Basically, the center is 0 and the outer is 1.
@@ -35,182 +26,246 @@ export interface JoystickManagerOptions {
     threshold?: number;
 
     /**
-     * Defaults to `250`
+     * ### Defaults to `'white'`
      *
-     * The time it takes for joystick to fade-out and fade-in when activated or de-activated.
+     * The background color of your joystick’s elements.
+     *
+     * Can be any valid CSS color.
+     */
+    color?: string;
+
+    /**
+     * ### Defaults to `250`
+     *
+     * The duration in ms it takes for a joystick to fade-out and fade-in
+     * when activated or de-activated.
      */
     fadeTime?: number;
 
     /**
-     * Defaults to `false`
+     * ### Defaults to `false`
      *
-     * Enable the multitouch capabilities.
+     * Only trigger events with data. No DOM manipulation/render.
      *
-     * If, for reasons, you need to have multiple nipples into the same zone.
-     *
-     * Otherwise it will only get one, and all new touches won’t do a thing.
-     *
-     * Please note that multitouch is off when in static or semi modes.
-     */
-    multitouch?: boolean;
-
-    /**
-     * Defaults to `1`
-     *
-     * If you need to, you can also control the maximum number of instance that could be created.
-     *
-     * Obviously in a multitouch configuration.
-     */
-    maxNumberOfNipples?: number;
-
-    /**
-     * Defaults to `false`
-     *
-     * The library won’t draw anything in the DOM and will only trigger events with data.
+     * Can be useful if you want to fully control the rendering.
      */
     dataOnly?: boolean;
 
     /**
-     * Defaults to `{top: 0, left: 0}`
+     * ### Defaults to `true`
      *
-     * An object that will determine the position of a static mode.
+     * Reset the joystick’s position to its center when it enters the rest state.
      *
-     * You can pass any of the four top, right, bottom and left.
+     * Use `false` to keep the joystick in its last position after release.
      *
-     * They will be applied as any css property.
-     */
-    position?: {
-        top?: string;
-        right?: string;
-        bottom?: string;
-        left?: string;
-    };
-
-    /**
-     * Behavioral mode for the joystick
-     *
-     * ### 'dynamic':
-     * a new joystick is created at each new touch.
-     * the joystick gets destroyed when released.
-     * can be multitouch.
-     *
-     * ### 'semi':
-     * new joystick is created at each new touch farther than options.catchDistance of any previously created joystick.
-     * the joystick is faded-out when released but not destroyed.
-     * when touch is made inside the options.catchDistance a new direction is triggered immediately.
-     * when touch is made outside the options.catchDistance the previous joystick is destroyed and a new one is created.
-     * cannot be multitouch.
-     *
-     * ### 'static':
-     * a joystick is positioned immediately at options.position.
-     * one joystick per zone.
-     * each new touch triggers a new direction.
-     * cannot be multitouch.
-     */
-    mode?: 'dynamic' | 'semi' | 'static';
-
-    /**
-     * Defaults to `true`
-     *
-     * Reset the joystick’s position when it enters the rest state.
+     * Use `{ x: false }` to only rest the y axis
+     * and `{ y: false }` to only rest the x axis.
      */
     restJoystick?: boolean | RestJoystickOption;
 
     /**
-     * Defaults to `0.5`
+     * ### Defaults to `0.5`
+     *
      * The opacity to apply when the joystick is in a rest position.
      */
     restOpacity?: number;
 
     /**
-     * Defaults to `200`
+     * ### Default to `dynamic`
      *
-     * This is only useful in the semi mode, and determine at which distance we recycle the previous joystick.
+     * Behavioral mode for the joystick
+     *
+     * #### 'dynamic':
+     * A new joystick is created at each new touch.
+     *
+     * The joystick gets destroyed after release.
+     *
+     * **Can be multitouch**.
+     *
+     * #### 'semi':
+     * New joystick is created at each new touch farther than `options.catchDistance`
+     * of any previously created joystick.
+     *
+     * The joystick is faded-out when released but not destroyed.
+     *
+     * When a touch is made **INSIDE** the `options.catchDistance` a new direction
+     * is triggered immediately.
+     *
+     * When a touch is made **OUTSIDE** the `options.catchDistance` the previous
+     * joystick is destroyed and a new one is created.
+     *
+     * **Cannot be multitouch**.
+     *
+     * #### 'static':
+     * A joystick is positioned immediately at `options.position`.
+     *
+     * Only one joystick per zone.
+     *
+     * Each new touch triggers a new direction.
+     *
+     * **Cannot be multitouch**.
+     *
      */
-    catchDistance?: number;
+    mode?: (typeof MODES)[keyof typeof MODES];
+    /**
+     * ### Defaults to `'body'`
+     *
+     * The dom element in which all your joysticks will be injected.
+     *
+     * This zone also serve as the mouse/touch events handler.
+     *
+     * It represents the zone where all your joysticks will be active.
+     */
+    zone?: HTMLElement;
 
     /**
-     * Defaults to `false`
+     * ### Defaults to `false`
      *
-     * Locks joystick’s movement to the x (horizontal) axis
+     * Lock joystick’s movement to the x (horizontal) axis
      */
     lockX?: boolean;
 
     /**
-     * Defaults to `false`
+     * ### Defaults to `false`
      *
-     * Locks joystick’s movement to the y (vertical) axis
+     * Lock joystick’s movement to the y (vertical) axis
      */
     lockY?: boolean;
 
     /**
-     * Defaults to `false`
+     * ### Defaults to `circle`
      *
-     * Enable if the page has dynamically visible elements such as for Vue, React, Angular or simply some CSS hiding or
-     * showing some DOM.
+     * The shape of the joystick.
+     */
+    shape?: 'circle' | 'square';
+}
+
+export interface JoystickOptions extends CommonOptions {
+    identifier: number;
+    position: Coordinates;
+    frontPosition: Coordinates;
+}
+
+export interface CollectionOptions extends CommonOptions {
+    /**
+     * ### Defaults to `false`
+     *
+     * Enable the multitouch capabilities.
+     *
+     * If you need to have multiple joysticks into the same zone.
+     *
+     * Otherwise it will only get one, and all new touches will be ignored.
+     *
+     * Note that multitouch is ALWAYS `false` in `static` and `semi` modes.
+     */
+    multitouch?: boolean;
+
+    /**
+     * ### Defaults to `1`
+     *
+     * The maximum number of joystick that can be created in a zone.
+     *
+     * Useful with `multitouch: true`.
+     */
+    maxNumberOfNipples?: number;
+
+    /**
+     * ### Defaults to `{ top: '0px', left: '0px' }`
+     *
+     * An object that will determine the position of a static mode.
+     *
+     * You can pass `top`, `right`, `bottom` and `left`.
+     *
+     * They will be applied as any css property.
+     */
+    position?: Partial<CssPosition>;
+
+    /**
+     * ### Defaults to `200`
+     *
+     * Only useful in the `semi` mode, and determine the distance
+     * up to which we recycle the previous joystick.
+     */
+    catchDistance?: number;
+
+    /**
+     * ### Defaults to `false`
+     *
+     * Enable if the page has dynamically visible elements such as for Vue, React, Angular
+     * or simply some CSS hiding or showing some DOM.
+     *
+     * It will force a re-calculation of the position of the joystick.
+     *
+     * Has a significant performance cost.
      */
     dynamicPage?: boolean;
 
     /**
-     * Defaults to `circle`
-     *
-     * Sets the shape of the joystick
-     */
-    shape?: 'circle' | 'square';
-
-    /**
-     * Defaults to `false`
+     * ### Defaults to `false`
      *
      * Make the joystick follow the cursor beyond its limits.
      */
     follow?: boolean;
 }
 
+/**
+ * ### Defaults to `{ x: true, y: true }`
+ *
+ * Specify which axis to rest or not.
+ *
+ * Use `{ x: false }` to only rest the y axis
+ * and `{ y: false }` to only rest the x axis.
+ */
 export interface RestJoystickOption {
     /**
-     * Defaults to `true`
+     * ### Defaults to `true`
      */
     x?: boolean;
     /**
-     * Defaults to `true`
+     * ### Defaults to `true`
      */
     y?: boolean;
 }
 
-export interface Position {
+export interface Coordinates {
     x: number;
     y: number;
 }
 
+export interface CssPosition {
+    top: string;
+    right: string;
+    bottom: string;
+    left: string;
+}
+
+/**
+ * The direction names of a joystick's event data.
+ */
 export interface Direction {
-    angle: 'up' | 'down' | 'right' | 'left';
-    x: 'left' | 'right';
-    y: 'up' | 'down';
+    /**
+     * The angle of the joystick with 45° angles.
+     *
+     * ```
+     *     \  up  /
+     *      \    /
+     * left  ›--‹  right
+     *      /    \
+     *     / down \
+     *```
+     */
+    angle?: 'up' | 'down' | 'right' | 'left';
+    /**
+     * The horizontal direction of the joystick.
+     */
+    x?: 'left' | 'right';
+    /**
+     * The vertical direction of the joystick.
+     */
+    y?: 'up' | 'down';
 }
 
-export interface JoystickOutputData {
-    angle: {
-        degree: number;
-        radian: number;
-    };
-    direction: Direction;
-    vector: {
-        x: number;
-        y: number;
-    };
-    raw: {
-        distance: number;
-        position: Position;
-    };
-    distance: number;
-    force: number;
-    identifier: number;
-    instance: Joystick;
-    position: Position;
-    pressure: number;
-}
-
-export type JoystickEventTypes =
+export type JoystickEventType =
     /**
      * A joystick is activated. (the user pressed on the active zone)
      * Will pass the instance alongside the event.
@@ -277,13 +332,13 @@ export type JoystickEventTypes =
     /**
      * MBP’s Force Touch, iOS’s 3D Touch, Microsoft’s pressure or MDN’s force
      *
-     *Is triggered when the pressure on the joystick is changed.
+     * Is triggered when the pressure on the joystick is changed.
      *
-     *The value, between 0 and 1, is sent back alongside the event.
+     * The value, between 0 and 1, is sent back alongside the event.
      */
     | 'pressure';
 
-export type ManagerOnlyEventTypes =
+export type FactoryOnlyEventType =
     /**
      * A joystick just got added.
      *
@@ -298,90 +353,82 @@ export type ManagerOnlyEventTypes =
      *
      * Will pass the instance alongside the event.
      *
-     * Won’t be trigger in a dataOnly configuration.
+     * Won’t be trigger in a 'dataOnly' configuration.
      */
     | 'removed';
 
-export type JoystickManagerEventTypes = JoystickEventTypes | ManagerOnlyEventTypes;
+export type FactoryEventType = JoystickEventType | FactoryOnlyEventType;
 
-export interface EventData {
-    type: JoystickEventTypes | ManagerOnlyEventTypes;
-    target: Collection;
-}
-
-export class JoystickManager {
-    create(options?: JoystickManagerOptions): JoystickManager;
-
-    on(
-        type: JoystickManagerEventTypes | JoystickManagerEventTypes[],
-        handler: (evt: EventData, data: JoystickOutputData) => void,
-    ): void;
-    off(
-        type: JoystickManagerEventTypes | JoystickManagerEventTypes[],
-        handler: (evt: EventData, data: JoystickOutputData) => void,
-    ): void;
-    get(identifier: number): Joystick;
-    destroy(): void;
-    ids: number[];
-    id: number;
-}
-
-export interface Collection {
-    nipples: Joystick[];
-    idles: Joystick[];
-    actives: Joystick[];
-    ids: number[];
-    pressureIntervals: {};
-    manager: JoystickManager;
-    id: number;
-    defaults: JoystickManagerOptions;
-    parentIsFlex: boolean;
-}
-
-export interface Joystick {
-    on(
-        type: JoystickEventTypes | JoystickEventTypes[],
-        handler: (evt: EventData, data: JoystickOutputData) => void,
-    ): void;
-    off(
-        type: JoystickEventTypes | JoystickEventTypes[],
-        handler: (evt: EventData, data: JoystickOutputData) => void,
-    ): void;
-    el: HTMLElement;
-    show(cb?: () => void): void;
-    hide(cb?: () => void): void;
-    add(): void;
-    remove(): void;
-    destroy(): void;
-    setPosition(cb: (joystick: Joystick) => void, position: Position): void;
-    identifier: number;
-    trigger(
-        type: JoystickEventTypes | JoystickEventTypes[],
-        handler: (evt: EventData, data: any) => void,
-    ): void;
-    position: Position;
-    frontPosition: Position;
-    ui: {
-        el: HTMLElement;
-        front: HTMLElement;
-        back: HTMLElement;
+export interface JoystickEventData {
+    angle: {
+        degree: number;
+        radian: number;
     };
-    options: JoystickManagerOptions;
+    direction?: Direction;
+    vector: Coordinates;
+    raw: {
+        distance: number;
+        position: Coordinates;
+    };
+    distance: number;
+    force: number;
+    identifier: number;
+    instance: Nipple;
+    lockX: boolean;
+    lockY: boolean;
+    position: Coordinates;
+    pressure: number;
 }
+
+export type DomEvent = {
+    identifier: number;
+    position: Coordinates;
+    pressure: number;
+    type: string;
+    raw: ProcessedEvent;
+};
+export type DomEventHandler = (evt: DomEvent) => void;
+
+export type InternalEventData = Nipple | Collection | JoystickEventData | number;
+export interface InternalEvent<T> {
+    type: FactoryEventType;
+    target: Super;
+    data: T;
+}
+
+export type InternalEventHandler<T> = (evt: InternalEvent<T>) => void;
 
 /**
- * A JavaScript library for creating vanillaJS virtual joysticks, for touch capable interfaces.
+ * The types of interface we support.
+ */
+export type InteractType = 'touch' | 'mouse' | 'pointer' | 'MSPointer';
+/**
+ * The types of event we support.
+ */
+export type EventType = 'start' | 'move' | 'end';
+
+/**
+ * The types of event we support.
+ */
+export type SupportedEvent = MouseEvent | TouchEvent | PointerEvent;
+export type ProcessedEvent = MouseEvent | Touch | PointerEvent;
+export type SupportedEventHandler = (evt: SupportedEvent) => void;
+
+export type SupportedElement = HTMLElement | Document | Window;
+
+/**
+ * A JavaScript library for creating virtual joysticks, for touch capable interfaces.
  */
 declare module 'nipplejs' {
     /**
-     * Create a Joystick manager
-     * @param options for creating a manager instance
-     * @return manager instance
+     * Create a new custom Joystick collection
+     * @param {CollectionOptions} options for creating a collection instance
+     * @return {Collection} a collection instance
      */
-    function create(options: JoystickManagerOptions): JoystickManager;
+    function create(options: CollectionOptions): Collection;
 
     /**
-     * Library's root manager instance.
+     * Root factory instance.
      */
-    const factory: JoystickManager;
+    const factory: Factory;
 }

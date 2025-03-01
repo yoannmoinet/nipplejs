@@ -2,9 +2,10 @@
     "extends": "../../tsconfig.json",
     "compilerOptions": {
         "baseUrl": "./",
-        "lib": [ "es2022", "dom" ],
+        "lib": ["es2022"],
         "rootDir": "./",
-        "outDir": "./dist"
+        "outDir": "./dist",
+        "types": ["@types/web"]
     },
     "include": ["**/*"],
     "exclude": ["dist", "node_modules"]

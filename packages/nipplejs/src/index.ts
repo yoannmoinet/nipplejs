@@ -1,9 +1,10 @@
-import Manager from 'nipplejs/manager';
+import Factory from './Factory';
+import type { CollectionOptions } from './types';
 
-const factory = new Manager();
+const factory = new Factory();
 export default {
-    create: function (options) {
+    create(options: CollectionOptions) {
         return factory.create(options);
     },
-    factory: factory,
+    factory,
 };
