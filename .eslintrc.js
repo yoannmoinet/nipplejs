@@ -1,4 +1,8 @@
+// eslint-disable-next-line import/no-extraneous-dependencies
+const globals = require('globals');
+
 const extensions = ['.json', '.ts', '.js', '.md'];
+
 module.exports = {
     root: true,
     rules: {
@@ -345,12 +349,25 @@ module.exports = {
             },
         },
     },
+    globals: {
+        ...globals.node,
+    },
     env: {
         node: true,
     },
     overrides: [
         {
+            files: ['*.ts', '*.tsx'],
+            rules: {
+                'no-dupe-class-members': 'off',
+            },
+        },
+        {
             files: ['packages/nipplejs/src/**/*.*'],
+            globals: {
+                EventListenerOrEventListenerObject: 'readonly',
+                ...globals.browser,
+            },
             env: {
                 browser: true,
             },

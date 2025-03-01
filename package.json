@@ -36,6 +36,7 @@
     },
     "devDependencies": {
         "@types/node": "^22",
+        "@types/web": "0.0.206",
         "@typescript-eslint/eslint-plugin": "7.5.0",
         "@typescript-eslint/parser": "7.5.0",
         "eslint": "8.57.0",
@@ -45,6 +46,7 @@
         "eslint-plugin-arca": "0.16.0",
         "eslint-plugin-import": "2.29.1",
         "eslint-plugin-prettier": "5.1.3",
+        "globals": "16.0.0",
         "husky": "4.2.5",
         "lint-staged": "10.2.0",
         "prettier": "3.2.5",
