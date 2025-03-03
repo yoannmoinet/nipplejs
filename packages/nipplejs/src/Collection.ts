@@ -401,7 +401,7 @@ export default class Collection extends Super {
      *  This is called from the Factory.
      * */
     processOnMove(evt: DomEvent) {
-        const nipple = this.getJoystick(evt.identifier);
+        const joystick = this.getJoystick(evt.identifier);
         const scroll = this.factory.scroll;
 
         // If it's not pressed, just process it as a end event instead.
@@ -410,37 +410,37 @@ export default class Collection extends Super {
             return;
         }
 
-        if (!nipple) {
+        if (!joystick) {
             console.error(`Found zombie joystick with ID ${evt.identifier}`);
             this.factory.removeId(evt.identifier);
             return;
         }
 
         if (this.options.dynamicPage) {
-            const elBox = nipple.ui.el.getBoundingClientRect();
-            nipple.position = {
+            const elBox = joystick.ui.el.getBoundingClientRect();
+            joystick.position = {
                 x: scroll.x + elBox.left,
                 y: scroll.y + elBox.top,
             };
         }
 
-        nipple.identifier = identifier;
+        joystick.identifier = identifier;
 
-        const size = nipple.options.size / 2;
+        const size = joystick.options.size / 2;
         let pos = {
             x: evt.pageX,
             y: evt.pageY,
         };
 
         if (this.options.lockX) {
-            pos.y = nipple.position.y;
+            pos.y = joystick.position.y;
         }
         if (this.options.lockY) {
-            pos.x = nipple.position.x;
+            pos.x = joystick.position.x;
         }
 
-        let dist = u.distance(pos, nipple.position);
-        const angle = u.angle(pos, nipple.position);
+        let dist = u.distance(pos, joystick.position);
+        const angle = u.angle(pos, joystick.position);
         const rAngle = u.radians(angle);
         const force = dist / size;
 
@@ -451,44 +451,44 @@ export default class Collection extends Super {
 
         let clamped_dist;
         let clamped_pos;
-        if (nipple.options.shape === 'circle') {
+        if (joystick.options.shape === 'circle') {
             clamped_dist = Math.min(dist, size);
-            clamped_pos = u.findCoord(nipple.position, clamped_dist, angle);
+            clamped_pos = u.findCoord(joystick.position, clamped_dist, angle);
         } else {
-            clamped_pos = u.clamp(pos, nipple.position, size);
-            clamped_dist = u.distance(clamped_pos, nipple.position);
+            clamped_pos = u.clamp(pos, joystick.position, size);
+            clamped_dist = u.distance(clamped_pos, joystick.position);
         }
 
         if (this.options.follow) {
             if (dist > size) {
                 const delta_x = pos.x - clamped_pos.x;
                 const delta_y = pos.y - clamped_pos.y;
-                nipple.position.x += delta_x;
-                nipple.position.y += delta_y;
-                nipple.ui.el.style.top = `${nipple.position.y - (this.box.top + scroll.y)}px`;
-                nipple.ui.el.style.left = `${nipple.position.x - (this.box.left + scroll.x)}px`;
+                joystick.position.x += delta_x;
+                joystick.position.y += delta_y;
+                joystick.ui.el.style.top = `${joystick.position.y - (this.box.top + scroll.y)}px`;
+                joystick.ui.el.style.left = `${joystick.position.x - (this.box.left + scroll.x)}px`;
 
-                dist = u.distance(pos, nipple.position);
+                dist = u.distance(pos, joystick.position);
             }
         } else {
             pos = clamped_pos;
             dist = clamped_dist;
         }
 
-        const xPosition = pos.x - nipple.position.x;
-        const yPosition = pos.y - nipple.position.y;
+        const xPosition = pos.x - joystick.position.x;
+        const yPosition = pos.y - joystick.position.y;
 
-        nipple.frontPosition = {
+        joystick.frontPosition = {
             x: xPosition,
             y: yPosition,
         };
 
         if (!this.options.dataOnly) {
-            nipple.ui.front.style.transform = `translate(${xPosition}px,${yPosition}px)`;
+            joystick.ui.front.style.transform = `translate(${xPosition}px,${yPosition}px)`;
         }
 
         const toSend: JoystickEventData = {
-            identifier: nipple.identifier,
+            identifier: joystick.identifier,
             position: pos,
             force,
             pressure: evt.pressure,
@@ -502,62 +502,62 @@ export default class Collection extends Super {
                 y: -yPosition / size,
             },
             raw,
-            instance: nipple,
+            instance: joystick,
             lockX: this.options.lockX,
             lockY: this.options.lockY,
         };
 
-        nipple.computeDirection(toSend);
+        joystick.computeDirection(toSend);
 
         toSend.angle = {
             radian: u.radians(180 - angle),
             degree: 180 - angle,
         };
 
-        nipple.trigger('move', toSend);
-        this.trigger(`move ${nipple.id}:move`, toSend);
+        joystick.trigger('move', toSend);
+        this.trigger(`move ${joystick.id}:move`, toSend);
     }
 
     processOnEnd(evt: DomEvent) {
         // const identifier = this.factory.getId(evt.identifier);
-        const nipple = this.getJoystick(evt.identifier);
+        const joystick = this.getJoystick(evt.identifier);
 
-        if (!nipple) {
+        if (!joystick) {
             return;
         }
 
-        const removedIdentifier = this.factory.removeId(nipple.identifier);
+        const removedIdentifier = this.factory.removeId(joystick.identifier);
         if (!this.options.dataOnly) {
-            nipple.hide(() => {
+            joystick.hide(() => {
                 if (this.options.mode === 'dynamic') {
-                    nipple.trigger('removed', nipple);
-                    this.trigger(`removed ${nipple.id}:removed`, nipple);
-                    this.factory.trigger(`removed ${nipple.id}:removed`, nipple);
-                    nipple.destroy();
+                    joystick.trigger('removed', joystick);
+                    this.trigger(`removed ${joystick.id}:removed`, joystick);
+                    this.factory.trigger(`removed ${joystick.id}:removed`, joystick);
+                    joystick.destroy();
                 }
             });
         }
 
         // Stop updating its pressure.
-        clearInterval(this.pressureIntervals[nipple.identifier]);
+        clearInterval(this.pressureIntervals[joystick.identifier]);
 
-        nipple.resetDirection();
+        joystick.resetDirection();
 
-        nipple.trigger('end', nipple);
-        this.trigger(`end ${nipple.id}:end`, nipple);
+        joystick.trigger('end', joystick);
+        this.trigger(`end ${joystick.id}:end`, joystick);
 
-        if (this.identifiers.indexOf(nipple.identifier) >= 0) {
-            this.identifiers.splice(this.identifiers.indexOf(nipple.identifier), 1);
+        if (this.identifiers.indexOf(joystick.identifier) >= 0) {
+            this.identifiers.splice(this.identifiers.indexOf(joystick.identifier), 1);
         }
 
-        if (this.actives.indexOf(nipple) >= 0) {
-            this.actives.splice(this.actives.indexOf(nipple), 1);
+        if (this.actives.indexOf(joystick) >= 0) {
+            this.actives.splice(this.actives.indexOf(joystick), 1);
         }
 
         if (/(semi|static)/.test(this.options.mode)) {
-            this.idles.push(nipple);
-        } else if (this.all.indexOf(nipple) >= 0) {
-            this.all.splice(this.all.indexOf(nipple), 1);
+            this.idles.push(joystick);
+        } else if (this.all.indexOf(joystick) >= 0) {
+            this.all.splice(this.all.indexOf(joystick), 1);
         }
 
         this.factory.unbindDocument();
@@ -569,10 +569,10 @@ export default class Collection extends Super {
     }
 
     destroy() {
-        this.unbindEvt(this.options.zone, 'start', this.onstart);
+        this.unbindEvt(this.options.zone, 'start', this.onStart);
 
-        this.all.forEach((nipple) => {
-            nipple.destroy();
+        this.all.forEach((joystick) => {
+            joystick.destroy();
         });
 
         for (const i in this.pressureIntervals) {
