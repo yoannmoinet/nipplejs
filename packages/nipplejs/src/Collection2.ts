@@ -1,8 +1,15 @@
 import type Factory from './Factory';
-import Nipple from './Nipple';
+import Joystick from './Joystick';
 import Super from './Super';
 import { MODES } from './constants';
-import type { CollectionOptions, JoystickEventData, InternalEvent, DomEvent } from './types';
+import type {
+    CollectionOptions,
+    JoystickEventData,
+    InternalEvent,
+    DomEvent,
+    Coordinates,
+    AnyPosition,
+} from './types';
 import * as u from './utils';
 
 export default class Collection extends Super {
@@ -15,9 +22,9 @@ export default class Collection extends Super {
      * */
     id: number;
     /**
-     *  The list of Nipple IDs this Collection manage.
+     *  The list of Joystick identifiers this Collection manage.
      * */
-    ids: number[] = [];
+    identifiers: number[] = [];
     /**
      *  The parent factory that created this Collection.
      * */
@@ -29,17 +36,17 @@ export default class Collection extends Super {
     /**
      *  The list of all the Joysticks of this Collection.
      * */
-    all: Nipple[] = [];
+    all: Joystick[] = [];
     /**
      *  The list of the idle Joysticks of this Collection.
      *  Idle Joysticks are the ones that are not being moved by the user.
      * */
-    idles: Nipple[] = [];
+    idles: Joystick[] = [];
     /**
      *  The list of the active Joysticks of this Collection.
      *  Active Joysticks are the ones that are being moved or touched by the user.
      * */
-    actives: Nipple[] = [];
+    actives: Joystick[] = [];
     /**
      *  The list of the setInterval IDs that we use to monitor pressure on the Joysticks.
      *  Used to clear the intervals when the Joystick is destroyed.
@@ -65,7 +72,7 @@ export default class Collection extends Super {
         follow: false,
         lockX: false,
         lockY: false,
-        maxNumberOfNipples: 10,
+        maxNumberOfJoysticks: 10,
         mode: MODES.dynamic,
         multitouch: false,
         position: { top: '0px', left: '0px' },
@@ -77,7 +84,7 @@ export default class Collection extends Super {
         zone: document.body,
     };
 
-    constructor(factory: any, options: CollectionOptions) {
+    constructor(factory: Factory, options: CollectionOptions) {
         super();
         this.factory = factory;
         this.id = Collection.id++;
@@ -89,9 +96,9 @@ export default class Collection extends Super {
             this.options.multitouch = false;
         }
 
-        // Overwrite the maxNumberOfNipples in a non multitouch setup.
+        // Overwrite the maxNumberOfJoysticks in a non multitouch setup.
         if (!this.options.multitouch) {
-            this.options.maxNumberOfNipples = 1;
+            this.options.maxNumberOfJoysticks = 1;
         }
 
         // Compute the parentIsFlex value.
@@ -105,27 +112,31 @@ export default class Collection extends Super {
         this.box = this.options.zone.getBoundingClientRect();
 
         // Bind the start event.
-        this.bindEvt(this.options.zone, 'start', this.onstart);
-        // Disable the default actions of touches. (zooming, panning, etc...)
-        this.options.zone.style.touchAction = 'none';
-        // @ts-expect-error - msTouchAction is not a known type
-        this.options.zone.style.msTouchAction = 'none';
+        this.bindEvt(this.options.zone, 'start', this.onStart);
 
-        // In static mode, we create our static joystick.
-        if (this.options.mode === 'static') {
-            const nipple = this.createNipple(
+        // Disable the default actions of touches. (zooming, panning, etc...)
+        u.extend(this.options.zone.style, {
+            touchAction: 'none',
+            // @ts-expect-error - msTouchAction is not a known type
+            msTouchAction: 'none',
+        });
+
+        // In static mode, we create our own static Joystick.
+        if (this.options.mode === MODES.static) {
+            const joystick = this.createJoystick(
                 this.options.position,
-                // FIXME: We're passing an id, not an identifier.
+                // Passing an arbitrary identifier, since it's the only Joystick we'll have.
                 this.factory.getId(this.factory.index),
             );
-            nipple.addToDom();
-            this.idles.push(nipple);
+            joystick.addToDom();
+            this.idles.push(joystick);
         }
     }
 
-    // TODO: Use Map or Object for all, idles and actives.
-    getJoystick(identifier?: number): Nipple | undefined {
-        // If we have no identifier, we return the first joystick.
+    // TODO: Use Map or Object for all, idles and actives for easier lookup.
+    // TODO: Use a Set for identifiers.
+    getJoystick(identifier?: number): Joystick | undefined {
+        // If we have no identifier, we return the first Joystick.
         if (identifier === undefined) {
             return this.all[0];
         }
@@ -137,42 +148,57 @@ export default class Collection extends Super {
         }
     }
 
-    createNipple(position: any, identifier: number): Nipple {
+    private createJoystick(position: AnyPosition, identifier: number): Joystick {
         const scroll = this.factory.scroll;
-        let toPutOn = {};
+        // In case of a flex container, the position is relative to the container.
         const offset = {
             x: this.parentIsFlex ? scroll.x : scroll.x + this.box.left,
             y: this.parentIsFlex ? scroll.y : scroll.y + this.box.top,
         };
 
-        let newPosition = position;
+        // FIXME: This process feels wonky, desperate need of a rewrite.
+        let toApply: AnyPosition;
+        let newPosition: Coordinates;
 
         if (position.x && position.y) {
-            toPutOn = {
+            toApply = {
                 x: position.x - offset.x,
                 y: position.y - offset.y,
             };
-        } else if (position.top || position.right || position.bottom || position.left) {
-            const dumb = document.createElement('DIV');
-            dumb.style.display = 'hidden';
-            dumb.style.top = position.top;
-            dumb.style.right = position.right;
-            dumb.style.bottom = position.bottom;
-            dumb.style.left = position.left;
-            dumb.style.position = 'absolute';
-
-            this.options.zone.appendChild(dumb);
-            const dumbBox = dumb.getBoundingClientRect();
-            this.options.zone.removeChild(dumb);
-
-            toPutOn = position;
             newPosition = {
-                x: dumbBox.left + scroll.x,
-                y: dumbBox.top + scroll.y,
+                x: position.x,
+                y: position.y,
             };
+        } else if (position.top || position.right || position.bottom || position.left) {
+            // Compute coordinates from given CssPosition by creating a stub element.
+            const stub = document.createElement('DIV');
+            u.extend(stub.style, {
+                display: 'hidden',
+                position: 'absolute',
+                top: position.top,
+                right: position.right,
+                bottom: position.bottom,
+                left: position.left,
+            });
+
+            // Add it to the dom to get its bounding box.
+            this.options.zone.appendChild(stub);
+            const stubBox = stub.getBoundingClientRect();
+            // Then remove it.
+            this.options.zone.removeChild(stub);
+
+            toApply = position;
+            newPosition = {
+                x: stubBox.left + scroll.x,
+                y: stubBox.top + scroll.y,
+            };
+        } else {
+            // TODO: Verify we never get there.
+            console.error('Invalid or missing position.', position);
         }
 
-        const nipple = new Nipple(this, {
+        // TODO: Maybe get one that may already exists.
+        const joystick = new Joystick(this, {
             color: this.options.color,
             size: this.options.size,
             threshold: this.options.threshold,
@@ -182,7 +208,7 @@ export default class Collection extends Super {
             restOpacity: this.options.restOpacity,
             mode: this.options.mode,
             identifier,
-            position: newPosition,
+            position: newPosition!,
             zone: this.options.zone,
             frontPosition: {
                 x: 0,
@@ -192,159 +218,201 @@ export default class Collection extends Super {
         });
 
         if (!this.options.dataOnly) {
-            u.applyPosition(nipple.ui.el, toPutOn);
-            u.applyPosition(nipple.ui.front, nipple.frontPosition);
+            // Position the Joystick at the right place.
+            u.applyPosition(joystick.ui.el, toApply!);
+            u.applyPosition(joystick.ui.front, joystick.frontPosition);
         }
 
-        this.all.push(nipple);
-        this.trigger(`added ${nipple.identifier}:added`, nipple);
-        this.factory.trigger(`added ${nipple.identifier}:added`, nipple);
+        this.all.push(joystick);
+        this.trigger(`added ${joystick.identifier}:added`, joystick);
+        this.factory.trigger(`added ${joystick.identifier}:added`, joystick);
 
-        this.bindNipple(nipple);
+        this.bindJoystick(joystick);
 
-        return nipple;
+        return joystick;
     }
 
-    bindNipple(nipple: Nipple) {
-        let type: string;
-        const handler = (evt: InternalEvent) => {
-            // TODO Verify data.id
-            type = `${evt.type} ${evt.data.id}:${evt.type}`;
-            this.trigger(type, evt.data);
+    // TODO: See if we can factorise with Factory.bindCollection.
+    private bindJoystick(joystick: Joystick) {
+        // Bubble up identified events.
+
+        // When a Joystick gets destroyed
+        // We clean behind.
+        joystick.on('destroyed', this.onDestroyed.bind(this));
+
+        // Other events that will get bubbled up.
+        joystick.on('start shown hidden rested', (evt) => {
+            type EvtType = `start${string}` &
+                `shown${string}` &
+                `hidden${string}` &
+                `rested${string}`;
+            const type = `${evt.type} ${evt.data.id}:${evt.type}`;
+            this.trigger(type as EvtType, evt.data);
+        });
+        joystick.on('dir dir:up dir:right dir:down dir:left', (evt) => {
+            const type = `${evt.type} ${evt.data.identifier}:${evt.type}`;
+            this.trigger(type as `dir${string}`, evt.data);
+        });
+        joystick.on('plain plain:up plain:right plain:down plain:left', (evt) => {
+            const type = `${evt.type} ${evt.data.identifier}:${evt.type}`;
+            this.trigger(type as `plain${string}`, evt.data);
+        });
+    }
+
+    private onDestroyed(evt: InternalEvent<Joystick>) {
+        const target = evt.data;
+        if (this.all.indexOf(target) >= 0) {
+            this.all.splice(this.all.indexOf(target), 1);
+        }
+        if (this.actives.indexOf(target) >= 0) {
+            this.actives.splice(this.actives.indexOf(target), 1);
+        }
+        if (this.idles.indexOf(target) >= 0) {
+            this.idles.splice(this.idles.indexOf(target), 1);
+        }
+        if (this.identifiers.indexOf(target.identifier) >= 0) {
+            this.identifiers.splice(this.identifiers.indexOf(target.identifier), 1);
+        }
+
+        this.factory.removeId(target.identifier);
+
+        this.factory.unbindDocument();
+    }
+
+    private onStart(evt: DomEvent) {
+        // Refresh the box position.
+        this.box = this.options.zone.getBoundingClientRect();
+
+        // If we're above our limit, and are on a touch,
+        // let's try to clean up the inactive ones.
+        // FIXME: This should be done somewhere else and more regularly at the factory level.
+        if (this.actives.length >= this.options.maxNumberOfJoysticks && evt.isTouch) {
+            // Make some place in the other touches that may be dormant.
+            // Search within our Factory's ids.
+            this.factory.ids.forEach((id, identifier) => {
+                const touches = 'touches' in evt.initial ? evt.initial.touches : [];
+                // If we don't find a saved identifier in the list of touches
+                // that are currently active on the event,
+                // we trigger an end event on it.
+                if (Array.from(touches).findIndex((t) => t.identifier === identifier) < 0) {
+                    this.processOnEnd(
+                        u.processEvent(evt.initial, {
+                            ...evt.raw,
+                            // Re-use the event but spoof it's identifier with the inactive one.
+                            identifier,
+                        }),
+                    );
+                }
+            });
+        }
+
+        // If we still have spots available, we add a new one.
+        if (this.actives.length < this.options.maxNumberOfJoysticks) {
+            this.processOnStart(evt);
+        }
+
+        // Ping the factory to bind the document in case it's not active yet.
+        this.factory.bindDocument();
+    }
+
+    private processOnStart(evt: DomEvent) {
+        // New joystick.
+        const joystick = this.getOrCreate(evt.identifier, evt.position);
+
+        const process = () => {
+            joystick.show();
+            if (evt.pressure > 0) {
+                // This is using the Touch from a TouchList.
+                // FIXME: This should be done from Super for all the touches automatically.
+                this.pressureFn(evt, joystick);
+            }
+            // Trigger a first move.
+            this.processOnMove(evt);
         };
 
-        nipple.on('destroyed', this.onDestroyed.bind(this));
-        nipple.on('shown hidden rested dir plain', handler);
-        nipple.on('dir:up dir:right dir:down dir:left', handler);
-        nipple.on('plain:up plain:right plain:down plain:left', handler);
+        // Move the Joystick in the right list.
+        const indexInIdles = this.idles.indexOf(joystick);
+        if (indexInIdles >= 0) {
+            this.idles.splice(indexInIdles, 1);
+        }
+        this.actives.push(joystick);
+        this.identifiers.push(joystick.identifier);
+
+        // In semi mode, we need to verify what to do, do we recycle (if we're in the catch distance),
+        // or do we create a new one and delete the previous one?
+        if (this.options.mode === MODES.semi) {
+            const distance = u.distance(evt.position, joystick.position);
+            if (distance <= this.options.catchDistance) {
+                // We're in the catch distance, we keep this one.
+                process();
+            } else {
+                // We're too far, delete it and create a new one.
+                joystick.destroy();
+                this.processOnStart(evt);
+            }
+        } else {
+            // In the other modes, we just process it.
+            process();
+        }
     }
 
-    pressureFn(touch: any, nipple: Nipple, identifier: number) {
+    private pressureFn(evt: DomEvent, joystick: Joystick) {
         let previousPressure = 0;
-        clearInterval(this.pressureIntervals[identifier]);
-        this.pressureIntervals[identifier] = setInterval(() => {
-            const pressure = touch.force || touch.pressure || touch.webkitForce || 0;
-            if (pressure !== previousPressure) {
-                nipple.trigger('pressure', pressure);
-                this.trigger(`pressure ${nipple.identifier}:pressure`, pressure);
-                previousPressure = pressure;
+        clearInterval(this.pressureIntervals[evt.identifier]);
+        this.pressureIntervals[evt.identifier] = setInterval(() => {
+            if (evt.pressure !== previousPressure) {
+                joystick.trigger('pressure', evt.pressure);
+                this.trigger(`pressure ${joystick.identifier}:pressure`, evt.pressure);
+                previousPressure = evt.pressure;
             }
         }, 100);
     }
 
-    onstart(evt: DomEvent) {
-        const origEvt = evt;
-        const preparedEvt = u.prepareEvent(evt);
+    private getOrCreate(identifier: number, position: Coordinates): Joystick {
+        // TODO: Verify if we don't already have a joystick with this identifier.
 
-        // Refresh the box position.
-        this.box = this.options.zone.getBoundingClientRect();
-
-        const process = (touch: any) => {
-            if (this.actives.length < this.options.maxNumberOfNipples) {
-                this.processOnStart(touch);
-            } else if (origEvt.type.match(/^touch/)) {
-                Object.keys(this.factory.ids).forEach((k) => {
-                    if (Object.values(origEvt.touches).findIndex((t) => t.identifier === k) < 0) {
-                        const e = [preparedEvt[0]];
-                        e.identifier = k;
-                        this.processOnEnd(e);
-                    }
-                });
-                if (this.actives.length < this.options.maxNumberOfNipples) {
-                    this.processOnStart(touch);
-                }
-            }
-        };
-
-        u.map(preparedEvt, process);
-
-        this.factory.bindDocument();
-        return false;
-    }
-
-    processOnStart(evt: DomEvent) {
-        // FIXME: This is not the identifier, but an arbitrary incremental index.
-        const identifier = this.factory.getId(evt.identifier);
-        const nipple = this.getOrCreate(identifier, evt.position);
-
-        if (nipple.identifier !== identifier) {
-            this.factory.removeId(nipple.identifier);
-        }
-        nipple.identifier = identifier;
-
-        const process = (nip: Nipple) => {
-            nip.trigger('start', nip);
-            this.trigger(`start ${nip.id}:start`, nip);
-
-            nip.show();
-            if (evt.pressure > 0) {
-                // This is using the Touch from a TouchList.
-                this.pressureFn(evt, nip, nip.identifier);
-            }
-            this.processOnMove(evt);
-        };
-
-        const indexInIdles = this.idles.indexOf(nipple);
-        if (indexInIdles >= 0) {
-            this.idles.splice(indexInIdles, 1);
-        }
-
-        this.actives.push(nipple);
-        this.ids.push(nipple.identifier);
-
-        if (this.options.mode !== 'semi') {
-            process(nipple);
-        } else {
-            const distance = u.distance(position, nipple.position);
-            if (distance <= this.options.catchDistance) {
-                process(nipple);
-            } else {
-                nipple.destroy();
-                this.processOnStart(evt);
-                return;
-            }
-        }
-
-        return nipple;
-    }
-
-    getOrCreate(identifier: number, position: any): Nipple | undefined {
-        let nipple;
-
+        // In semi and static modes, we recycle the idle joystick.
         if (this.options.mode === MODES.semi || this.options.mode === MODES.static) {
-            nipple = this.idles[0];
-
-            if (nipple) {
+            // If there is an idle joystick, we use it.
+            if (this.idles[0]) {
+                const joystick = this.idles[0];
                 this.idles.splice(0, 1);
-                return nipple;
+                return joystick;
             }
 
+            // In semi mode, we may not have an idle joystick.
+            // So we create a new one.
             if (this.options.mode === MODES.semi) {
-                return this.createNipple(position, identifier);
+                return this.createJoystick(position, identifier);
             }
 
-            console.warn("Coudln't find the needed nipple.");
-            return;
+            // This should never be reached.
+            // Static mode should always have an idle joystick.
+            console.warn("Coudln't find the expected joystick. Creating a new one.");
         }
 
-        nipple = this.createNipple(position, identifier);
-        return nipple;
+        // Return a new joystick.
+        return this.createJoystick(position, identifier);
     }
 
+    /**
+     *  Whenever a move event happens.
+     *
+     *  This is called from the Factory.
+     * */
     processOnMove(evt: DomEvent) {
-        // FIXME: This is not the identifier, but an arbitrary incremental index.
-        const identifier = this.factory.getId(evt.identifier);
-        const nipple = this.getJoystick(identifier);
+        const nipple = this.getJoystick(evt.identifier);
         const scroll = this.factory.scroll;
 
-        if (!u.isPressed(evt)) {
+        // If it's not pressed, just process it as a end event instead.
+        if (!evt.pressure) {
             this.processOnEnd(evt);
             return;
         }
 
         if (!nipple) {
-            console.error(`Found zombie joystick with ID ${identifier}`);
-            this.factory.removeId(identifier);
+            console.error(`Found zombie joystick with ID ${evt.identifier}`);
+            this.factory.removeId(evt.identifier);
             return;
         }
 
@@ -423,7 +491,7 @@ export default class Collection extends Super {
             identifier: nipple.identifier,
             position: pos,
             force,
-            pressure: evt.force || evt.pressure || evt.webkitForce || 0,
+            pressure: evt.pressure,
             distance: dist,
             angle: {
                 radian: rAngle,
@@ -451,8 +519,8 @@ export default class Collection extends Super {
     }
 
     processOnEnd(evt: DomEvent) {
-        const identifier = this.factory.getId(evt.identifier);
-        const nipple = this.getJoystick(identifier);
+        // const identifier = this.factory.getId(evt.identifier);
+        const nipple = this.getJoystick(evt.identifier);
 
         if (!nipple) {
             return;
@@ -478,8 +546,8 @@ export default class Collection extends Super {
         nipple.trigger('end', nipple);
         this.trigger(`end ${nipple.id}:end`, nipple);
 
-        if (this.ids.indexOf(nipple.identifier) >= 0) {
-            this.ids.splice(this.ids.indexOf(nipple.identifier), 1);
+        if (this.identifiers.indexOf(nipple.identifier) >= 0) {
+            this.identifiers.splice(this.identifiers.indexOf(nipple.identifier), 1);
         }
 
         if (this.actives.indexOf(nipple) >= 0) {
@@ -494,30 +562,10 @@ export default class Collection extends Super {
 
         this.factory.unbindDocument();
 
-        // FIXME: What?
+        // FIXME: What? Probably to recycle the joystick in those modes.
         if (/(semi|static)/.test(this.options.mode)) {
             this.factory.ids[removedIdentifier.id] = removedIdentifier.identifier;
         }
-    }
-
-    onDestroyed(evt: InternalEvent) {
-        const nipple: Nipple = evt.data;
-        if (this.all.indexOf(nipple) >= 0) {
-            this.all.splice(this.all.indexOf(nipple), 1);
-        }
-        if (this.actives.indexOf(nipple) >= 0) {
-            this.actives.splice(this.actives.indexOf(nipple), 1);
-        }
-        if (this.idles.indexOf(nipple) >= 0) {
-            this.idles.splice(this.idles.indexOf(nipple), 1);
-        }
-        if (this.ids.indexOf(nipple.identifier) >= 0) {
-            this.ids.splice(this.ids.indexOf(nipple.identifier), 1);
-        }
-
-        this.factory.removeId(nipple.identifier);
-
-        this.factory.unbindDocument();
     }
 
     destroy() {

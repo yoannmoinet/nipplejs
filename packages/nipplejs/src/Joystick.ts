@@ -1,15 +1,16 @@
+import type Collection from './Collection';
 import Super from './Super';
 import { ANGLE_45, ANGLE_90 } from './constants';
-import type { Direction, JoystickEventData, JoystickOptions } from './types';
+import type { Coordinates, Direction, JoystickEventData, JoystickOptions } from './types';
 import * as u from './utils';
 
-export default class Nipple extends Super {
+export default class Joystick extends Super {
     static id: number = 0;
     id: number;
     identifier: number;
-    position: { x: number; y: number };
-    frontPosition: { x: number; y: number };
-    collection: any;
+    position: Coordinates;
+    frontPosition: Coordinates;
+    collection: Collection;
     ui: {
         el: HTMLElement;
         back: HTMLElement;
@@ -35,7 +36,7 @@ export default class Nipple extends Super {
         shape: 'circle',
     };
 
-    constructor(collection: any, options: JoystickOptions) {
+    constructor(collection: Collection, options: JoystickOptions) {
         super();
         this.identifier = options.identifier;
         this.position = options.position;
@@ -45,10 +46,11 @@ export default class Nipple extends Super {
 
         // Overwrites
         if (this.options.mode === 'dynamic') {
+            // For dynamic Joystick, they will fade completely out.
             this.options.restOpacity = 0;
         }
 
-        this.id = Nipple.id++;
+        this.id = Joystick.id++;
 
         this.ui = {
             el: document.createElement('div'),
@@ -63,63 +65,57 @@ export default class Nipple extends Super {
 
     private buildEl() {
         // Build the dom element.
-        this.ui.el.className = `nipple collection_${this.collection.id}`;
+        this.ui.el.className = `joystick collection_${this.collection.id}`;
         this.ui.back.className = 'back';
         this.ui.front.className = 'front';
 
-        this.ui.el.setAttribute('id', `nipple_${this.collection.id}_${this.id}`);
+        this.ui.el.setAttribute('id', `joystick_${this.collection.id}_${this.id}`);
 
         this.ui.el.appendChild(this.ui.back);
         this.ui.el.appendChild(this.ui.front);
 
-        // Apply CSS to the dom element.
+        // Apply CSS to the dom elements.
         const animTime = `${this.options.fadeTime}ms`;
-        const borderStyle = u.getVendorStyle('borderRadius', '50%');
-        const transitStyle = u.getTransitionStyle('transition', 'opacity', animTime);
-        const styles: Record<keyof typeof this.ui, Partial<CSSStyleDeclaration>> = {
-            el: {
-                position: 'absolute',
-                opacity: this.options.restOpacity.toString(),
-                display: 'block',
-                zIndex: '999',
-            },
-            back: {
-                position: 'absolute',
-                display: 'block',
-                width: `${this.options.size}px`,
-                height: `${this.options.size}px`,
-                left: '0',
-                marginLeft: `${-this.options.size / 2}px`,
-                marginTop: `${-this.options.size / 2}px`,
-                background: this.options.color,
-                opacity: '.5',
-            },
-            front: {
-                width: `${this.options.size / 2}px`,
-                height: `${this.options.size / 2}px`,
-                position: 'absolute',
-                display: 'block',
-                left: '0',
-                marginLeft: `${-this.options.size / 4}px`,
-                marginTop: `${-this.options.size / 4}px`,
-                background: this.options.color,
-                opacity: '.5',
-                transform: 'translate(0px, 0px)',
-            },
-        };
+        const borderStyle = u.configStylePropertyObject('borderRadius', '50%');
+        const transitStyle = u.configStylePropertyObject('transition', `opacity ${animTime}`);
 
-        u.extend(styles.el, transitStyle);
-        if (this.options.shape === 'circle') {
-            u.extend(styles.back, borderStyle);
-        }
-        u.extend(styles.front, borderStyle);
+        u.extend(this.ui.el.style, {
+            position: 'absolute',
+            opacity: this.options.restOpacity.toString(),
+            display: 'block',
+            zIndex: '999',
+            ...transitStyle,
+        });
 
-        u.extend(this.ui.el.style, styles.el);
-        u.extend(this.ui.back.style, styles.back);
-        u.extend(this.ui.front.style, styles.front);
+        u.extend(this.ui.back.style, {
+            position: 'absolute',
+            display: 'block',
+            width: `${this.options.size}px`,
+            height: `${this.options.size}px`,
+            left: '0',
+            marginLeft: `${-this.options.size / 2}px`,
+            marginTop: `${-this.options.size / 2}px`,
+            background: this.options.color,
+            opacity: '.5',
+            ...(this.options.shape === 'circle' ? borderStyle : {}),
+        });
+
+        u.extend(this.ui.front.style, {
+            width: `${this.options.size / 2}px`,
+            height: `${this.options.size / 2}px`,
+            position: 'absolute',
+            display: 'block',
+            left: '0',
+            marginLeft: `${-this.options.size / 4}px`,
+            marginTop: `${-this.options.size / 4}px`,
+            background: this.options.color,
+            opacity: '.5',
+            transform: 'translate(0px, 0px)',
+            ...borderStyle,
+        });
     }
 
-    // Inject the Nipple instance into DOM.
+    // Inject the Joystick instance into DOM.
     addToDom(): void {
         // We're not adding it if we're dataOnly or already in dom.
         if (this.options.dataOnly || document.body.contains(this.ui.el)) {
@@ -128,7 +124,7 @@ export default class Nipple extends Super {
         this.options.zone.appendChild(this.ui.el);
     }
 
-    // Remove the Nipple instance from DOM.
+    // Remove the Joystick instance from DOM.
     removeFromDom(): void {
         if (this.options.dataOnly || !document.body.contains(this.ui.el)) {
             return;
@@ -136,42 +132,37 @@ export default class Nipple extends Super {
         this.options.zone.removeChild(this.ui.el);
     }
 
-    // Entirely destroy this nipple
+    private clearTimeouts(): void {
+        clearTimeout(this.removeTimeout);
+        clearTimeout(this.showTimeout);
+        clearTimeout(this.restTimeout);
+    }
+
+    // Entirely destroy this Joystick
     destroy(): void {
-        if (this.removeTimeout) {
-            clearTimeout(this.removeTimeout);
-        }
-        if (this.showTimeout) {
-            clearTimeout(this.showTimeout);
-        }
-        if (this.restTimeout) {
-            clearTimeout(this.restTimeout);
-        }
+        this.clearTimeouts();
         this.trigger('destroyed', this);
         this.removeFromDom();
         this.off();
     }
 
-    // Fade in the Nipple instance.
+    // Fade in the Joystick instance.
     show(cb?: () => void): void {
         if (this.options.dataOnly) {
             return;
         }
+        this.trigger('start', this);
 
         // Clear the timeouts.
-        clearTimeout(this.removeTimeout);
-        clearTimeout(this.showTimeout);
-        clearTimeout(this.restTimeout);
-
+        this.clearTimeouts();
         // Add it to the dom.
         this.addToDom();
         // Go straight to rest.
         this.restCallback();
 
-        // TODO: Use requestAnimationFrame().
-        setTimeout(() => {
+        requestAnimationFrame(() => {
             this.ui.el.style.opacity = '1';
-        }, 0);
+        });
 
         this.showTimeout = setTimeout(() => {
             this.trigger('shown', this);
@@ -181,29 +172,20 @@ export default class Nipple extends Super {
         }, this.options.fadeTime);
     }
 
-    // Fade out the Nipple instance.
+    // Fade out the Joystick instance.
     hide(cb?: () => void): void {
         if (this.options.dataOnly) {
             return;
         }
 
+        // Clear the timeouts.
+        this.clearTimeouts();
+
+        // Set the faded out opacity.
         this.ui.el.style.opacity = this.options.restOpacity.toString();
 
-        // Clear the timeouts.
-        clearTimeout(this.removeTimeout);
-        clearTimeout(this.showTimeout);
-        clearTimeout(this.restTimeout);
-
-        this.removeTimeout = setTimeout(() => {
-            const display = this.options.mode === 'dynamic' ? 'none' : 'block';
-            this.ui.el.style.display = display;
-            if (typeof cb === 'function') {
-                cb.call(this);
-            }
-
-            this.trigger('hidden', this);
-        }, this.options.fadeTime);
-
+        // If the Joystick has to rest (go back to center),
+        // we update its position.
         if (this.options.restJoystick) {
             const rest = this.options.restJoystick;
             const newPosition = {
@@ -213,23 +195,38 @@ export default class Nipple extends Super {
 
             this.setPosition(cb, newPosition);
         }
+
+        // Create a timeout to trigger an event after the fadeTime.
+        // And completely hide it if it's a dynamic Joystick.
+        this.removeTimeout = setTimeout(() => {
+            // If dynamic, we'll completely hide the Joystick (display: none).
+            this.ui.el.style.display = this.options.mode === 'dynamic' ? 'none' : 'block';
+            if (typeof cb === 'function') {
+                cb.call(this);
+            }
+            this.trigger('hidden', this);
+        }, this.options.fadeTime);
     }
 
-    // Set the nipple to the specified position
-    setPosition(cb: (() => void) | undefined, position: { x: number; y: number }): void {
+    // Set the Joystick to the specified position
+    setPosition(cb: (() => void) | undefined, position: Coordinates): void {
         this.frontPosition = {
             x: position.x,
             y: position.y,
         };
         const animTime = `${this.options.fadeTime}ms`;
+        const transitStyle = u.extend(
+            // Transition style.
+            u.configStylePropertyObject('transition', `transform ${animTime}`),
+            // Transform style.
+            u.configStylePropertyObject(
+                'transform',
+                `translate(${this.frontPosition.x}px, ${this.frontPosition.y}px)`,
+            ),
+        );
 
         // Apply CSS.
-        u.extend(
-            this.ui.front.style,
-            u.extend(u.getTransitionStyle('transition', ['transform'], animTime), {
-                transform: `translate(${this.frontPosition.x}px,${this.frontPosition.y}px)`,
-            }),
-        );
+        u.extend(this.ui.front.style, transitStyle);
 
         this.restTimeout = setTimeout(() => {
             if (typeof cb === 'function') {
@@ -240,7 +237,8 @@ export default class Nipple extends Super {
     }
 
     private restCallback(): void {
-        u.extend(this.ui.front.style, u.getTransitionStyle('transition', 'none', ''));
+        // Once rested, remove the transition.
+        u.extend(this.ui.front.style, u.configStylePropertyObject('transition', 'none'));
         this.trigger('rested', this);
     }
 
@@ -291,6 +289,7 @@ export default class Nipple extends Super {
             }
         }
 
+        // Trigger the events based on the threshold.
         if (obj.force > this.options.threshold) {
             const oldDirection = {
                 x: this.direction.x,
@@ -309,6 +308,7 @@ export default class Nipple extends Super {
 
             // If all 3 directions are the same, we don't trigger anything.
             if (same.x && same.y && same.angle) {
+                // Early out.
                 return obj;
             }
 
@@ -328,6 +328,7 @@ export default class Nipple extends Super {
                 this.trigger(`dir dir:${direction.angle}`, obj);
             }
         } else {
+            // If no threshold reached, simply reset the direction.
             this.resetDirection();
         }
 
