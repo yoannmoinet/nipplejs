@@ -1,6 +1,6 @@
 import type Collection from './Collection';
 import type Factory from './Factory';
-import type Nipple from './Nipple';
+import type Joystick from './Joystick';
 import type Super from './Super';
 import type { MODES } from './constants';
 
@@ -107,6 +107,7 @@ export interface CommonOptions {
      *
      */
     mode?: (typeof MODES)[keyof typeof MODES];
+
     /**
      * ### Defaults to `'body'`
      *
@@ -167,7 +168,7 @@ export interface CollectionOptions extends CommonOptions {
      *
      * Useful with `multitouch: true`.
      */
-    maxNumberOfNipples?: number;
+    maxNumberOfJoysticks?: number;
 
     /**
      * ### Defaults to `{ top: '0px', left: '0px' }`
@@ -238,6 +239,8 @@ export interface CssPosition {
     bottom: string;
     left: string;
 }
+
+export type AnyPosition = Partial<Coordinates> & Partial<CssPosition>;
 
 /**
  * The direction names of a joystick's event data.
@@ -373,7 +376,7 @@ export interface JoystickEventData {
     distance: number;
     force: number;
     identifier: number;
-    instance: Nipple;
+    instance: Joystick;
     lockX: boolean;
     lockY: boolean;
     position: Coordinates;
@@ -382,14 +385,16 @@ export interface JoystickEventData {
 
 export type DomEvent = {
     identifier: number;
+    isTouch: boolean;
     position: Coordinates;
     pressure: number;
     type: string;
+    initial: SupportedEvent;
     raw: ProcessedEvent;
 };
 export type DomEventHandler = (evt: DomEvent) => void;
 
-export type InternalEventData = Nipple | Collection | JoystickEventData | number;
+export type InternalEventData = Joystick | Collection | JoystickEventData | number;
 export interface InternalEvent<T> {
     type: FactoryEventType;
     target: Super;

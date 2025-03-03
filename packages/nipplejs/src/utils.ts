@@ -1,4 +1,12 @@
-import type { Coordinates, CssPosition, SupportedElement, SupportedEventHandler } from './types';
+import type {
+    AnyPosition,
+    Coordinates,
+    DomEvent,
+    ProcessedEvent,
+    SupportedElement,
+    SupportedEvent,
+    SupportedEventHandler,
+} from './types';
 
 /**
  * Calculate the distance between two points.
@@ -129,22 +137,96 @@ export const unbindEvt = (
     }
 };
 
+// Reconciliation layer for MouseEvent, TouchEvent and PointerEvent.
+// It will ease the process later down the line.
+export const processEvents = (evt: SupportedEvent): DomEvent[] => {
+    // Prevent the browser default action.
+    evt.preventDefault();
+
+    // Prepare arrays of initial events.
+    const domEvents: ProcessedEvent[] = [];
+    // TouchEvent may have multitouches, split them out in an array.
+    if ('changedTouches' in evt) {
+        // evt.changedTouches doesn't really offer a nice iterable interface.
+        for (let i = 0; i < evt.changedTouches.length; i += 1) {
+            const touch = evt.changedTouches.item(i);
+            if (touch) {
+                domEvents.push(touch);
+            }
+        }
+    } else {
+        domEvents.push(evt);
+    }
+
+    // Will return an array of events, based on touches, pointer or mouse data.
+    const events: DomEvent[] = domEvents.map<DomEvent>((domEvt) => {
+        return processEvent(evt, domEvt);
+    });
+
+    return events;
+};
+
+export const processEvent = (evt: SupportedEvent, domEvt: ProcessedEvent): DomEvent => {
+    // Compute identifier of the event.
+    // It's especially important for touches,
+    // to track the correct touch in a multitouch interaction.
+    const identifier: number =
+        'identifier' in domEvt
+            ? domEvt.identifier
+            : 'pointerId' in domEvt
+              ? domEvt.pointerId
+              : 0 || 0;
+
+    // Compute the pressure data.
+    // To keep track of it, we'll also need to start an interval.
+    // TODO: Do the pressure tracking interval abstraction here.
+    const pressure: number =
+        'force' in domEvt
+            ? domEvt.force
+            : 'pressure' in domEvt
+              ? domEvt.pressure
+              : 'webkitForce' in domEvt // Pressure on trackpads.
+                ? (domEvt.webkitForce as number)
+                : 'buttons' in domEvt // Id of the mouse button pressed. 0 is none.
+                  ? domEvt.buttons !== 0
+                      ? 1
+                      : 0
+                  : 0;
+
+    // This is only what we need, to normalize the interaction event.
+    // Everything else is based off this data.
+    return {
+        identifier,
+        isTouch: 'touches' in evt || 'changedTouches' in evt,
+        position: {
+            x: domEvt.pageX,
+            y: domEvt.pageY,
+        },
+        pressure,
+        type: evt.type,
+        initial: evt,
+        raw: domEvt,
+    };
+};
+
 /**
  * Trigger a custom event on an element.
  * @param {HTMLElement} el - The element to trigger the event on.
  * @param {string} type - The type of event to trigger.
  * @param {any} data - The data to pass to the event.
  */
-export const trigger = (el: HTMLElement, type: string, data: any): void => {
-    const evt = new CustomEvent(type, data);
-    el.dispatchEvent(evt);
-};
+// TODO: This isn't used apparently.
+// export const trigger = (el: HTMLElement, type: string, data: any): void => {
+//     const evt = new CustomEvent(type, data);
+//     el.dispatchEvent(evt);
+// };
 
 /**
  * Prepare an event for processing.
  * @param {MouseEvent | TouchEvent} evt - The event to prepare.
  * @returns {TouchList | MouseEvent} The prepared event.
  */
+// TODO: This isn't used apparently.
 // export const prepareEvent = (evt: MouseEvent | TouchEvent): TouchList | MouseEvent => {
 //     evt.preventDefault();
 //     return evt.type.match(/^touch/) ? (evt as TouchEvent).changedTouches : (evt as MouseEvent);
@@ -175,62 +257,13 @@ export const getScroll = (): Coordinates => {
  * @param {HTMLElement} el - The element to apply the position to.
  * @param {Coordinates} pos - The position to apply.
  */
-export const applyPosition = (el: HTMLElement, pos: Coordinates | CssPosition): void => {
-    const { left, top, right, bottom, x, y } = pos as Coordinates & CssPosition;
+export const applyPosition = (el: HTMLElement, pos: AnyPosition): void => {
+    const { left, top, right, bottom, x, y } = pos;
     if (top || right || bottom || left) {
-        el.style.top = top;
-        el.style.right = right;
-        el.style.bottom = bottom;
-        el.style.left = left;
-    } else if (!isNaN(x) || !isNaN(y)) {
-        el.style.left = `${x}px`;
-        el.style.top = `${y}px`;
+        extend(el.style, { top, right, bottom, left });
+    } else if (!isNaN(x || 0) || !isNaN(y || 0)) {
+        extend(el.style, { left: `${x || 0}px`, top: `${y || 0}px` });
     }
-};
-
-/**
- * Get the transition style for a property.
- * @param {string} property - The property to get the transition style for.
- * @param {string | string[]} values - The values to transition to.
- * @param {string} time - The duration of the transition.
- * @returns {Record<string, string>} The transition style for the property.
- */
-export const getTransitionStyle = (
-    property: string,
-    values: string | string[],
-    time: string,
-): Record<string, string> => {
-    const obj = configStylePropertyObject(property);
-    for (const i in obj) {
-        if (Object.hasOwn(obj, i)) {
-            if (typeof values === 'string') {
-                obj[i] = `${values} ${time}`;
-            } else {
-                let st = '';
-                for (let j = 0, max = values.length; j < max; j += 1) {
-                    st += `${values[j]} ${time}, `;
-                }
-                obj[i] = st.slice(0, -2);
-            }
-        }
-    }
-    return obj;
-};
-
-/**
- * Get the vendor style for a property.
- * @param {string} property - The property to get the vendor style for.
- * @param {string} value - The value to set for the property.
- * @returns {Record<string, string>} The vendor style for the property.
- */
-export const getVendorStyle = (property: string, value: string): Record<string, string> => {
-    const obj = configStylePropertyObject(property);
-    for (const i in obj) {
-        if (Object.hasOwn(obj, i)) {
-            obj[i] = value;
-        }
-    }
-    return obj;
 };
 
 /**
@@ -238,12 +271,17 @@ export const getVendorStyle = (property: string, value: string): Record<string, 
  * @param {string} prop - The property to configure.
  * @returns {Record<string, string>} The configured style property object.
  */
-export const configStylePropertyObject = (prop: string): Record<string, string> => {
-    const obj: Record<string, string> = {};
-    obj[prop] = '';
-    const vendors = ['webkit', 'Moz', 'o'];
-    vendors.forEach((vendor) => {
-        obj[vendor + prop.charAt(0).toUpperCase() + prop.slice(1)] = '';
+export const configStylePropertyObject = (
+    prop: string,
+    value: string = '',
+): Record<string, string> => {
+    const obj: Record<string, string> = {
+        [prop]: value,
+    };
+    const newProp = prop.charAt(0).toUpperCase() + prop.slice(1);
+    // Apply the vendor prefixes.
+    ['webkit', 'Moz', 'o'].forEach((vendor) => {
+        obj[`${vendor}${newProp}`] = value;
     });
     return obj;
 };
