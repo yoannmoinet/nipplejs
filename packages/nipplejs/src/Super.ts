@@ -42,7 +42,7 @@ class Super {
     on<T>(arg: string, cb: InternalEventHandler<T>): void {
         this.mapOnEvents(arg, (type) => {
             this._handlers_[type] = this._handlers_[type] || new Set();
-            this._handlers_[type].add(cb);
+            this._handlers_[type]!.add(cb);
         });
     }
 
@@ -70,7 +70,7 @@ class Super {
                     this._handlers_[type] = new Set();
                 } else if (this._handlers_[type]) {
                     // If the callback is found, remove it.
-                    this._handlers_[type].delete(cb);
+                    this._handlers_[type]!.delete(cb);
                 }
             });
         }
@@ -91,8 +91,9 @@ class Super {
     trigger(arg: `pressure${string}`, data: number): void;
     trigger<T>(arg: string, data: T): void {
         this.mapOnEvents(arg, (type) => {
-            if (this._handlers_[type] && this._handlers_[type].size) {
-                this._handlers_[type].forEach((handler) => {
+            const handlers = this._handlers_[type];
+            if (handlers && handlers.size) {
+                handlers.forEach((handler) => {
                     handler.call(this, {
                         type,
                         target: this,

@@ -3,7 +3,8 @@
     "compilerOptions": {
         "baseUrl": "./",
         "rootDir": "./",
-        "outDir": "./dist"
+        "outDir": "./dist",
+        "types": ["@types/node"]
     },
     "include": ["**/*"],
     "exclude": ["dist", "node_modules"]
