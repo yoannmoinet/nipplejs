@@ -13,7 +13,9 @@ import type {
 import * as u from './utils';
 
 class Super {
-    private _handlers_: Partial<Record<FactoryEventType, InternalEventHandler<any>[]>> = {};
+    uid: number = 0;
+    private _domHandlers_: Map<DomEventHandler, (evt: SupportedEvent) => void> = new Map();
+    private _handlers_: Partial<Record<FactoryEventType, Set<InternalEventHandler<any>>>> = {};
 
     mapOnEvents(arg: string, cb: (type: FactoryEventType) => void): void {
         const types = arg.split(/[ ,]+/g) as FactoryEventType[];
@@ -34,13 +36,13 @@ class Super {
     on(arg: `shown${string}`, cb: InternalEventHandler<Joystick>): void;
     on(arg: `hidden${string}`, cb: InternalEventHandler<Joystick>): void;
     on(arg: `rested${string}`, cb: InternalEventHandler<Joystick>): void;
-    on(arg: `destroyed${string}`, cb: InternalEventHandler<Joystick>): void;
-    on(arg: `destroyed${string}`, cb: InternalEventHandler<Collection>): void;
+    on(arg: `joystickDestroyed${string}`, cb: InternalEventHandler<Joystick>): void;
+    on(arg: `collectionDestroyed${string}`, cb: InternalEventHandler<Collection>): void;
     on(arg: `pressure${string}`, cb: InternalEventHandler<number>): void;
     on<T>(arg: string, cb: InternalEventHandler<T>): void {
         this.mapOnEvents(arg, (type) => {
-            this._handlers_[type] = this._handlers_[type] || [];
-            this._handlers_[type].push(cb);
+            this._handlers_[type] = this._handlers_[type] || new Set();
+            this._handlers_[type].add(cb);
         });
     }
 
@@ -54,8 +56,8 @@ class Super {
     off(arg?: `shown${string}`, cb?: InternalEventHandler<Joystick>): void;
     off(arg?: `hidden${string}`, cb?: InternalEventHandler<Joystick>): void;
     off(arg?: `rested${string}`, cb?: InternalEventHandler<Joystick>): void;
-    off(arg?: `destroyed${string}`, cb?: InternalEventHandler<Joystick>): void;
-    off(arg?: `destroyed${string}`, cb?: InternalEventHandler<Collection>): void;
+    off(arg?: `joystickDestroyed${string}`, cb?: InternalEventHandler<Joystick>): void;
+    off(arg?: `collectionDestroyed${string}`, cb?: InternalEventHandler<Collection>): void;
     off(arg?: `pressure${string}`, cb?: InternalEventHandler<number>): void;
     off<T>(arg?: string, cb?: InternalEventHandler<T>): void {
         if (arg === undefined) {
@@ -65,10 +67,10 @@ class Super {
             this.mapOnEvents(arg, (type) => {
                 if (cb === undefined) {
                     // If no callback provided, clear all handlers for the type.
-                    this._handlers_[type] = [];
-                } else if (this._handlers_[type] && this._handlers_[type].indexOf(cb) >= 0) {
+                    this._handlers_[type] = new Set();
+                } else if (this._handlers_[type]) {
                     // If the callback is found, remove it.
-                    this._handlers_[type].splice(this._handlers_[type].indexOf(cb), 1);
+                    this._handlers_[type].delete(cb);
                 }
             });
         }
@@ -84,12 +86,12 @@ class Super {
     trigger(arg: `shown${string}`, data: Joystick): void;
     trigger(arg: `hidden${string}`, data: Joystick): void;
     trigger(arg: `rested${string}`, data: Joystick): void;
-    trigger(arg: `destroyed${string}`, data: Joystick): void;
-    trigger(arg: `destroyed${string}`, data: Collection): void;
+    trigger(arg: `joystickDestroyed${string}`, data: Joystick): void;
+    trigger(arg: `collectionDestroyed${string}`, data: Collection): void;
     trigger(arg: `pressure${string}`, data: number): void;
     trigger<T>(arg: string, data: T): void {
         this.mapOnEvents(arg, (type) => {
-            if (this._handlers_[type] && this._handlers_[type].length) {
+            if (this._handlers_[type] && this._handlers_[type].size) {
                 this._handlers_[type].forEach((handler) => {
                     handler.call(this, {
                         type,
@@ -105,9 +107,12 @@ class Super {
     bindEvt(el: SupportedElement, type: EventType, handler: DomEventHandler) {
         const cb = (evt: SupportedEvent) => {
             for (const domEvt of u.processEvents(evt)) {
-                handler(domEvt);
+                handler.call(this, domEvt);
             }
         };
+
+        // Save the handler so we can unbind later.
+        this._domHandlers_.set(handler, cb);
 
         u.bindEvt(el, PRIMARY_BIND[type], cb);
 
@@ -119,11 +124,12 @@ class Super {
 
     // Unbind DOM events.
     unbindEvt(el: SupportedElement, type: EventType, handler: DomEventHandler) {
-        const cb = (evt: SupportedEvent) => {
-            for (const domEvt of u.processEvents(evt)) {
-                handler(domEvt);
-            }
-        };
+        const cb = this._domHandlers_.get(handler);
+
+        if (!cb) {
+            console.error(`Internal handler not found for event ${type}.`, handler);
+            return;
+        }
 
         u.unbindEvt(el, PRIMARY_BIND[type], cb);
 

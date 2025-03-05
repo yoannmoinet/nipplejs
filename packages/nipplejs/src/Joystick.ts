@@ -1,12 +1,12 @@
 import type Collection from './Collection';
 import Super from './Super';
-import { ANGLE_45, ANGLE_90 } from './constants';
+import { ANGLE_45, ANGLE_90, MODES } from './constants';
 import type { Coordinates, Direction, JoystickEventData, JoystickOptions } from './types';
 import * as u from './utils';
 
 export default class Joystick extends Super {
-    static id: number = 0;
-    id: number;
+    static index: number = 0;
+    uid: number;
     identifier: number;
     position: Coordinates;
     frontPosition: Coordinates;
@@ -50,7 +50,7 @@ export default class Joystick extends Super {
             this.options.restOpacity = 0;
         }
 
-        this.id = Joystick.id++;
+        this.uid = Joystick.index++;
 
         this.ui = {
             el: document.createElement('div'),
@@ -61,15 +61,17 @@ export default class Joystick extends Super {
         if (!this.options.dataOnly) {
             this.buildEl();
         }
+
+        this.trigger(`added`, this);
     }
 
     private buildEl() {
         // Build the dom element.
-        this.ui.el.className = `joystick collection_${this.collection.id}`;
+        this.ui.el.className = `joystick collection_${this.collection.uid}`;
         this.ui.back.className = 'back';
         this.ui.front.className = 'front';
 
-        this.ui.el.setAttribute('id', `joystick_${this.collection.id}_${this.id}`);
+        this.ui.el.setAttribute('id', `joystick_${this.collection.uid}_${this.uid}`);
 
         this.ui.el.appendChild(this.ui.back);
         this.ui.el.appendChild(this.ui.front);
@@ -141,7 +143,7 @@ export default class Joystick extends Super {
     // Entirely destroy this Joystick
     destroy(): void {
         this.clearTimeouts();
-        this.trigger('destroyed', this);
+        this.trigger('joystickDestroyed', this);
         this.removeFromDom();
         this.off();
     }
@@ -200,11 +202,19 @@ export default class Joystick extends Super {
         // And completely hide it if it's a dynamic Joystick.
         this.removeTimeout = setTimeout(() => {
             // If dynamic, we'll completely hide the Joystick (display: none).
-            this.ui.el.style.display = this.options.mode === 'dynamic' ? 'none' : 'block';
+            this.ui.el.style.display = this.options.mode === MODES.dynamic ? 'none' : 'block';
+            this.trigger('hidden', this);
+
+            // We trigger a removed event only in dynamic mode,
+            // which is the only mode where joysticks get removed.
+            if (this.options.mode === MODES.dynamic) {
+                this.trigger('removed', this);
+                this.destroy();
+            }
+
             if (typeof cb === 'function') {
                 cb.call(this);
             }
-            this.trigger('hidden', this);
         }, this.options.fadeTime);
     }
 
@@ -244,10 +254,11 @@ export default class Joystick extends Super {
 
     resetDirection(): void {
         // Fully rebuild the object to let the iteration possible.
+        // TODO: Check if necessary.
         this.direction = {};
     }
 
-    computeDirection(obj: JoystickEventData): JoystickEventData {
+    computeDirectionAndTriggerEvents(obj: JoystickEventData): JoystickEventData {
         const rAngle = obj.angle.radian;
         const direction: Direction = {};
 
@@ -289,6 +300,14 @@ export default class Joystick extends Super {
             }
         }
 
+        // Rotate the angle measure from 0 to 180° to have a more human reading of it.
+        obj.angle = {
+            radian: u.radians(180 - obj.angle.degree),
+            degree: 180 - obj.angle.degree,
+        };
+
+        // TODO: Split the events triggering into a separate function.
+
         // Trigger the events based on the threshold.
         if (obj.force > this.options.threshold) {
             const oldDirection = {
@@ -304,6 +323,7 @@ export default class Joystick extends Super {
             };
 
             this.direction = direction;
+            // MUTATION!!!!!
             obj.direction = direction;
 
             // If all 3 directions are the same, we don't trigger anything.
@@ -331,6 +351,9 @@ export default class Joystick extends Super {
             // If no threshold reached, simply reset the direction.
             this.resetDirection();
         }
+
+        // Trigger the move.
+        this.trigger('move', obj);
 
         return obj;
     }

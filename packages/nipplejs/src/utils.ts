@@ -337,13 +337,14 @@ export const map = <T>(ar: T[] | T, fn: (item: T) => void): void => {
 /**
  * Clamp a position within a range.
  * @param {Coordinates} pos - The position to clamp.
- * @param {Coordinates} nipplePos - The position of the nipple.
+ * @param {Coordinates} joystickPos - The position of the joystick.
  * @param {number} size - The size of the range.
  * @returns {Coordinates} The clamped position.
  */
-export const clamp = (pos: Coordinates, nipplePos: Coordinates, size: number): Coordinates => ({
-    //                          left-clamping        right-clamping
-    x: Math.min(Math.max(pos.x, nipplePos.x - size), nipplePos.x + size),
-    //                          top-clamping         bottom-clamping
-    y: Math.min(Math.max(pos.y, nipplePos.y - size), nipplePos.y + size),
+// TODO: Verify this calculation.
+export const clamp = (pos: Coordinates, joystickPos: Coordinates, size: number): Coordinates => ({
+    //                          left-clamping          right-clamping
+    x: Math.min(Math.max(pos.x, joystickPos.x - size), joystickPos.x + size),
+    //                          top-clamping           bottom-clamping
+    y: Math.min(Math.max(pos.y, joystickPos.y - size), joystickPos.y + size),
 });

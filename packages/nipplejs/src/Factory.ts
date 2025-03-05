@@ -1,15 +1,15 @@
 import Collection from './Collection';
+import type Joystick from './Joystick';
 import Super from './Super';
-import type { InternalEvent, CollectionOptions, DomEvent } from './types';
+import { MODES } from './constants';
+import type { CollectionOptions, DomEvent } from './types';
 import * as u from './utils';
 
 export default class Factory extends Super {
-    // TODO: Make this a map.
-    ids: Map<number, number> = new Map();
-    index: number = 0;
     scroll: { x: number; y: number } = u.getScroll();
     private binded: boolean = false;
-    private collections: Collection[] = [];
+    private joysticks: Map<number, { joystick: Joystick; collection: Collection }> = new Map();
+    private collections: Set<Collection> = new Set();
 
     constructor() {
         super();
@@ -21,9 +21,9 @@ export default class Factory extends Super {
     private bindResize() {
         const resizeHandler = () => {
             this.collections.forEach((collection) => {
-                collection.all.forEach((nipple) => {
-                    const pos = nipple.ui.el.getBoundingClientRect();
-                    nipple.position = {
+                collection.all.forEach((joystick) => {
+                    const pos = joystick.ui.el.getBoundingClientRect();
+                    joystick.position = {
                         x: this.scroll.x + pos.left,
                         y: this.scroll.y + pos.top,
                     };
@@ -52,8 +52,8 @@ export default class Factory extends Super {
     getJoystick(identifier: number) {
         for (const coll of this.collections) {
             // TODO: Could be optimised using Map or Set.
-            if (coll.identifiers.includes(identifier)) {
-                return coll.getJoystick(identifier);
+            if (coll.all.has(identifier)) {
+                return coll.all.get(identifier);
             }
         }
     }
@@ -63,7 +63,7 @@ export default class Factory extends Super {
         const collection = new Collection(this, options);
 
         this.bindCollection(collection);
-        this.collections.push(collection);
+        this.collections.add(collection);
 
         return collection;
     }
@@ -74,35 +74,104 @@ export default class Factory extends Super {
 
         // When a collection gets destroyed
         // we clean behind.
-        collection.on('destroyed', this.onDestroyed.bind(this));
+        collection.on('collectionDestroyed', (evt) => {
+            // Clean local lists.
+            this.collections.delete(evt.data);
+            evt.data.all.forEach((joystick) => {
+                this.joysticks.delete(joystick.identifier);
+            });
+            this.unbindDocument();
+        });
 
-        // Other events that will get bubbled up.
-        collection.on('start shown hidden rested', (evt) => {
-            type EvtType = `shown${string}` & `hidden${string}` & `rested${string}`;
-            const type = `${evt.type} ${evt.data.id}:${evt.type}`;
+        collection.on('joystickDestroyed', (evt) => {
+            this.joysticks.delete(evt.data.identifier);
+            this.unbindDocument();
+        });
+
+        collection.on('end', () => {
+            this.unbindDocument();
+        });
+
+        collection.on('added', (evt) => {
+            this.joysticks.set(evt.data.identifier, { collection, joystick: evt.data });
+            this.bindDocument();
+        });
+
+        // Other events that we bubble up.
+        collection.on('pressure', (evt) => {
+            this.trigger(`pressure ${evt.target.uid}:pressure`, evt.data);
+        });
+        collection.on('collectionDestroyed', (evt) => {
+            const type = `${evt.type} ${evt.target.uid}:${evt.type}`;
+            this.trigger(type as `collectionDestroyed${string}`, evt.data);
+        });
+        collection.on('added start shown hidden rested removed end joystickDestroyed', (evt) => {
+            type EvtType = `added${string}` &
+                `start${string}` &
+                `shown${string}` &
+                `hidden${string}` &
+                `rested${string}` &
+                `removed${string}` &
+                `end${string}` &
+                `joystickDestroyed${string}`;
+            const type = `${evt.type} ${evt.target.uid}:${evt.type}`;
             this.trigger(type as EvtType, evt.data);
         });
+        collection.on('move', (evt) => {
+            this.trigger(`move ${evt.target.uid}:move`, evt.data);
+        });
         collection.on('dir dir:up dir:right dir:down dir:left', (evt) => {
-            const type = `${evt.type} ${evt.data.identifier}:${evt.type}`;
+            const type = `${evt.type} ${evt.target.uid}:${evt.type}`;
             this.trigger(type as `dir${string}`, evt.data);
         });
         collection.on('plain plain:up plain:right plain:down plain:left', (evt) => {
-            const type = `${evt.type} ${evt.data.identifier}:${evt.type}`;
+            const type = `${evt.type} ${evt.target.uid}:${evt.type}`;
             this.trigger(type as `plain${string}`, evt.data);
         });
     }
 
-    onDestroyed(evt: InternalEvent<Collection>) {
-        const coll = evt.data;
-        if (this.collections.indexOf(coll) < 0) {
+    cleanInactiveTouches(evt: DomEvent) {
+        if (!evt.isTouch) {
             return;
         }
-        this.collections.splice(this.collections.indexOf(coll), 1);
+
+        const toucheIdentifiers =
+            'touches' in evt.initial
+                ? Array.from(evt.initial.touches).map((t) => t.identifier)
+                : [];
+
+        // Make some place in the other touches that may be dormant.
+        // Search within our Factory's joysticks.
+        for (const [identifier, { collection, joystick }] of this.joysticks) {
+            // No need to clean if the collection is static or semi.
+            if (collection.options.mode !== MODES.dynamic) {
+                continue;
+            }
+
+            // If we don't find a saved identifier in the list of touches
+            // that are currently active on the event,
+            // we trigger an end event on it.
+            if (!toucheIdentifiers.includes(identifier)) {
+                if (!joystick) {
+                    console.error(`No collection found for cleaning identifier ${identifier}`);
+                    return;
+                }
+
+                collection.processOnEnd(
+                    u.processEvent(evt.initial, {
+                        ...evt.raw,
+                        // Re-use the event but spoof it's identifier with the inactive one.
+                        identifier,
+                    }),
+                );
+            }
+        }
     }
 
     bindDocument() {
         // Bind only if not already binded
         if (!this.binded) {
+            this.bindEvt(document, 'start', this.onstart);
             this.bindEvt(document, 'move', this.onmove);
             this.bindEvt(document, 'end', this.onend);
             this.binded = true;
@@ -111,30 +180,26 @@ export default class Factory extends Super {
 
     unbindDocument(force: boolean = false) {
         // If there are no touch left unbind the document.
-        if (!Object.keys(this.ids).length || force === true) {
+        if (this.binded && (!this.joysticks.size || force === true)) {
+            this.unbindEvt(document, 'start', this.onstart);
             this.unbindEvt(document, 'move', this.onmove);
             this.unbindEvt(document, 'end', this.onend);
             this.binded = false;
         }
     }
 
-    // Get an incremented id.
-    // Abstraction layer over the evt.identifier.
-    // TODO: Verify if this is actually useful.
-    getId(identifier: number) {
-        if (!this.ids.has(identifier)) {
-            this.ids.set(identifier, this.index++);
+    getCollectionFromIdentifier(identifier: number) {
+        for (const coll of this.collections) {
+            if (coll.all.has(identifier)) {
+                return coll;
+            }
         }
-
-        return this.ids.get(identifier)!;
     }
 
-    removeId(identifier: number) {
-        if (this.ids.has(identifier)) {
-            const removed = { id: this.ids.get(identifier), identifier };
-            this.ids.delete(identifier);
-            return removed;
-        }
+    private onstart(evt: DomEvent) {
+        // Each collection handles its own start event on their respective zones.
+        // Clean the inactive touches.
+        this.cleanInactiveTouches(evt);
     }
 
     private onmove(evt: DomEvent) {
@@ -144,43 +209,30 @@ export default class Factory extends Super {
     }
 
     private onend(evt: DomEvent) {
+        // Clean the inactive touches.
+        this.cleanInactiveTouches(evt);
         this.handleEventInCollection(evt, (coll) => {
             coll.processOnEnd(evt);
         });
     }
 
-    // TODO: Verify if this is actually called.
-    // private oncancel(evt: DomEvent) {
-    //     this.handleEventInCollection(evt, (coll) => {
-    //         coll.processOnEnd(evt);
-    //     });
-    // }
-
     private handleEventInCollection(evt: DomEvent, cb: (coll: Collection) => void) {
-        let collectionFound = false;
-        for (const coll of this.collections) {
-            if (!coll.identifiers.includes(evt.identifier)) {
-                continue;
-            }
-
-            // Run the collection's handler.
-            cb(coll);
-            // Mark the event to avoid cleaning it later.
-            collectionFound = true;
-        }
-
+        const joystick = this.joysticks.get(evt.identifier);
         // If the event isn't handled by any collection,
         // we need to clean its identifier.
-        if (!collectionFound) {
-            this.removeId(evt.identifier);
+        if (!joystick) {
+            console.error(
+                `No collection found for event ${evt.type} on identifier ${evt.identifier}`,
+            );
+            this.joysticks.delete(evt.identifier);
+            return;
         }
+        cb(joystick.collection);
     }
 
     // Cleanly destroy the factory
     destroy() {
         this.unbindDocument(true);
-        this.ids.clear();
-        this.index = 0;
         this.collections.forEach((collection) => {
             collection.destroy();
         });

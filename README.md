@@ -112,6 +112,8 @@ define(['nipplejs'], function (nipplejs) {
 ```javascript
 // Module
 import nipplejs from 'nipplejs';
+
+nipplejs.create(options);
 ```
 
 ```html
@@ -145,8 +147,7 @@ var options = {
     restOpacity: Number,            // opacity when not 'dynamic' and rested
     lockX: Boolean,                 // only move on the X axis
     lockY: Boolean,                 // only move on the Y axis
-    catchDistance: Number,          // distance to recycle previous joystick in
-                                    // 'semi' mode
+    catchDistance: Number,          // distance to recycle previous joystick in 'semi' mode
     shape: String,                  // 'circle' or 'square'
     dynamicPage: Boolean,           // Enable if the page has dynamically visible elements
     follow: Boolean,                // Makes the joystick follow the thumbstick

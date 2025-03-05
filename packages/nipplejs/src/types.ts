@@ -375,7 +375,6 @@ export interface JoystickEventData {
     };
     distance: number;
     force: number;
-    identifier: number;
     instance: Joystick;
     lockX: boolean;
     lockY: boolean;
