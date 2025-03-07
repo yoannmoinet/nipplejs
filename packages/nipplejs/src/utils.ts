@@ -159,39 +159,36 @@ export const processEvents = (evt: SupportedEvent): DomEvent[] => {
     }
 
     // Will return an array of events, based on touches, pointer or mouse data.
-    const events: DomEvent[] = domEvents.map<DomEvent>((domEvt) => {
+    return domEvents.map<DomEvent>((domEvt) => {
         return processEvent(evt, domEvt);
     });
-
-    return events;
 };
 
-export const processEvent = (evt: SupportedEvent, domEvt: ProcessedEvent): DomEvent => {
+export const getPressureFromEvt = (evt: ProcessedEvent): number => {
+    // Compute the pressure data.
+    return 'force' in evt // Pressure on iOS 3D Touch.
+        ? evt.force
+        : 'pressure' in evt // Pressure on Pointers.
+          ? evt.pressure
+          : 'webkitForce' in evt // Pressure on trackpads.
+            ? (evt.webkitForce as number)
+            : 'buttons' in evt // Id of the mouse button pressed. 0 is none, 1 is left, 2 is right, ...
+              ? evt.buttons !== 0
+                  ? 1
+                  : 0
+              : 0;
+};
+
+export const processEvent = (evt: SupportedEvent, processedEvt: ProcessedEvent): DomEvent => {
     // Compute identifier of the event.
     // It's especially important for touches,
     // to track the correct touch in a multitouch interaction.
     const identifier: number =
-        'identifier' in domEvt
-            ? domEvt.identifier
-            : 'pointerId' in domEvt
-              ? domEvt.pointerId
+        'identifier' in processedEvt
+            ? processedEvt.identifier
+            : 'pointerId' in processedEvt
+              ? processedEvt.pointerId
               : 0 || 0;
-
-    // Compute the pressure data.
-    // To keep track of it, we'll also need to start an interval.
-    // TODO: Do the pressure tracking interval abstraction here.
-    const pressure: number =
-        'force' in domEvt
-            ? domEvt.force
-            : 'pressure' in domEvt
-              ? domEvt.pressure
-              : 'webkitForce' in domEvt // Pressure on trackpads.
-                ? (domEvt.webkitForce as number)
-                : 'buttons' in domEvt // Id of the mouse button pressed. 0 is none.
-                  ? domEvt.buttons !== 0
-                      ? 1
-                      : 0
-                  : 0;
 
     // This is only what we need, to normalize the interaction event.
     // Everything else is based off this data.
@@ -199,38 +196,15 @@ export const processEvent = (evt: SupportedEvent, domEvt: ProcessedEvent): DomEv
         identifier,
         isTouch: 'touches' in evt || 'changedTouches' in evt,
         position: {
-            x: domEvt.pageX,
-            y: domEvt.pageY,
+            x: processedEvt.pageX,
+            y: processedEvt.pageY,
         },
-        pressure,
+        pressure: getPressureFromEvt(processedEvt),
         type: evt.type,
         initial: evt,
-        raw: domEvt,
+        raw: processedEvt,
     };
 };
-
-/**
- * Trigger a custom event on an element.
- * @param {HTMLElement} el - The element to trigger the event on.
- * @param {string} type - The type of event to trigger.
- * @param {any} data - The data to pass to the event.
- */
-// TODO: This isn't used apparently.
-// export const trigger = (el: HTMLElement, type: string, data: any): void => {
-//     const evt = new CustomEvent(type, data);
-//     el.dispatchEvent(evt);
-// };
-
-/**
- * Prepare an event for processing.
- * @param {MouseEvent | TouchEvent} evt - The event to prepare.
- * @returns {TouchList | MouseEvent} The prepared event.
- */
-// TODO: This isn't used apparently.
-// export const prepareEvent = (evt: MouseEvent | TouchEvent): TouchList | MouseEvent => {
-//     evt.preventDefault();
-//     return evt.type.match(/^touch/) ? (evt as TouchEvent).changedTouches : (evt as MouseEvent);
-// };
 
 /**
  * Get the current scroll position of the window.

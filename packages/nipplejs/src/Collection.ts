@@ -43,11 +43,6 @@ export default class Collection extends Super {
      * */
     actives: Set<number> = new Set();
     /**
-     *  The list of the setInterval IDs that we use to monitor pressure on the Joysticks.
-     *  Used to clear the intervals when the Joystick is destroyed.
-     * */
-    pressureIntervals: Record<number, number> = {};
-    /**
      *  Is the parent element of the Joysticks a flex container?
      * */
     parentIsFlex: boolean = false;
@@ -135,6 +130,7 @@ export default class Collection extends Super {
             return this.all.values().next().value;
         }
 
+        // TODO: Should we fallback to the first Joystick?
         return this.all.get(identifier);
     }
 
@@ -189,6 +185,10 @@ export default class Collection extends Super {
         }
 
         // TODO: Maybe get one that may already exists.
+        if (this.all.has(identifier)) {
+            console.error(`Joystick with identifier ${identifier} already exists.`);
+        }
+
         const joystick = new Joystick(this, {
             color: this.options.color,
             size: this.options.size,
@@ -223,22 +223,20 @@ export default class Collection extends Super {
         return joystick;
     }
 
-    // TODO: See if we can factorise with Factory.bindCollection.
     private bindJoystick(joystick: Joystick) {
-        // Bubble up identified events.
-
-        // When a Joystick gets destroyed
-        // We clean behind.
+        // When a Joystick gets destroyed, we clean behind.
         joystick.on('joystickDestroyed', (evt) => {
             this.deleteIdentifierFromLists(joystick.identifier);
-            this.trigger(`joystickDestroyed ${joystick.uid}:joystickDestroyed`, evt.data);
-        });
-
-        joystick.on('pressure', (evt) => {
-            this.trigger(`pressure ${joystick.uid}:pressure`, evt.data);
         });
 
         // Other events that will get bubbled up.
+        // TODO: See if we can factorise with Factory.bindCollection.
+        joystick.on('joystickDestroyed', (evt) => {
+            this.trigger(`joystickDestroyed ${joystick.uid}:joystickDestroyed`, evt.data);
+        });
+        joystick.on('pressure', (evt) => {
+            this.trigger(`pressure ${joystick.uid}:pressure`, evt.data);
+        });
         joystick.on('added start shown hidden rested removed end', (evt) => {
             type EvtType = `added${string}` &
                 `start${string}` &
@@ -275,12 +273,8 @@ export default class Collection extends Super {
         const joystick = this.getOrCreate(evt.identifier, evt.position);
 
         const process = () => {
-            joystick.show();
-            if (evt.pressure > 0) {
-                // This is using the Touch from a TouchList.
-                // FIXME: This should be done from Super for all the touches automatically.
-                this.pressureFn(evt, joystick);
-            }
+            // Show the joystick.
+            joystick.start();
             // Trigger a first move.
             this.processOnMove(evt);
         };
@@ -297,7 +291,7 @@ export default class Collection extends Super {
                 // We're in the catch distance, we keep this one.
                 process();
             } else {
-                // We're too far, delete it and create a new one.
+                // We're too far, delete it and start over.
                 joystick.destroy();
                 this.processOnStart(evt);
             }
@@ -305,17 +299,6 @@ export default class Collection extends Super {
             // In the other modes, we just process it.
             process();
         }
-    }
-
-    private pressureFn(evt: DomEvent, joystick: Joystick) {
-        let previousPressure = 0;
-        clearInterval(this.pressureIntervals[evt.identifier]);
-        this.pressureIntervals[evt.identifier] = setInterval(() => {
-            if (evt.pressure !== previousPressure) {
-                joystick.trigger('pressure', evt.pressure);
-                previousPressure = evt.pressure;
-            }
-        }, 100);
     }
 
     private getOrCreate(identifier: number, position: Coordinates): Joystick {
@@ -366,6 +349,7 @@ export default class Collection extends Super {
         }
 
         // This should not happen.
+        // TODO: This could be done from this.getJoystick.
         // FIXME: Maybe  it happens in multitouch when we have more touches than maxNumberOfJoysticks.
         if (!joystick) {
             console.error(`Found zombie joystick onMove with identifier ${evt.identifier}`);
@@ -495,6 +479,7 @@ export default class Collection extends Super {
         const joystick = this.getJoystick(evt.identifier);
 
         // This should not happen.
+        // TODO: This could be done from this.getJoystick.
         if (!joystick) {
             console.error(`Found zombie joystick onEnd with identifier ${evt.identifier}`);
             this.deleteIdentifierFromLists(evt.identifier);
@@ -502,15 +487,7 @@ export default class Collection extends Super {
         }
 
         // We hide the joystick.
-        joystick.hide();
-
-        // Stop updating its pressure.
-        clearInterval(this.pressureIntervals[joystick.identifier]);
-
-        // TODO: Why do this?
-        joystick.resetDirection();
-
-        joystick.trigger('end', joystick);
+        joystick.end();
 
         // We only delete all its references if we're in dynamic.
         if (this.options.mode === MODES.dynamic) {
@@ -534,13 +511,6 @@ export default class Collection extends Super {
         this.all.clear();
         this.idles.clear();
         this.actives.clear();
-
-        // Clear the intervals.
-        for (const i in this.pressureIntervals) {
-            if (Object.hasOwn(this.pressureIntervals, i)) {
-                clearInterval(this.pressureIntervals[i]);
-            }
-        }
 
         // Events.
         this.trigger('collectionDestroyed', this);

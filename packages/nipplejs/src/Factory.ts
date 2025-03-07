@@ -48,14 +48,9 @@ export default class Factory extends Super {
 
     // Get a joystick from its identifier.
     // Public API, not used internally.
-    // TODO: Verify if this is actually useful.
+    // TODO: Verify if this is actually useful/documented.
     getJoystick(identifier: number) {
-        for (const coll of this.collections) {
-            // TODO: Could be optimised using Map or Set.
-            if (coll.all.has(identifier)) {
-                return coll.all.get(identifier);
-            }
-        }
+        return this.joysticks.get(identifier)?.joystick;
     }
 
     // Collection Factory
@@ -68,12 +63,8 @@ export default class Factory extends Super {
         return collection;
     }
 
-    // TODO: See if we can factorise with Collection.bindCollection.
     private bindCollection(collection: Collection) {
-        // Bubble up identified events.
-
-        // When a collection gets destroyed
-        // we clean behind.
+        // When a collection gets destroyed, we clean behind.
         collection.on('collectionDestroyed', (evt) => {
             // Clean local lists.
             this.collections.delete(evt.data);
@@ -98,6 +89,7 @@ export default class Factory extends Super {
         });
 
         // Other events that we bubble up.
+        // TODO: See if we can factorise with Collection.bindCollection.
         collection.on('pressure', (evt) => {
             this.trigger(`pressure ${evt.target.uid}:pressure`, evt.data);
         });
@@ -131,14 +123,10 @@ export default class Factory extends Super {
     }
 
     cleanInactiveTouches(evt: DomEvent) {
-        if (!evt.isTouch) {
-            return;
-        }
-
         const toucheIdentifiers =
             'touches' in evt.initial
                 ? Array.from(evt.initial.touches).map((t) => t.identifier)
-                : [];
+                : [evt.identifier];
 
         // Make some place in the other touches that may be dormant.
         // Search within our Factory's joysticks.
@@ -211,6 +199,7 @@ export default class Factory extends Super {
     private onend(evt: DomEvent) {
         // Clean the inactive touches.
         this.cleanInactiveTouches(evt);
+        // Proceed with each collection.
         this.handleEventInCollection(evt, (coll) => {
             coll.processOnEnd(evt);
         });
