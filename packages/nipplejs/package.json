@@ -13,49 +13,52 @@
     "bugs": {
         "url": "https://github.com/yoannmoinet/nipplejs/issues"
     },
-    "main": "./dist/src/index.js",
-    "browser": "./dist/src/index.js",
-    "module": "./dist/src/index.mjs",
-    "types": "./dist/src/index.d.ts",
+    "main": "./dist/index.js",
+    "browser": "./dist/index.js",
+    "module": "./dist/index.mjs",
+    "types": "./dist/index.d.ts",
     "exports": {
-        "./dist/src/*": "./dist/src/*",
+        "./dist/*": "./dist/*",
         ".": "./src/index.ts",
         "./*": "./src/*.ts"
     },
     "publishConfig": {
         "access": "public",
-        "types": "./dist/src/index.d.ts",
+        "types": "./dist/index.d.ts",
         "exports": {
             "./package.json": "./package.json",
             ".": {
-                "import": "./dist/src/index.mjs",
-                "require": "./dist/src/index.js",
-                "types": "./dist/src/index.d.ts"
-            }
+                "import": "./dist/index.mjs",
+                "require": "./dist/index.js",
+                "types": "./dist/index.d.ts"
+            },
+            "./*": "./src/*.ts"
         }
     },
     "files": [
-        "dist"
+        "dist",
+        "src"
     ],
     "scripts": {
-        "build": "yarn clean && rollup --config rollup.config.mjs",
+        "buildCmd": "rollup --config rollup.config.mjs",
+        "build": "yarn clean && yarn buildCmd",
         "clean": "rm -rf dist",
         "prepack": "NODE_ENV=production yarn build",
         "typecheck": "tsc --noEmit",
-        "watch": "yarn clean && rollup --config rollup.config.mjs --watch"
+        "watch": "yarn build --watch"
     },
     "devDependencies": {
         "@nipple/core": "workspace:*",
         "@nipple/tools": "workspace:*",
-        "@rollup/plugin-commonjs": "28.0.1",
-        "@rollup/plugin-esm-shim": "0.1.7",
+        "@rollup/plugin-commonjs": "28.0.3",
+        "@rollup/plugin-esm-shim": "0.1.8",
         "@rollup/plugin-json": "6.1.0",
-        "@rollup/plugin-node-resolve": "15.3.0",
+        "@rollup/plugin-node-resolve": "16.0.0",
         "@rollup/plugin-terser": "0.4.4",
         "esbuild": "0.24.0",
         "rollup": "4.24.2",
         "rollup-plugin-dts": "6.1.1",
-        "rollup-plugin-esbuild": "6.1.1",
+        "rollup-plugin-esbuild": "6.2.1",
         "typescript": "5.4.3"
     }
 }

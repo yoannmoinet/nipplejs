@@ -420,5 +420,11 @@ module.exports = {
                 'no-console': ['error', { allow: ['time', 'timeEnd'] }],
             },
         },
+        {
+            files: ['rollup.config.mjs'],
+            rules: {
+                'import/no-extraneous-dependencies': 'off',
+            },
+        },
     ],
 };
