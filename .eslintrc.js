@@ -376,6 +376,7 @@ module.exports = {
             files: ['packages/tests/**/*.*'],
             env: {
                 jest: true,
+                browser: true,
             },
             globals: {
                 fail: 'readonly',

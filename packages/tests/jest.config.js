@@ -7,6 +7,6 @@ module.exports = {
     resetModules: true,
     roots: ['./src/unit/'],
     setupFilesAfterEnv: ['<rootDir>/src/_jest/setupAfterEnv.ts'],
-    testEnvironment: 'node',
+    testEnvironment: 'jsdom',
     testMatch: ['**/*.test.*'],
 };

@@ -41,6 +41,8 @@
     "devDependencies": {
         "@types/jest": "29.5.12",
         "@types/node": "^22",
+        "@types/web": "0.0.206",
+        "jest-environment-jsdom": "29.7.0",
         "typescript": "5.4.3"
     }
 }
