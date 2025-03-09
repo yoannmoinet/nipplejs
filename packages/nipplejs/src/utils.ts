@@ -22,7 +22,7 @@ export const distance = (p1: Coordinates, p2: Coordinates): number => {
 };
 
 /**
- * Calculate the angle between two points in degrees.
+ * Calculate the angle formed by a segment of two points, in degrees.
  * @param {Coordinates} p1 - The first point.
  * @param {Coordinates} p2 - The second point.
  * @returns {number} The angle between the two points in degrees.
@@ -42,11 +42,11 @@ export const angle = (p1: Coordinates, p2: Coordinates): number => {
  * @returns {Coordinates} The coordinates of the new point.
  */
 export const findCoord = (p: Coordinates, d: number, a: number): Coordinates => {
-    const b: Coordinates = { x: 0, y: 0 };
     const aInRad = radians(a);
-    b.x = p.x - d * Math.cos(aInRad);
-    b.y = p.y - d * Math.sin(aInRad);
-    return b;
+    return {
+        x: p.x - d * Math.cos(aInRad),
+        y: p.y - d * Math.sin(aInRad),
+    };
 };
 
 /**
@@ -66,18 +66,6 @@ export const radians = (a: number): number => {
 export const degrees = (a: number): number => {
     return a * (180 / Math.PI);
 };
-
-/**
- * Check if a mouse, touch, or pointer event is pressed.
- * @param {SupportedEvent} evt - The event to check.
- * @returns {boolean} True if the event is pressed, false otherwise.
- */
-// export const isPressed = (evt: SupportedEvent): boolean => {
-//     if (isNaN(evt.buttons)) {
-//         return evt.pressure !== 0;
-//     }
-//     return evt.buttons !== 0;
-// };
 
 const timers = new Map<() => void, number>();
 /**
@@ -273,39 +261,6 @@ export const extend = <T extends object>(objA: T, objB: Partial<T>): T => {
         }
     }
     return objA;
-};
-
-/**
- * Safely extend an object with the properties of another object, overwrite only what's already present
- * @param {T} objA - The object to extend.
- * @param {Partial<T>} objB - The object to extend with.
- * @returns {T} The extended object.
- */
-export const safeExtend = <T extends object>(objA: T, objB: Partial<T>): T => {
-    const obj: Partial<T> = {};
-    for (const i in objA) {
-        if (Object.hasOwn(objA, i) && Object.hasOwn(objB, i)) {
-            obj[i as keyof T] = objB[i] as T[keyof T];
-        } else if (Object.hasOwn(objA, i)) {
-            obj[i as keyof T] = objA[i];
-        }
-    }
-    return obj as T;
-};
-
-/**
- * Map a function over an array or a single item.
- * @param {T[] | T} ar - The array or item to map over.
- * @param {(item: T) => void} fn - The function to map.
- */
-export const map = <T>(ar: T[] | T, fn: (item: T) => void): void => {
-    if (Array.isArray(ar)) {
-        for (let i = 0, max = ar.length; i < max; i += 1) {
-            fn(ar[i]);
-        }
-    } else {
-        fn(ar);
-    }
 };
 
 /**
