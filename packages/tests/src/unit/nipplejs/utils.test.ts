@@ -1,4 +1,12 @@
+import type { Coordinates } from 'nipplejs/types';
 import * as u from 'nipplejs/utils';
+
+// JSDOM does not implement Touch.
+const getTouch = (args: Partial<Touch>) => args as Touch;
+// JSDOM does not implement PointerEvent.
+const getPointerEvent = (args: Partial<PointerEvent>) => args as PointerEvent;
+// JSDOM does not implement MouseEvent super well.
+const getMouseEvent = (args: Partial<MouseEvent>) => args as MouseEvent;
 
 describe('utils', () => {
     describe('distance', () => {
@@ -149,5 +157,217 @@ describe('utils', () => {
         });
     });
 
-    describe('processEvents', () => {});
+    describe('getPressureFromEvt', () => {
+        it('should return the pressure from a mouse event', () => {
+            const evt = new MouseEvent('click', { buttons: 1 });
+            expect(u.getPressureFromEvt(evt)).toBe(1);
+        });
+
+        it('should return the pressure from a touch event', () => {
+            const touch = getTouch({
+                identifier: 1,
+                target: document.createElement('div'),
+                force: 0.5,
+                pageX: 150,
+                pageY: 250,
+            });
+            expect(u.getPressureFromEvt(touch)).toBe(0.5);
+        });
+
+        it('should return the pressure from a pointer event', () => {
+            const evt = getPointerEvent({
+                pointerId: 3,
+                pageX: 200,
+                pageY: 300,
+                pressure: 0.5,
+            });
+            expect(u.getPressureFromEvt(evt)).toBe(0.5);
+        });
+    });
+
+    describe('processEvent', () => {
+        it('should process a single mouse event', () => {
+            const evt = getMouseEvent({ buttons: 1, pageX: 100, pageY: 200, type: 'click' });
+            const processedEvent = u.processEvent(evt, evt);
+            expect(processedEvent).toEqual(
+                expect.objectContaining({
+                    identifier: 0,
+                    isTouch: false,
+                    position: { x: 100, y: 200 },
+                    pressure: 1,
+                    type: 'click',
+                    initial: evt,
+                    raw: evt,
+                }),
+            );
+        });
+
+        it('should process a touch event', () => {
+            const touch = getTouch({
+                identifier: 1,
+                target: document.createElement('div'),
+                pageX: 150,
+                pageY: 250,
+            });
+            const evt = new TouchEvent('touchstart', { changedTouches: [touch] });
+            const processedEvent = u.processEvent(evt, touch);
+            expect(processedEvent).toEqual(
+                expect.objectContaining({
+                    identifier: 1,
+                    isTouch: true,
+                    position: { x: 150, y: 250 },
+                    pressure: 0,
+                    type: 'touchstart',
+                    initial: evt,
+                    raw: touch,
+                }),
+            );
+        });
+
+        it('should process a pointer event', () => {
+            const evt = getPointerEvent({
+                pointerId: 3,
+                pageX: 200,
+                pageY: 300,
+                pressure: 0.5,
+                type: 'pointerdown',
+            });
+            const processedEvent = u.processEvent(evt, evt);
+            expect(processedEvent).toEqual(
+                expect.objectContaining({
+                    identifier: 3,
+                    isTouch: false,
+                    position: { x: 200, y: 300 },
+                    pressure: 0.5,
+                    type: 'pointerdown',
+                    initial: evt,
+                    raw: evt,
+                }),
+            );
+        });
+    });
+
+    describe('processEvents', () => {
+        it('should process multiple touch events', () => {
+            const touch1 = getTouch({
+                identifier: 1,
+                target: document.createElement('div'),
+                pageX: 150,
+                pageY: 250,
+            });
+            const touch2 = getTouch({
+                identifier: 2,
+                target: document.createElement('div'),
+                pageX: 300,
+                pageY: 400,
+            });
+            const evt = new TouchEvent('touchmove', { changedTouches: [touch1, touch2] });
+            const processedEvents = u.processEvents(evt);
+            expect(processedEvents).toHaveLength(2);
+        });
+
+        it('should process a single mouse event', () => {
+            const evt = new MouseEvent('click', { screenX: 100, screenY: 200 });
+            const processedEvents = u.processEvents(evt);
+            expect(processedEvents).toHaveLength(1);
+        });
+    });
+
+    describe('getScroll', () => {
+        it('should return the scroll position', () => {
+            expect(u.getScroll()).toEqual({ x: 0, y: 0 });
+        });
+    });
+
+    describe('applyPosition', () => {
+        it('should apply the coordinates as position to the element', () => {
+            const el = document.createElement('div');
+            u.applyPosition(el, { x: 100, y: 200 });
+            expect(el.style.left).toBe('100px');
+            expect(el.style.top).toBe('200px');
+        });
+
+        it('should apply the CSS position to the element', () => {
+            const el = document.createElement('div');
+            u.applyPosition(el, { top: '100px', left: '200px', right: '50px', bottom: '10px' });
+            expect(el.style.top).toBe('100px');
+            expect(el.style.left).toBe('200px');
+            expect(el.style.right).toBe('50px');
+            expect(el.style.bottom).toBe('10px');
+        });
+    });
+
+    describe('configStylePropertyObject', () => {
+        it('should return the object with the CSS properties vendorised', () => {
+            const style = u.configStylePropertyObject('borderRadius', '50%');
+            expect(style).toEqual({
+                borderRadius: '50%',
+                WebkitBorderRadius: '50%',
+                MozBorderRadius: '50%',
+                OBorderRadius: '50%',
+                msBorderRadius: '50%',
+            });
+        });
+    });
+
+    describe('extend', () => {
+        const expectations = [
+            {
+                name: 'basic extend',
+                obj: { a: 1, b: 2 },
+                other: { b: 3, c: 4 },
+                expected: { a: 1, b: 3, c: 4 },
+            },
+            {
+                name: 'override existing properties',
+                obj: { a: 1, b: 2 },
+                other: { b: 3, c: 4, a: 5 },
+                expected: { a: 5, b: 3, c: 4 },
+            },
+            {
+                name: 'extend with new properties',
+                obj: { a: 1, b: 2 },
+                other: { b: 3, c: 4, a: 5, d: 6 },
+                expected: { a: 5, b: 3, c: 4, d: 6 },
+            },
+        ];
+        it.each(expectations)(
+            'should extend the object with "$name"',
+            ({ obj, other, expected }) => {
+                u.extend(obj, other);
+                expect(obj).toEqual(expected);
+            },
+        );
+    });
+
+    describe('clamp', () => {
+        const expectations: {
+            name: string;
+            center: Coordinates;
+            position: Coordinates;
+            maximumRange: number;
+            expected: Coordinates;
+        }[] = [
+            {
+                name: 'position within the range',
+                center: { x: 0, y: 0 },
+                position: { x: 3, y: 4 },
+                maximumRange: 5,
+                expected: { x: 0, y: 0 },
+            },
+            {
+                name: 'position outside the range',
+                center: { x: 0, y: 0 },
+                position: { x: 3, y: 4 },
+                maximumRange: 2,
+                expected: { x: 1, y: 2 },
+            },
+        ];
+        it.each(expectations)(
+            'should clamp "$name"',
+            ({ center, position, maximumRange, expected }) => {
+                expect(u.clamp(center, position, maximumRange)).toEqual(expected);
+            },
+        );
+    });
 });

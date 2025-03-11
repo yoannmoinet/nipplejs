@@ -35,3 +35,8 @@ nock.disableNetConnect();
 // Have a simpler, less verbose, console.log output.
 // This bypasses Jest's --silent flag though.
 global.console = console;
+
+// @ts-expect-error - JSDOM does not support PointerEvent.
+global.PointerEvent = MouseEvent;
+// @ts-expect-error - JSDOM does not support Touch.
+global.Touch = MouseEvent;

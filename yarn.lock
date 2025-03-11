@@ -1080,12 +1080,12 @@ __metadata:
     "@types/jest": "npm:29.5.12"
     "@types/node": "npm:^22"
     "@types/web": "npm:0.0.206"
-    clipanion: "npm:4.0.0-rc.3"
     esbuild: "npm:0.24.0"
     glob: "npm:11.0.0"
     jest: "npm:29.7.0"
     jest-environment-jsdom: "npm:29.7.0"
     memfs: "npm:4.9.2"
+    nipplejs: "workspace:*"
     nock: "npm:14.0.0-beta.7"
     rollup: "npm:4.24.2"
     rollup-plugin-esbuild: "npm:6.1.1"
@@ -6137,7 +6137,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"nipplejs@workspace:packages/nipplejs":
+"nipplejs@workspace:*, nipplejs@workspace:packages/nipplejs":
   version: 0.0.0-use.local
   resolution: "nipplejs@workspace:packages/nipplejs"
   dependencies:

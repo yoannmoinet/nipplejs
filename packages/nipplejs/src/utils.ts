@@ -125,33 +125,6 @@ export const unbindEvt = (
     }
 };
 
-// Reconciliation layer for MouseEvent, TouchEvent and PointerEvent.
-// It will ease the process later down the line.
-export const processEvents = (evt: SupportedEvent): DomEvent[] => {
-    // Prevent the browser default action.
-    evt.preventDefault();
-
-    // Prepare arrays of initial events.
-    const domEvents: ProcessedEvent[] = [];
-    // TouchEvent may have multitouches, split them out in an array.
-    if ('changedTouches' in evt) {
-        // evt.changedTouches doesn't really offer a nice iterable interface.
-        for (let i = 0; i < evt.changedTouches.length; i += 1) {
-            const touch = evt.changedTouches.item(i);
-            if (touch) {
-                domEvents.push(touch);
-            }
-        }
-    } else {
-        domEvents.push(evt);
-    }
-
-    // Will return an array of events, based on touches, pointer or mouse data.
-    return domEvents.map<DomEvent>((domEvt) => {
-        return processEvent(evt, domEvt);
-    });
-};
-
 export const getPressureFromEvt = (evt: ProcessedEvent): number => {
     // Compute the pressure data.
     return 'force' in evt // Pressure on iOS 3D Touch.
@@ -192,6 +165,32 @@ export const processEvent = (evt: SupportedEvent, processedEvt: ProcessedEvent):
         initial: evt,
         raw: processedEvt,
     };
+};
+
+// Reconciliation layer for MouseEvent, TouchEvent and PointerEvent.
+// It will ease the process later down the line.
+export const processEvents = (evt: SupportedEvent): DomEvent[] => {
+    // Prevent the browser default action.
+    evt.preventDefault();
+
+    // Prepare arrays of initial events.
+    const domEvents: ProcessedEvent[] = [];
+    // TouchEvent may have multitouches, split them out in an array.
+    if ('changedTouches' in evt) {
+        // evt.changedTouches doesn't really offer a nice iterable interface.
+        for (const touch of evt.changedTouches) {
+            if (touch) {
+                domEvents.push(touch);
+            }
+        }
+    } else {
+        domEvents.push(evt);
+    }
+
+    // Will return an array of events, based on touches, pointer or mouse data.
+    return domEvents.map<DomEvent>((domEvt) => {
+        return processEvent(evt, domEvt);
+    });
 };
 
 /**
@@ -242,7 +241,7 @@ export const configStylePropertyObject = (
     };
     const newProp = prop.charAt(0).toUpperCase() + prop.slice(1);
     // Apply the vendor prefixes.
-    ['webkit', 'Moz', 'o'].forEach((vendor) => {
+    ['Webkit', 'Moz', 'O', 'ms'].forEach((vendor) => {
         obj[`${vendor}${newProp}`] = value;
     });
     return obj;
@@ -270,7 +269,6 @@ export const extend = <T extends object>(objA: T, objB: Partial<T>): T => {
  * @param {number} size - The size of the range.
  * @returns {Coordinates} The clamped position.
  */
-// TODO: Verify this calculation.
 export const clamp = (pos: Coordinates, joystickPos: Coordinates, size: number): Coordinates => ({
     //                          left-clamping          right-clamping
     x: Math.min(Math.max(pos.x, joystickPos.x - size), joystickPos.x + size),

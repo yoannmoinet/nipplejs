@@ -1,4 +1,6 @@
-module.exports = {
+import type { JestConfigWithTsJest } from 'ts-jest';
+
+const config: JestConfigWithTsJest = {
     // Automatically clear mock calls and instances between every test
     clearMocks: true,
     globalSetup: '<rootDir>/src/_jest/globalSetup.ts',
@@ -10,3 +12,5 @@ module.exports = {
     testEnvironment: 'jsdom',
     testMatch: ['**/*.test.*'],
 };
+
+export default config;
