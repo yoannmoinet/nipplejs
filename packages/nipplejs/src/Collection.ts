@@ -75,7 +75,7 @@ export default class Collection extends Super {
     };
 
     constructor(factory: Factory, options: CollectionOptions) {
-        super();
+        super('collection');
         this.factory = factory;
         this.uid = Collection.index++;
         this.options = { ...this.defaults, ...options };
@@ -311,7 +311,7 @@ export default class Collection extends Super {
             if (idleIdentifier) {
                 const joystick = this.all.get(idleIdentifier);
                 if (!joystick) {
-                    console.error(`Couldn't find the joystick with identifier ${idleIdentifier}`);
+                    this.error(`Couldn't find the joystick with identifier ${idleIdentifier}`);
                 }
                 return joystick!;
             }
@@ -324,7 +324,7 @@ export default class Collection extends Super {
 
             // This should never be reached.
             // Static mode should always have an idle joystick.
-            console.warn("Coudln't find the expected joystick. Creating a new one.");
+            this.warn("Coudln't find the expected joystick. Creating a new one.");
         }
 
         // Return a new joystick.
@@ -343,7 +343,7 @@ export default class Collection extends Super {
         // If it's not pressed, just process it as a end event instead.
         // TODO: Note when this can happen.
         if (!evt.pressure) {
-            console.error(`Found unpressed joystick with identifier ${evt.identifier}`);
+            this.error(`Found unpressed joystick with identifier ${evt.identifier}`);
             this.processOnEnd(evt);
             return;
         }
@@ -352,7 +352,7 @@ export default class Collection extends Super {
         // TODO: This could be done from this.getJoystick.
         // FIXME: Maybe  it happens in multitouch when we have more touches than maxNumberOfJoysticks.
         if (!joystick) {
-            console.error(`Found zombie joystick onMove with identifier ${evt.identifier}`);
+            this.error(`Found zombie joystick onMove with identifier ${evt.identifier}`);
             this.deleteIdentifierFromLists(evt.identifier);
             return;
         }
@@ -481,7 +481,7 @@ export default class Collection extends Super {
         // This should not happen.
         // TODO: This could be done from this.getJoystick.
         if (!joystick) {
-            console.error(`Found zombie joystick onEnd with identifier ${evt.identifier}`);
+            this.error(`Found zombie joystick onEnd with identifier ${evt.identifier}`);
             this.deleteIdentifierFromLists(evt.identifier);
             return;
         }

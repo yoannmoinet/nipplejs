@@ -14,8 +14,13 @@ import * as u from './utils';
 
 class Super {
     uid: number = 0;
+    name: string = 'Super';
     private _domHandlers_: Map<DomEventHandler, (evt: SupportedEvent) => void> = new Map();
     private _handlers_: Partial<Record<FactoryEventType, Set<InternalEventHandler<any>>>> = {};
+
+    constructor(name: string) {
+        this.name = name;
+    }
 
     mapOnEvents(arg: string, cb: (type: FactoryEventType) => void): void {
         const types = arg.split(/[ ,]+/g) as FactoryEventType[];
@@ -128,7 +133,7 @@ class Super {
         const cb = this._domHandlers_.get(handler);
 
         if (!cb) {
-            console.error(`Internal handler not found for event ${type}.`, handler);
+            this.error(`Internal handler not found for event ${type}.`, handler);
             return;
         }
 
@@ -138,6 +143,18 @@ class Super {
             // Support multiple interfaces type when necessary.
             u.unbindEvt(el, SECONDARY_BIND[type], cb);
         }
+    }
+
+    log(...args: any[]) {
+        console.log(`[${this.name}|${this.uid}]`, ...args);
+    }
+
+    warn(...args: any[]) {
+        console.warn(`[${this.name}|${this.uid}]`, ...args);
+    }
+
+    error(...args: any[]) {
+        console.error(`[${this.name}|${this.uid}]`, ...args);
     }
 }
 

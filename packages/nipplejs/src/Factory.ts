@@ -12,7 +12,7 @@ export default class Factory extends Super {
     private collections: Set<Collection> = new Set();
 
     constructor() {
-        super();
+        super('factory');
         this.bindResize();
         this.bindScroll();
     }
@@ -141,7 +141,7 @@ export default class Factory extends Super {
             // we trigger an end event on it.
             if (!toucheIdentifiers.includes(identifier)) {
                 if (!joystick) {
-                    console.error(`No collection found for cleaning identifier ${identifier}`);
+                    this.error(`No collection found for cleaning identifier ${identifier}`);
                     return;
                 }
 
@@ -210,9 +210,7 @@ export default class Factory extends Super {
         // If the event isn't handled by any collection,
         // we need to clean its identifier.
         if (!joystick) {
-            console.error(
-                `No collection found for event ${evt.type} on identifier ${evt.identifier}`,
-            );
+            this.error(`No collection found for event ${evt.type} on identifier ${evt.identifier}`);
             this.joysticks.delete(evt.identifier);
             return;
         }

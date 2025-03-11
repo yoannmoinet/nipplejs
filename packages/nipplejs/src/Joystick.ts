@@ -45,7 +45,7 @@ export default class Joystick extends Super {
     };
 
     constructor(collection: Collection, options: JoystickOptions) {
-        super();
+        super('joystick');
         this.identifier = options.identifier;
         this.position = options.position;
         this.frontPosition = options.frontPosition;
