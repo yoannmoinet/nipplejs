@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="utf-8">
-        <title>NippleJS</title>
-        <meta name="viewport" content="width=device-width, initial-scale=0.5, maximum-scale=0.5">
-        <style>
-        html, body {
+
+<head>
+    <meta charset="utf-8">
+    <title>NippleJS</title>
+    <meta name="viewport" content="width=device-width, initial-scale=0.5, maximum-scale=0.5">
+    <style>
+        html,
+        body {
             position: absolute;
             top: 0;
             left: 0;
@@ -32,30 +34,32 @@
             width: 50%;
             background: rgba(0, 0, 255, 0.1);
         }
-        </style>
-    </head>
-    <body>
-        <div id="left"></div>
-        <div id="right"></div>
-        <script src="/dist/nipplejs.js"></script>
-        <script>
-            var joystickL = nipplejs.create({
-                zone: document.getElementById('left'),
-                mode: 'static',
-                position: { left: '20%', top: '50%' },
-                color: 'green',
-                size: 200,
-                lockX: true
-            });
+    </style>
+</head>
 
-            var joystickR = nipplejs.create({
-                zone: document.getElementById('right'),
-                mode: 'static',
-                position: { left: '80%', top: '50%' },
-                color: 'red',
-                size: 200,
-                lockY: true
-            });
-        </script>
-    </body>
+<body>
+    <div id="left"></div>
+    <div id="right"></div>
+    <script src="../../nipplejs/dist/index.js"></script>
+    <script>
+        var joystickL = nipplejs.create({
+            zone: document.getElementById('left'),
+            mode: 'static',
+            position: { left: '20%', top: '50%' },
+            color: 'green',
+            size: 200,
+            lockX: true
+        });
+
+        var joystickR = nipplejs.create({
+            zone: document.getElementById('right'),
+            mode: 'static',
+            position: { left: '80%', top: '50%' },
+            color: 'red',
+            size: 200,
+            lockY: true
+        });
+    </script>
+</body>
+
 </html>

@@ -40,7 +40,7 @@ export const bundle = (config) => ({
  */
 const getOutput = (overrides = {}) => {
     const filename = overrides.format === 'esm' ? packageJson.module : packageJson.main;
-    const plugins = [terser()];
+    const plugins = [];
 
     // Inject ESM shims to support __dirname and co.
     if (overrides.format === 'esm') {
@@ -71,7 +71,7 @@ export const getDefaultBuildConfigs = async () => {
         // Main bundle.
         bundle({
             plugins: [esbuild()],
-            output: [getOutput({ format: 'esm' }), getOutput({ format: 'cjs' })],
+            output: [getOutput({ format: 'esm' }), getOutput({ format: 'umd', name: 'nipplejs' })],
         }),
         // Bundle type definitions.
         bundle({
