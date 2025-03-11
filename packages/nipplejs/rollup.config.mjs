@@ -40,7 +40,7 @@ export const bundle = (config) => ({
  */
 const getOutput = (overrides = {}) => {
     const filename = overrides.format === 'esm' ? packageJson.module : packageJson.main;
-    const plugins = [];
+    const plugins = [terser()];
 
     // Inject ESM shims to support __dirname and co.
     if (overrides.format === 'esm') {
