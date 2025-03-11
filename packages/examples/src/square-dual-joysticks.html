@@ -42,7 +42,7 @@
     <div id="right"></div>
     <script src="../../nipplejs/dist/index.js"></script>
     <script>
-        var joystickL = nipplejs.default.create({
+        var joystickL = nipplejs.create({
             zone: document.getElementById("left"),
             mode: "static",
             position: { left: "30%", top: "50%" },
@@ -51,7 +51,7 @@
             shape: "square"
         });
 
-        var joystickR = nipplejs.default.create({
+        var joystickR = nipplejs.create({
             zone: document.getElementById("right"),
             mode: "static",
             position: { left: "70%", top: "50%" },
