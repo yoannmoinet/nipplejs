@@ -419,20 +419,3 @@ export type ProcessedEvent = MouseEvent | Touch | PointerEvent;
 export type SupportedEventHandler = (evt: SupportedEvent) => void;
 
 export type SupportedElement = HTMLElement | Document | Window;
-
-/**
- * A JavaScript library for creating virtual joysticks, for touch capable interfaces.
- */
-declare module 'nipplejs' {
-    /**
-     * Create a new custom Joystick collection
-     * @param {CollectionOptions} options for creating a collection instance
-     * @return {Collection} a collection instance
-     */
-    function create(options: CollectionOptions): Collection;
-
-    /**
-     * Root factory instance.
-     */
-    const factory: Factory;
-}
