@@ -1030,11 +1030,9 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@nipple/core@workspace:packages/core"
   dependencies:
-    "@types/async-retry": "npm:1.4.8"
     "@types/chalk": "npm:2.2.0"
     "@types/node": "npm:^22"
     "@types/web": "npm:0.0.206"
-    async-retry: "npm:1.3.3"
     chalk: "npm:2.3.1"
     glob: "npm:11.0.0"
     typescript: "npm:5.4.3"
@@ -1533,15 +1531,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/async-retry@npm:1.4.8":
-  version: 1.4.8
-  resolution: "@types/async-retry@npm:1.4.8"
-  dependencies:
-    "@types/retry": "npm:*"
-  checksum: 10/5d4b0b786e2506ab690c311d55a8000c3675cf1036290ad3b83af11ad791c62c9e16e7ff5a6dac3fae557404127451e72c297d711701015b027227586368eaf5
-  languageName: node
-  linkType: hard
-
 "@types/babel__core@npm:^7.1.14":
   version: 7.20.5
   resolution: "@types/babel__core@npm:7.20.5"
@@ -1728,13 +1717,6 @@ __metadata:
   version: 1.20.2
   resolution: "@types/resolve@npm:1.20.2"
   checksum: 10/1bff0d3875e7e1557b6c030c465beca9bf3b1173ebc6937cac547654b0af3bb3ff0f16470e9c4d7c5dc308ad9ac8627c38dbff24ef698b66673ff5bd4ead7f7e
-  languageName: node
-  linkType: hard
-
-"@types/retry@npm:*":
-  version: 0.12.5
-  resolution: "@types/retry@npm:0.12.5"
-  checksum: 10/3fb6bf91835ca0eb2987567d6977585235a7567f8aeb38b34a8bb7bbee57ac050ed6f04b9998cda29701b8c893f5dfe315869bc54ac17e536c9235637fe351a2
   languageName: node
   linkType: hard
 
@@ -2221,15 +2203,6 @@ __metadata:
   version: 1.0.0
   resolution: "async-function@npm:1.0.0"
   checksum: 10/1a09379937d846f0ce7614e75071c12826945d4e417db634156bf0e4673c495989302f52186dfa9767a1d9181794554717badd193ca2bbab046ef1da741d8efd
-  languageName: node
-  linkType: hard
-
-"async-retry@npm:1.3.3":
-  version: 1.3.3
-  resolution: "async-retry@npm:1.3.3"
-  dependencies:
-    retry: "npm:0.13.1"
-  checksum: 10/38a7152ff7265a9321ea214b9c69e8224ab1febbdec98efbbde6e562f17ff68405569b796b1c5271f354aef8783665d29953f051f68c1fc45306e61aec82fdc4
   languageName: node
   linkType: hard
 
@@ -6142,8 +6115,6 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "nipplejs@workspace:packages/nipplejs"
   dependencies:
-    "@nipple/core": "workspace:*"
-    "@nipple/tools": "workspace:*"
     "@rollup/plugin-commonjs": "npm:28.0.3"
     "@rollup/plugin-esm-shim": "npm:0.1.8"
     "@rollup/plugin-json": "npm:6.1.0"
@@ -6903,13 +6874,6 @@ __metadata:
     onetime: "npm:^5.1.0"
     signal-exit: "npm:^3.0.2"
   checksum: 10/f877dd8741796b909f2a82454ec111afb84eb45890eb49ac947d87991379406b3b83ff9673a46012fca0d7844bb989f45cc5b788254cf1a39b6b5a9659de0630
-  languageName: node
-  linkType: hard
-
-"retry@npm:0.13.1":
-  version: 0.13.1
-  resolution: "retry@npm:0.13.1"
-  checksum: 10/6125ec2e06d6e47e9201539c887defba4e47f63471db304c59e4b82fc63c8e89ca06a77e9d34939a9a42a76f00774b2f46c0d4a4cbb3e287268bd018ed69426d
   languageName: node
   linkType: hard
 

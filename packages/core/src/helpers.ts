@@ -1,10 +1,6 @@
-import retry from 'async-retry';
 import fsp from 'fs/promises';
 import fs from 'fs';
 import path from 'path';
-import type { RequestInit } from 'undici-types';
-
-import type { RequestOpts } from './types';
 
 // Format a duration 0h 0m 0s 0ms
 export const formatDuration = (duration: number) => {
@@ -18,74 +14,6 @@ export const formatDuration = (duration: number) => {
     return `${days ? `${days}d ` : ''}${hours ? `${hours}h ` : ''}${minutes ? `${minutes}m ` : ''}${
         seconds ? `${seconds}s ` : ''
     }${milliseconds ? `${milliseconds}ms` : ''}`.trim();
-};
-
-export const ERROR_CODES_NO_RETRY = [400, 403, 413];
-export const NB_RETRIES = 5;
-// Do a retriable fetch.
-export const doRequest = <T>(opts: RequestOpts): Promise<T> => {
-    const { url, method = 'GET', getData, onRetry, type = 'text' } = opts;
-    return retry(
-        async (bail: (e: Error) => void, attempt: number) => {
-            let response: Response;
-            try {
-                const requestInit: RequestInit = {
-                    method,
-                    // This is needed for sending body in NodeJS' Fetch.
-                    // https://github.com/nodejs/node/issues/46221
-                    duplex: 'half',
-                };
-
-                let requestHeaders: RequestInit['headers'] = {};
-                if (typeof getData === 'function') {
-                    const { data, headers } = await getData();
-                    requestInit.body = data;
-                    requestHeaders = { ...requestHeaders, ...headers };
-                }
-
-                response = await fetch(url, { ...requestInit, headers: requestHeaders });
-            } catch (error: any) {
-                // We don't want to retry if there is a non-fetch related error.
-                bail(error);
-                // bail(error) throws so the return is never executed.
-                return {} as T;
-            }
-
-            if (!response.ok) {
-                // Not instantiating the error here, as it will make Jest throw in the tests.
-                const errorMessage = `HTTP ${response.status} ${response.statusText}`;
-                if (ERROR_CODES_NO_RETRY.includes(response.status)) {
-                    bail(new Error(errorMessage));
-                    // bail(error) throws so the return is never executed.
-                    return {} as T;
-                } else {
-                    // Trigger the retry.
-                    throw new Error(errorMessage);
-                }
-            }
-
-            try {
-                let result;
-                // Await it so we catch any parsing error and bail.
-                if (type === 'json') {
-                    result = await response.json();
-                } else {
-                    result = await response.text();
-                }
-
-                return result as T;
-            } catch (error: any) {
-                // We don't want to retry on parsing errors.
-                bail(error);
-                // bail(error) throws so the return is never executed.
-                return {} as T;
-            }
-        },
-        {
-            retries: NB_RETRIES,
-            onRetry,
-        },
-    );
 };
 
 // Truncate a string to a certain length.

@@ -48,8 +48,6 @@
         "watch": "yarn build --watch"
     },
     "devDependencies": {
-        "@nipple/core": "workspace:*",
-        "@nipple/tools": "workspace:*",
         "@rollup/plugin-commonjs": "28.0.3",
         "@rollup/plugin-esm-shim": "0.1.8",
         "@rollup/plugin-json": "6.1.0",
