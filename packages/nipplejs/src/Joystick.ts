@@ -4,16 +4,19 @@ import { ANGLE_45, ANGLE_90, MODES } from './constants';
 import type {
     Coordinates,
     Direction,
+    Identifier,
     JoystickEventData,
     JoystickOptions,
     ProcessedEvent,
+    Uid,
 } from './types';
 import * as u from './utils';
 
 export default class Joystick extends Super {
     static index: number = 0;
-    uid: number;
-    identifier: number;
+    private _identifier?: Identifier;
+    private _pressure?: number;
+    uid: Uid;
     position: Coordinates;
     frontPosition: Coordinates;
     collection: Collection;
@@ -23,9 +26,9 @@ export default class Joystick extends Super {
         front: HTMLElement;
     };
     pressureInterval?: number;
-    pressure: number = 0;
     removeTimeout?: number;
     showTimeout?: number;
+    activeTimeout?: number;
     restTimeout?: number;
     direction: Direction = {};
     options: Required<JoystickOptions>;
@@ -46,7 +49,7 @@ export default class Joystick extends Super {
 
     constructor(collection: Collection, options: JoystickOptions) {
         super('joystick');
-        this.identifier = options.identifier;
+
         this.position = options.position;
         this.frontPosition = options.frontPosition;
         this.collection = collection;
@@ -58,7 +61,7 @@ export default class Joystick extends Super {
             this.options.restOpacity = 0;
         }
 
-        this.uid = Joystick.index++;
+        this.uid = Joystick.index++ as Uid;
 
         this.ui = {
             el: document.createElement('div'),
@@ -69,8 +72,28 @@ export default class Joystick extends Super {
         if (!this.options.dataOnly) {
             this.buildEl();
         }
+    }
 
-        this.trigger(`added`, this);
+    get identifier(): Identifier | undefined {
+        return this._identifier;
+    }
+
+    set identifier(identifier: Identifier | undefined) {
+        if (!u.isNumber(identifier)) {
+            this.trigger(`detached`, {
+                collection: this.collection,
+                joystick: this,
+                identifier: this._identifier!,
+            });
+            this._identifier = undefined;
+        } else {
+            this._identifier = identifier;
+            this.trigger(`attached`, {
+                collection: this.collection,
+                joystick: this,
+                identifier,
+            });
+        }
     }
 
     private buildEl() {
@@ -125,17 +148,24 @@ export default class Joystick extends Super {
         });
     }
 
+    get pressure(): number {
+        return this._pressure ?? 0;
+    }
+
+    set pressure(pressure: number) {
+        if (pressure !== this._pressure) {
+            this._pressure = pressure;
+            this.trigger('pressure', pressure);
+        }
+    }
+
     startPressureInterval(evt: ProcessedEvent): void {
         if (this.pressureInterval) {
             return;
         }
 
         this.pressureInterval = setInterval(() => {
-            const pressure = u.getPressureFromEvt(evt);
-            if (this.pressure !== pressure) {
-                this.pressure = pressure;
-                this.trigger('pressure', this.pressure);
-            }
+            this.pressure = u.getPressureFromEvt(evt);
         }, 100);
     }
 
@@ -146,6 +176,7 @@ export default class Joystick extends Super {
 
     // Inject the Joystick instance into DOM.
     addToDom(): void {
+        this.trigger(`added`, this);
         // We're not adding it if we're dataOnly or already in dom.
         if (this.options.dataOnly || document.body.contains(this.ui.el)) {
             return;
@@ -165,11 +196,16 @@ export default class Joystick extends Super {
         clearTimeout(this.removeTimeout);
         clearTimeout(this.showTimeout);
         clearTimeout(this.restTimeout);
-        this.stopPressureInterval();
+        clearTimeout(this.activeTimeout);
+
+        this.removeTimeout = undefined;
+        this.showTimeout = undefined;
+        this.restTimeout = undefined;
+        this.activeTimeout = undefined;
     }
 
     // Fade in the Joystick instance.
-    start(cb?: () => void): void {
+    start(evt: ProcessedEvent, cb?: () => void): void {
         this.trigger('start', this);
         // Clear the timeouts.
         this.clearTimeouts();
@@ -181,16 +217,18 @@ export default class Joystick extends Super {
             return;
         }
 
+        // TODO: Not sure about these two, only in dynamic mode do we want to add it to the dom.
         // Add it to the dom.
         this.addToDom();
-        // Go straight to rest.
-        this.restCallback();
+
+        this.startPressureInterval(evt);
 
         requestAnimationFrame(() => {
             this.ui.el.style.opacity = '1';
         });
 
         this.showTimeout = setTimeout(() => {
+            this.showTimeout = undefined;
             this.trigger('shown', this);
             if (typeof cb === 'function') {
                 cb.call(this);
@@ -200,11 +238,11 @@ export default class Joystick extends Super {
 
     // Fade out the Joystick instance.
     end(cb?: () => void): void {
-        this.trigger('end', this);
-        // TODO: Why do this?
         this.resetDirection();
-        // Clear the timeouts.
         this.clearTimeouts();
+        this.stopPressureInterval();
+        this.pressure = 0;
+        this.trigger('end', this);
 
         if (this.options.dataOnly) {
             if (typeof cb === 'function') {
@@ -229,8 +267,10 @@ export default class Joystick extends Super {
         }
 
         // Create a timeout to trigger an event after the fadeTime.
-        // And completely hide it if it's a dynamic Joystick.
+        // And destroy it if it's a dynamic Joystick.
+        clearTimeout(this.removeTimeout);
         this.removeTimeout = setTimeout(() => {
+            this.removeTimeout = undefined;
             // If dynamic, we'll completely hide the Joystick (display: none).
             this.ui.el.style.display = this.options.mode === MODES.dynamic ? 'none' : 'block';
             this.trigger('hidden', this);
@@ -248,43 +288,58 @@ export default class Joystick extends Super {
         }, this.options.fadeTime);
     }
 
+    setTransition(animated: boolean = false, cb?: () => void) {
+        if (animated) {
+            const activeTime = 100;
+            const animTime = `${activeTime}ms`;
+            const transitStyle = u.extend(
+                // Transition style.
+                u.configStylePropertyObject('transition', `transform ${animTime}`),
+                // Transform style.
+                u.configStylePropertyObject(
+                    'transform',
+                    `translate(${this.frontPosition.x}px, ${this.frontPosition.y}px)`,
+                ),
+            );
+
+            // Apply CSS.
+            u.extend(this.ui.front.style, transitStyle);
+
+            clearTimeout(this.activeTimeout);
+            this.activeTimeout = setTimeout(() => {
+                this.activeTimeout = undefined;
+                if (typeof cb === 'function') {
+                    cb.call(this);
+                }
+            }, activeTime);
+        } else {
+            u.extend(this.ui.front.style, u.configStylePropertyObject('transition', 'none'));
+        }
+    }
+
     // Set the Joystick to the specified position
     setPosition(cb: (() => void) | undefined, position: Coordinates): void {
         this.frontPosition = {
             x: position.x,
             y: position.y,
         };
-        const animTime = `${this.options.fadeTime}ms`;
-        const transitStyle = u.extend(
-            // Transition style.
-            u.configStylePropertyObject('transition', `transform ${animTime}`),
-            // Transform style.
-            u.configStylePropertyObject(
-                'transform',
-                `translate(${this.frontPosition.x}px, ${this.frontPosition.y}px)`,
-            ),
-        );
 
-        // Apply CSS.
-        u.extend(this.ui.front.style, transitStyle);
+        this.setTransition(true);
 
+        clearTimeout(this.restTimeout);
         this.restTimeout = setTimeout(() => {
+            this.restTimeout = undefined;
             if (typeof cb === 'function') {
                 cb.call(this);
             }
-            this.restCallback();
+            // Once rested, remove the transition.
+            this.setTransition(false);
+            this.trigger('rested', this);
         }, this.options.fadeTime);
-    }
-
-    private restCallback(): void {
-        // Once rested, remove the transition.
-        u.extend(this.ui.front.style, u.configStylePropertyObject('transition', 'none'));
-        this.trigger('rested', this);
     }
 
     resetDirection(): void {
         // Fully rebuild the object to let the iteration possible.
-        // TODO: Check if necessary.
         this.direction = {};
     }
 
@@ -353,7 +408,7 @@ export default class Joystick extends Super {
             };
 
             this.direction = direction;
-            // MUTATION!!!!!
+            // NOTE: MUTATION!!!!!
             obj.direction = direction;
 
             // If all 3 directions are the same, we don't trigger anything.
@@ -362,16 +417,12 @@ export default class Joystick extends Super {
                 return obj;
             }
 
-            if (!same.x || !same.y) {
-                this.trigger('plain', obj);
-            }
-
             if (!same.x) {
-                this.trigger(`plain:${direction.x}`, obj);
+                this.trigger(`plain plain:${direction.x}`, obj);
             }
 
             if (!same.y) {
-                this.trigger(`plain:${direction.y}`, obj);
+                this.trigger(`plain plain:${direction.y}`, obj);
             }
 
             if (!same.angle) {
@@ -391,8 +442,9 @@ export default class Joystick extends Super {
     // Entirely destroy this Joystick
     destroy(): void {
         this.clearTimeouts();
-        this.trigger('joystickDestroyed', this);
+        this.identifier = undefined;
         this.removeFromDom();
+        this.trigger('joystickDestroyed', this);
         this.off();
     }
 }

@@ -9,11 +9,13 @@ import type {
     JoystickEventData,
     SupportedEvent,
     DomEventHandler,
+    AttachEventData,
+    Uid,
 } from './types';
 import * as u from './utils';
 
 class Super {
-    uid: number = 0;
+    uid: Uid = 0 as Uid;
     name: string = 'Super';
     private _domHandlers_: Map<DomEventHandler, (evt: SupportedEvent) => void> = new Map();
     private _handlers_: Partial<Record<FactoryEventType, Set<InternalEventHandler<any>>>> = {};
@@ -31,6 +33,8 @@ class Super {
     }
 
     // Basic event system.
+    on(arg: `attached${string}`, cb: InternalEventHandler<AttachEventData>): void;
+    on(arg: `detached${string}`, cb: InternalEventHandler<AttachEventData>): void;
     on(arg: `dir${string}`, cb: InternalEventHandler<JoystickEventData>): void;
     on(arg: `plain${string}`, cb: InternalEventHandler<JoystickEventData>): void;
     on(arg: `move${string}`, cb: InternalEventHandler<JoystickEventData>): void;
@@ -51,6 +55,8 @@ class Super {
         });
     }
 
+    off(arg?: `attached${string}`, cb?: InternalEventHandler<AttachEventData>): void;
+    off(arg?: `detached${string}`, cb?: InternalEventHandler<AttachEventData>): void;
     off(arg?: `dir${string}`, cb?: InternalEventHandler<JoystickEventData>): void;
     off(arg?: `plain${string}`, cb?: InternalEventHandler<JoystickEventData>): void;
     off(arg?: `move${string}`, cb?: InternalEventHandler<JoystickEventData>): void;
@@ -81,6 +87,8 @@ class Super {
         }
     }
 
+    trigger(arg: `attached${string}`, data: AttachEventData): void;
+    trigger(arg: `detached${string}`, data: AttachEventData): void;
     trigger(arg: `dir${string}`, data: JoystickEventData): void;
     trigger(arg: `plain${string}`, data: JoystickEventData): void;
     trigger(arg: `move${string}`, data: JoystickEventData): void;
@@ -112,6 +120,7 @@ class Super {
     // Bind DOM events.
     bindEvt(el: SupportedElement, type: EventType, handler: DomEventHandler) {
         const cb = (evt: SupportedEvent) => {
+            this.log(`    - "${type}" [trigger]`);
             for (const domEvt of u.processEvents(evt)) {
                 handler.call(this, domEvt);
             }
@@ -145,16 +154,20 @@ class Super {
         }
     }
 
+    logSuffix() {
+        return `[${this.name}|${this.uid}]`;
+    }
+
     log(...args: any[]) {
-        console.log(`[${this.name}|${this.uid}]`, ...args);
+        console.log(...args, this.logSuffix());
     }
 
     warn(...args: any[]) {
-        console.warn(`[${this.name}|${this.uid}]`, ...args);
+        console.warn(...args, this.logSuffix());
     }
 
     error(...args: any[]) {
-        console.error(`[${this.name}|${this.uid}]`, ...args);
+        console.error(...args, this.logSuffix());
     }
 }
 

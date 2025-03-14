@@ -3,6 +3,14 @@ import type Joystick from './Joystick';
 import type Super from './Super';
 import type { MODES } from './constants';
 
+// Make it unique so we can better type it.
+declare const identifierSymbol: unique symbol;
+export type Identifier = number & { [identifierSymbol]: never };
+
+// Make it unique so we can better type it.
+declare const uidSymbol: unique symbol;
+export type Uid = number & { [uidSymbol]: never };
+
 /**
  * Common configuration options shared between joysticks and collections.
  *
@@ -150,11 +158,6 @@ export interface CommonOptions {
  * Extends the common options shared across joysticks and collections.
  */
 export interface JoystickOptions extends CommonOptions {
-    /**
-     * Event's identifier that's attached to this joystick instance.
-     */
-    identifier: number;
-
     /**
      * The base position coordinates of the joystick.
      *
@@ -316,12 +319,28 @@ export type Direction = {
  */
 export type JoystickEventType =
     /**
+     * A joystick is attached to an event.
+     *
+     * Will pass the instance, its collection and the event's identifier.
+     */
+    | 'attached'
+
+    /**
+     * A joystick is detached from a collection.
+     *
+     * Will pass the instance, its collection and the event's identifier.
+     */
+    | 'detached'
+
+    /**
      * A joystick is activated. (the user pressed on the active zone)
+     *
      * Will pass the instance alongside the event.
      */
     | 'start'
 
     /** A joystick is de-activated. (the user released the active zone)
+     *
      * Will pass the instance alongside the event.
      */
     | 'end'
@@ -344,6 +363,7 @@ export type JoystickEventType =
 
     /**
      * When a plain direction is reached after the threshold.
+     *
      * Plain directions are split with a 90° angle.
      */
     | 'plain'
@@ -356,6 +376,7 @@ export type JoystickEventType =
 
     /**
      * Is triggered at the end of the fade-in animation.
+     *
      * Will pass the instance alongside the event.
      *
      * Won’t be trigger in a dataOnly configuration.
@@ -473,11 +494,23 @@ export interface JoystickEventData {
 }
 
 /**
+ * The data of an attach event.
+ */
+export type AttachEventData = {
+    /** The collection that the joystick is attached to */
+    collection: Collection;
+    /** The joystick that is attached */
+    joystick: Joystick;
+    /** The identifier of the event that triggered this attachment */
+    identifier: Identifier;
+};
+
+/**
  * The normalized event data of a DOM event.
  */
 export type DomEvent = {
     /** The identifier of the event */
-    identifier: number;
+    identifier: Identifier;
     /** Whether the event is a touch event */
     // FIXME: Might not be used.
     isTouch: boolean;
@@ -501,7 +534,12 @@ export type DomEventHandler = (evt: DomEvent) => void;
 /**
  * The data of an internal event.
  */
-export type InternalEventData = Joystick | Collection | JoystickEventData | number;
+export type InternalEventData =
+    | Joystick
+    | Collection
+    | JoystickEventData
+    | AttachEventData
+    | number;
 
 /**
  * The internal event.
@@ -528,7 +566,7 @@ export type InteractType = 'touch' | 'mouse' | 'pointer' | 'MSPointer';
 /**
  * The types of event we support.
  */
-export type EventType = 'start' | 'move' | 'end';
+export type EventType = 'start' | 'move' | 'end' | 'pressure';
 
 /**
  * The types of event sources we support.

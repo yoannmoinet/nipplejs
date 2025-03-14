@@ -370,4 +370,52 @@ describe('utils', () => {
             },
         );
     });
+
+    describe('isNumber', () => {
+        const expectations = [
+            {
+                name: 'valid number',
+                value: 42,
+                expected: true,
+            },
+            {
+                name: 'zero',
+                value: 0,
+                expected: true,
+            },
+            {
+                name: 'negative number',
+                value: -123,
+                expected: true,
+            },
+            {
+                name: 'string number',
+                value: '42',
+                expected: false,
+            },
+            {
+                name: 'NaN',
+                value: NaN,
+                expected: false,
+            },
+            {
+                name: 'undefined',
+                value: undefined,
+                expected: false,
+            },
+            {
+                name: 'null',
+                value: null,
+                expected: false,
+            },
+            {
+                name: 'object',
+                value: {},
+                expected: false,
+            },
+        ];
+        it.each(expectations)('should return $expected for $name', ({ value, expected }) => {
+            expect(u.isNumber(value)).toBe(expected);
+        });
+    });
 });

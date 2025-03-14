@@ -8,6 +8,8 @@ import type {
     DomEvent,
     Coordinates,
     AnyPosition,
+    Uid,
+    Identifier,
 } from './types';
 import * as u from './utils';
 
@@ -19,7 +21,7 @@ export default class Collection extends Super {
     /**
      *  The unique ID of this Collection instance.
      * */
-    uid: number;
+    uid: Uid;
     /**
      *  The parent factory that created this Collection.
      * */
@@ -30,18 +32,36 @@ export default class Collection extends Super {
     options: Required<CollectionOptions>;
     /**
      *  The list of all the Joysticks of this Collection.
+     *
+     *  Indexed by their uid.
      * */
-    all: Map<number, Joystick> = new Map();
+    all: Map<Uid, Joystick> = new Map();
     /**
      *  The list of the idle Joysticks of this Collection.
+     *
      *  Idle Joysticks are the ones that are not being moved by the user.
+     *
+     *  Indexed by their uid.
      * */
-    idles: Set<number> = new Set();
+    idles: Set<Uid> = new Set();
     /**
      *  The list of the active Joysticks of this Collection.
+     *
      *  Active Joysticks are the ones that are being moved or touched by the user.
+     *
+     *  Indexed by their event's identifier.
      * */
-    actives: Set<number> = new Set();
+    actives: Map<Identifier, Joystick> = new Map();
+    /**
+     *  The list of the resting Joysticks of this Collection.
+     *
+     *  Resting Joysticks are the ones that are on their way out.
+     *
+     *  Keeping them here, just in case we get a new start before the end.
+     *
+     *  Indexed by their event's identifier.
+     * */
+    resting: Map<Identifier, Joystick> = new Map();
     /**
      *  Is the parent element of the Joysticks a flex container?
      * */
@@ -77,7 +97,7 @@ export default class Collection extends Super {
     constructor(factory: Factory, options: CollectionOptions) {
         super('collection');
         this.factory = factory;
-        this.uid = Collection.index++;
+        this.uid = Collection.index++ as Uid;
         this.options = { ...this.defaults, ...options };
 
         // Overwrite the multitouch option if we are in static or semi modes.
@@ -113,28 +133,141 @@ export default class Collection extends Super {
 
         // In static mode, we create our own static Joystick.
         if (this.options.mode === MODES.static) {
-            const joystick = this.createJoystick(
-                this.options.position,
-                // Passing an arbitrary identifier, since it's the only Joystick we'll have.
-                // Maybe in the case the client would create a new collection from the default factory.
-                // To note that Joystick.uid is incremental already.
-                Joystick.index,
-            );
+            const joystick = this.createJoystick(this.options.position);
             joystick.addToDom();
         }
     }
 
-    getJoystick(identifier?: number): Joystick | undefined {
-        // If we have no identifier, we return the first Joystick.
-        if (identifier === undefined) {
+    getJoystickByUid(uid?: Uid): Joystick | undefined {
+        // If we have no uid, we return the first Joystick.
+        if (uid === undefined) {
             return this.all.values().next().value;
         }
 
         // TODO: Should we fallback to the first Joystick?
-        return this.all.get(identifier);
+        return this.all.get(uid);
     }
 
-    private createJoystick(position: AnyPosition, identifier: number): Joystick {
+    private bindJoystick(joystick: Joystick) {
+        // When a Joystick gets destroyed, we clean behind.
+        joystick.on('joystickDestroyed', () => {
+            this.deleteJoystickFromLists(joystick);
+        });
+
+        // When a Joystick gets attached, we move it from idle to active.
+        joystick.on('attached', (evt) => {
+            this.idles.delete(evt.data.joystick.uid);
+            this.actives.set(evt.data.identifier, joystick);
+        });
+
+        // When a Joystick gets detached, we move it from active to idle.
+        joystick.on('detached', (evt) => {
+            this.idles.add(evt.data.joystick.uid);
+            this.deleteIdentifierFromLists(evt.data.identifier);
+        });
+
+        // When a Joystick gets hidden, we move it from active to resting.
+        joystick.on('end', (evt) => {
+            if (u.isNumber(evt.data.identifier)) {
+                this.actives.delete(evt.data.identifier);
+                this.resting.set(evt.data.identifier, joystick);
+            }
+        });
+
+        // When a Joystick gets hidden, we move it from resting to idle.
+        joystick.on('hidden', (evt) => {
+            if (u.isNumber(evt.data.identifier)) {
+                this.resting.delete(evt.data.identifier);
+            }
+            this.idles.add(evt.data.uid);
+        });
+
+        // Other events that will get bubbled up.
+        // TODO: See if we can factorise with Factory.bindCollection.
+        joystick.on('joystickDestroyed', (evt) => {
+            this.trigger(`joystickDestroyed ${joystick.uid}:joystickDestroyed`, evt.data);
+        });
+        joystick.on('pressure', (evt) => {
+            this.trigger(`pressure ${joystick.uid}:pressure`, evt.data);
+        });
+        joystick.on('attached detached', (evt) => {
+            type EvtType = `attached${string}` & `detached${string}`;
+            const type = `${evt.type} ${evt.data.joystick.uid}:${evt.type}`;
+            this.trigger(type as EvtType, evt.data);
+        });
+        joystick.on('added start shown hidden rested removed end', (evt) => {
+            type EvtType = `added${string}` &
+                `start${string}` &
+                `shown${string}` &
+                `hidden${string}` &
+                `rested${string}` &
+                `removed${string}` &
+                `end${string}`;
+            const type = `${evt.type} ${evt.data.uid}:${evt.type}`;
+            this.trigger(type as EvtType, evt.data);
+        });
+        joystick.on('move', (evt) => {
+            this.trigger(`move ${evt.data.instance.uid}:move`, evt.data);
+        });
+        joystick.on('dir dir:up dir:right dir:down dir:left', (evt) => {
+            const type = `${evt.type} ${evt.data.instance.uid}:${evt.type}`;
+            this.trigger(type as `dir${string}`, evt.data);
+        });
+        joystick.on('plain plain:up plain:right plain:down plain:left', (evt) => {
+            const type = `${evt.type} ${evt.data.instance.uid}:${evt.type}`;
+            this.trigger(type as `plain${string}`, evt.data);
+        });
+    }
+
+    private deleteJoystickFromLists(joystick: Joystick) {
+        this.deleteUidFromLists(joystick.uid);
+        if (u.isNumber(joystick.identifier)) {
+            this.deleteIdentifierFromLists(joystick.identifier);
+        }
+    }
+
+    private deleteUidFromLists(uid: Uid) {
+        this.all.delete(uid);
+        this.idles.delete(uid);
+    }
+
+    private deleteIdentifierFromLists(identifier: Identifier) {
+        this.actives.delete(identifier);
+        this.resting.delete(identifier);
+    }
+
+    private getOrCreate(position: Coordinates): Joystick {
+        // In semi and static modes, we recycle the idle joystick.
+        if (this.options.mode === MODES.semi || this.options.mode === MODES.static) {
+            // If there is an idle joystick, we use it.
+            const idleUid: Uid = this.idles.values().next().value;
+            if (u.isNumber(idleUid)) {
+                const joystick = this.all.get(idleUid);
+                if (!joystick) {
+                    this.error(`Couldn't find the joystick ${idleUid}. Creating a new one.`);
+                    // Clean unbound uid.
+                    this.deleteUidFromLists(idleUid);
+                } else {
+                    return joystick;
+                }
+            }
+
+            // In semi mode, we may not have an idle joystick.
+            // So we create a new one.
+            if (this.options.mode === MODES.semi) {
+                return this.createJoystick(position);
+            }
+
+            // This should never be reached.
+            // Static mode should always have an idle joystick.
+            this.warn("Coudln't find the expected joystick. Creating a new one.");
+        }
+
+        // Return a new joystick.
+        return this.createJoystick(position);
+    }
+
+    private createJoystick(position: AnyPosition): Joystick {
         const scroll = this.factory.scroll;
         // In case of a flex container, the position is relative to the container.
         const offset = {
@@ -146,7 +279,7 @@ export default class Collection extends Super {
         let toApply: AnyPosition;
         let newPosition: Coordinates;
 
-        if (position.x && position.y) {
+        if (u.isNumber(position.x) && u.isNumber(position.y)) {
             toApply = {
                 x: position.x - offset.x,
                 y: position.y - offset.y,
@@ -180,13 +313,7 @@ export default class Collection extends Super {
                 y: stubBox.top + scroll.y,
             };
         } else {
-            // TODO: Verify we never get there.
-            console.error('Invalid or missing position.', position);
-        }
-
-        // TODO: Maybe get one that may already exists.
-        if (this.all.has(identifier)) {
-            console.error(`Joystick with identifier ${identifier} already exists.`);
+            this.error('Invalid or missing position.', position);
         }
 
         const joystick = new Joystick(this, {
@@ -198,7 +325,6 @@ export default class Collection extends Super {
             restJoystick: this.options.restJoystick,
             restOpacity: this.options.restOpacity,
             mode: this.options.mode,
-            identifier,
             // TODO: Verify what we use this for.
             position: newPosition!,
             zone: this.options.zone,
@@ -209,79 +335,50 @@ export default class Collection extends Super {
             shape: this.options.shape,
         });
 
+        if (this.all.has(joystick.uid)) {
+            this.error(`Joystick with uid ${joystick.uid} already exists.`);
+        }
+
         if (!this.options.dataOnly) {
             // Position the Joystick at the right place.
             u.applyPosition(joystick.ui.el, toApply!);
             u.applyPosition(joystick.ui.front, joystick.frontPosition);
         }
 
-        this.all.set(identifier, joystick);
-        this.idles.add(identifier);
-
+        this.all.set(joystick.uid, joystick);
+        this.idles.add(joystick.uid);
         this.bindJoystick(joystick);
 
         return joystick;
-    }
-
-    private bindJoystick(joystick: Joystick) {
-        // When a Joystick gets destroyed, we clean behind.
-        joystick.on('joystickDestroyed', (evt) => {
-            this.deleteIdentifierFromLists(joystick.identifier);
-        });
-
-        // Other events that will get bubbled up.
-        // TODO: See if we can factorise with Factory.bindCollection.
-        joystick.on('joystickDestroyed', (evt) => {
-            this.trigger(`joystickDestroyed ${joystick.uid}:joystickDestroyed`, evt.data);
-        });
-        joystick.on('pressure', (evt) => {
-            this.trigger(`pressure ${joystick.uid}:pressure`, evt.data);
-        });
-        joystick.on('added start shown hidden rested removed end', (evt) => {
-            type EvtType = `added${string}` &
-                `start${string}` &
-                `shown${string}` &
-                `hidden${string}` &
-                `rested${string}` &
-                `removed${string}` &
-                `end${string}`;
-            const type = `${evt.type} ${evt.data.uid}:${evt.type}`;
-            this.trigger(type as EvtType, evt.data);
-        });
-        joystick.on('move', (evt) => {
-            this.trigger(`move ${evt.data.instance.uid}:move`, evt.data);
-        });
-        joystick.on('dir dir:up dir:right dir:down dir:left', (evt) => {
-            const type = `${evt.type} ${evt.data.instance.uid}:${evt.type}`;
-            this.trigger(type as `dir${string}`, evt.data);
-        });
-        joystick.on('plain plain:up plain:right plain:down plain:left', (evt) => {
-            const type = `${evt.type} ${evt.data.instance.uid}:${evt.type}`;
-            this.trigger(type as `plain${string}`, evt.data);
-        });
     }
 
     processOnStart(evt: DomEvent) {
         // Refresh the box position.
         this.box = this.options.zone.getBoundingClientRect();
         // If we don't have spots available, we stop right here.
-        if (this.actives.size >= this.options.maxNumberOfJoysticks) {
+        if (
+            // Only if the event is already active.
+            !this.actives.has(evt.identifier) &&
+            this.actives.size >= this.options.maxNumberOfJoysticks
+        ) {
+            this.warn('No more joysticks allowed.');
             return;
         }
 
-        // New joystick.
-        const joystick = this.getOrCreate(evt.identifier, evt.position);
+        // Get an existing joystick or create a new one.
+        const joystick =
+            this.actives.get(evt.identifier) ||
+            this.resting.get(evt.identifier) ||
+            this.getOrCreate(evt.position);
 
         const process = () => {
             // Show the joystick.
-            joystick.start();
+            joystick.start(evt.raw);
+            // Attach joystick to its event.
+            joystick.identifier = evt.identifier;
             // Trigger a first move.
-            this.processOnMove(evt);
+            this.processOnMove(evt, true);
         };
-
-        // Move the Joystick in the right list.
-        this.idles.delete(joystick.identifier);
-        this.actives.add(joystick.identifier);
 
         // In semi mode, we need to verify what to do, do we recycle (if we're in the catch distance),
         // or do we create a new one and delete the previous one?
@@ -301,59 +398,30 @@ export default class Collection extends Super {
         }
     }
 
-    private getOrCreate(identifier: number, position: Coordinates): Joystick {
-        // TODO: Verify if we don't already have a joystick with this identifier.
-
-        // In semi and static modes, we recycle the idle joystick.
-        if (this.options.mode === MODES.semi || this.options.mode === MODES.static) {
-            // If there is an idle joystick, we use it.
-            const idleIdentifier = this.idles.values().next().value;
-            if (idleIdentifier) {
-                const joystick = this.all.get(idleIdentifier);
-                if (!joystick) {
-                    this.error(`Couldn't find the joystick with identifier ${idleIdentifier}`);
-                }
-                return joystick!;
-            }
-
-            // In semi mode, we may not have an idle joystick.
-            // So we create a new one.
-            if (this.options.mode === MODES.semi) {
-                return this.createJoystick(position, identifier);
-            }
-
-            // This should never be reached.
-            // Static mode should always have an idle joystick.
-            this.warn("Coudln't find the expected joystick. Creating a new one.");
-        }
-
-        // Return a new joystick.
-        return this.createJoystick(position, identifier);
-    }
-
     /**
      *  Whenever a move event happens.
      *
      *  This is called from the Factory.
      * */
-    processOnMove(evt: DomEvent) {
-        const joystick = this.getJoystick(evt.identifier);
+    processOnMove(evt: DomEvent, animated: boolean = false) {
+        const joystick = this.actives.get(evt.identifier);
         const scroll = this.factory.scroll;
 
-        // If it's not pressed, just process it as a end event instead.
-        // TODO: Note when this can happen.
-        if (!evt.pressure) {
-            this.error(`Found unpressed joystick with identifier ${evt.identifier}`);
-            this.processOnEnd(evt);
-            return;
-        }
-
         // This should not happen.
-        // TODO: This could be done from this.getJoystick.
         // FIXME: Maybe  it happens in multitouch when we have more touches than maxNumberOfJoysticks.
         if (!joystick) {
             this.error(`Found zombie joystick onMove with identifier ${evt.identifier}`);
             this.deleteIdentifierFromLists(evt.identifier);
+            return;
+        }
+
+        // If it's not pressed, and not on its way out, just process it as an end event instead.
+        // It can happen if the joystick is in its resting animation.
+        if (!evt.pressure && !joystick.removeTimeout) {
+            // this.error(
+            //     `Found unpressed joystick ${joystick?.uid} for identifier ${evt.identifier}`,
+            // );
+            // this.processOnEnd(evt);
             return;
         }
 
@@ -443,6 +511,11 @@ export default class Collection extends Super {
 
         // Apply the transformation to the nibble if we're not data only.
         if (!this.options.dataOnly) {
+            if (animated) {
+                joystick.setTransition(true, () => {
+                    joystick.setTransition(false);
+                });
+            }
             joystick.ui.front.style.transform = `translate(${xPosition}px,${yPosition}px)`;
         }
 
@@ -469,17 +542,10 @@ export default class Collection extends Super {
         joystick.computeDirectionAndTriggerEvents(toSend);
     }
 
-    private deleteIdentifierFromLists(identifier: number) {
-        this.all.delete(identifier);
-        this.idles.delete(identifier);
-        this.actives.delete(identifier);
-    }
-
     processOnEnd(evt: DomEvent) {
-        const joystick = this.getJoystick(evt.identifier);
+        const joystick = this.actives.get(evt.identifier);
 
         // This should not happen.
-        // TODO: This could be done from this.getJoystick.
         if (!joystick) {
             this.error(`Found zombie joystick onEnd with identifier ${evt.identifier}`);
             this.deleteIdentifierFromLists(evt.identifier);
@@ -488,16 +554,6 @@ export default class Collection extends Super {
 
         // We hide the joystick.
         joystick.end();
-
-        // We only delete all its references if we're in dynamic.
-        if (this.options.mode === MODES.dynamic) {
-            this.deleteIdentifierFromLists(joystick.identifier);
-        } else {
-            // Otherwise (semi and static modes) we move it to the idle list,
-            // so it is recycled later.
-            this.actives.delete(joystick.identifier);
-            this.idles.add(joystick.identifier);
-        }
     }
 
     destroy() {
@@ -511,6 +567,7 @@ export default class Collection extends Super {
         this.all.clear();
         this.idles.clear();
         this.actives.clear();
+        this.resting.clear();
 
         // Events.
         this.trigger('collectionDestroyed', this);

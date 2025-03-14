@@ -2,19 +2,29 @@ import Collection from './Collection';
 import type Joystick from './Joystick';
 import Super from './Super';
 import { MODES } from './constants';
-import type { CollectionOptions, DomEvent } from './types';
+import type { CollectionOptions, DomEvent, Identifier, Uid } from './types';
 import * as u from './utils';
 
 export default class Factory extends Super {
     scroll: { x: number; y: number } = u.getScroll();
     private binded: boolean = false;
-    private joysticks: Map<number, { joystick: Joystick; collection: Collection }> = new Map();
+    private joysticksByUid: Map<Uid, { joystick: Joystick; collection: Collection }> = new Map();
+    private joysticksByIdentifier: Map<Identifier, { joystick: Joystick; collection: Collection }> =
+        new Map();
     private collections: Set<Collection> = new Set();
 
     constructor() {
         super('factory');
         this.bindResize();
         this.bindScroll();
+    }
+
+    // Just add some logs.
+    trigger<T>(arg: string, data: T) {
+        this.mapOnEvents(arg, (type) => {
+            this.log(`        - "${type}" [trigger]`);
+        });
+        super.trigger(arg as any, data as any);
     }
 
     // Listen for resize, to reposition every joysticks
@@ -46,11 +56,16 @@ export default class Factory extends Super {
         });
     }
 
+    // Get a joystick from its uid.
+    // Public API, not used internally.
+    getJoystickByUid(uid: Uid) {
+        return this.joysticksByUid.get(uid)?.joystick;
+    }
+
     // Get a joystick from its identifier.
     // Public API, not used internally.
-    // TODO: Verify if this is actually useful/documented.
-    getJoystick(identifier: number) {
-        return this.joysticks.get(identifier)?.joystick;
+    getJoystickByIdentifier(identifier: Identifier) {
+        return this.joysticksByIdentifier.get(identifier)?.joystick;
     }
 
     // Collection Factory
@@ -63,30 +78,51 @@ export default class Factory extends Super {
         return collection;
     }
 
+    private removeJoystickFromLists(joystick: Joystick) {
+        this.joysticksByUid.delete(joystick.uid);
+        if (u.isNumber(joystick.identifier)) {
+            this.joysticksByIdentifier.delete(joystick.identifier);
+        }
+    }
+
     private bindCollection(collection: Collection) {
         // When a collection gets destroyed, we clean behind.
         collection.on('collectionDestroyed', (evt) => {
             // Clean local lists.
             this.collections.delete(evt.data);
             evt.data.all.forEach((joystick) => {
-                this.joysticks.delete(joystick.identifier);
+                this.removeJoystickFromLists(joystick);
             });
             this.unbindDocument();
         });
 
         collection.on('joystickDestroyed', (evt) => {
-            this.joysticks.delete(evt.data.identifier);
+            this.removeJoystickFromLists(evt.data);
             this.unbindDocument();
         });
 
-        collection.on('end', () => {
+        collection.on('end', (evt) => {
+            if (u.isNumber(evt.data.identifier)) {
+                this.joysticksByIdentifier.delete(evt.data.identifier);
+            }
             this.unbindDocument();
         });
 
         collection.on('added', (evt) => {
-            this.joysticks.set(evt.data.identifier, { collection, joystick: evt.data });
+            this.joysticksByUid.set(evt.data.uid, { collection, joystick: evt.data });
             this.bindDocument();
         });
+
+        collection.on('attached', (evt) => {
+            this.joysticksByIdentifier.set(evt.data.identifier, {
+                collection,
+                joystick: evt.data.joystick,
+            });
+        });
+
+        // collection.on('detached', (evt) => {
+        //     this.joysticksByIdentifier.delete(evt.data.identifier);
+        // });
 
         // Other events that we bubble up.
         // TODO: See if we can factorise with Collection.bindCollection.
@@ -94,8 +130,12 @@ export default class Factory extends Super {
             this.trigger(`pressure ${evt.target.uid}:pressure`, evt.data);
         });
         collection.on('collectionDestroyed', (evt) => {
-            const type = `${evt.type} ${evt.target.uid}:${evt.type}`;
+            const type = `${evt.type} ${evt.data.uid}:${evt.type}`;
             this.trigger(type as `collectionDestroyed${string}`, evt.data);
+        });
+        collection.on('attached detached', (evt) => {
+            const type = `${evt.type} ${evt.data.joystick.uid}:${evt.type}`;
+            this.trigger(type as `attached${string}` & `detached${string}`, evt.data);
         });
         collection.on('added start shown hidden rested removed end joystickDestroyed', (evt) => {
             type EvtType = `added${string}` &
@@ -106,18 +146,18 @@ export default class Factory extends Super {
                 `removed${string}` &
                 `end${string}` &
                 `joystickDestroyed${string}`;
-            const type = `${evt.type} ${evt.target.uid}:${evt.type}`;
+            const type = `${evt.type} ${evt.data.uid}:${evt.type}`;
             this.trigger(type as EvtType, evt.data);
         });
         collection.on('move', (evt) => {
-            this.trigger(`move ${evt.target.uid}:move`, evt.data);
+            this.trigger(`move ${evt.data.instance.uid}:move`, evt.data);
         });
         collection.on('dir dir:up dir:right dir:down dir:left', (evt) => {
-            const type = `${evt.type} ${evt.target.uid}:${evt.type}`;
+            const type = `${evt.type} ${evt.data.instance.uid}:${evt.type}`;
             this.trigger(type as `dir${string}`, evt.data);
         });
         collection.on('plain plain:up plain:right plain:down plain:left', (evt) => {
-            const type = `${evt.type} ${evt.target.uid}:${evt.type}`;
+            const type = `${evt.type} ${evt.data.instance.uid}:${evt.type}`;
             this.trigger(type as `plain${string}`, evt.data);
         });
     }
@@ -130,7 +170,7 @@ export default class Factory extends Super {
 
         // Make some place in the other touches that may be dormant.
         // Search within our Factory's joysticks.
-        for (const [identifier, { collection, joystick }] of this.joysticks) {
+        for (const [identifier, { collection, joystick }] of this.joysticksByIdentifier) {
             // No need to clean if the collection is static or semi.
             if (collection.options.mode !== MODES.dynamic) {
                 continue;
@@ -162,25 +202,19 @@ export default class Factory extends Super {
             this.bindEvt(document, 'start', this.onstart);
             this.bindEvt(document, 'move', this.onmove);
             this.bindEvt(document, 'end', this.onend);
+            this.bindEvt(document, 'pressure', this.onpressure);
             this.binded = true;
         }
     }
 
     unbindDocument(force: boolean = false) {
         // If there are no touch left unbind the document.
-        if (this.binded && (!this.joysticks.size || force === true)) {
+        if (this.binded && (!this.joysticksByUid.size || force === true)) {
             this.unbindEvt(document, 'start', this.onstart);
             this.unbindEvt(document, 'move', this.onmove);
             this.unbindEvt(document, 'end', this.onend);
+            this.unbindEvt(document, 'pressure', this.onpressure);
             this.binded = false;
-        }
-    }
-
-    getCollectionFromIdentifier(identifier: number) {
-        for (const coll of this.collections) {
-            if (coll.all.has(identifier)) {
-                return coll;
-            }
         }
     }
 
@@ -205,16 +239,25 @@ export default class Factory extends Super {
         });
     }
 
-    private handleEventInCollection(evt: DomEvent, cb: (coll: Collection) => void) {
-        const joystick = this.joysticks.get(evt.identifier);
-        // If the event isn't handled by any collection,
-        // we need to clean its identifier.
-        if (!joystick) {
-            this.error(`No collection found for event ${evt.type} on identifier ${evt.identifier}`);
-            this.joysticks.delete(evt.identifier);
+    private onpressure(evt: DomEvent) {
+        evt.initial.preventDefault();
+        const record = this.joysticksByIdentifier.get(evt.identifier);
+        if (!record?.joystick) {
+            this.error(`No joystick found for pressure event ${evt.identifier}`);
             return;
         }
-        cb(joystick.collection);
+        record.joystick.pressure = evt.pressure;
+    }
+
+    private handleEventInCollection(evt: DomEvent, cb: (coll: Collection) => void) {
+        const record = this.joysticksByIdentifier.get(evt.identifier);
+
+        // If the event doesn't have any record, we don't call any.
+        if (!record) {
+            return;
+        }
+
+        cb(record.collection);
     }
 
     // Cleanly destroy the factory

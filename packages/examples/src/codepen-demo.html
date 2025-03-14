@@ -5,8 +5,8 @@
     <meta charset="utf-8">
     <title>NippleJS</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <link rel="stylesheet" href="../../assets/styles.css" media="screen" title="no title" charset="utf-8">
-    <link rel="stylesheet" href="../../assets/github-light.css" media="screen" title="no title" charset="utf-8">
+    <link rel="stylesheet" href="../../assets/src/styles.css" media="screen" title="no title" charset="utf-8">
+    <link rel="stylesheet" href="../../assets/src/github-light.css" media="screen" title="no title" charset="utf-8">
     <style>
         body {
             margin: 0;
@@ -205,7 +205,7 @@
         var removeClass = function (el, clss) {
             el.className = el.className.replace(new RegExp('\\b' + clss + ' ?\\b', 'g'), '');
         }
-        var joysticks = {
+        var collections = {
             dynamic: {
                 zone: s('.zone.dynamic'),
                 color: 'blue',
@@ -224,7 +224,7 @@
                 color: 'red'
             }
         };
-        var joystick;
+        var collection;
 
         // Get debug elements and map them
         var elDebug = sId('debug');
@@ -261,26 +261,29 @@
         createNipple('dynamic');
 
         function bindNipple() {
-            joystick.on('start end', function (evt, data) {
+            collection.on('added start shown hidden rested removed end', function (evt) {
                 dump(evt.type);
-                debug(data);
-            }).on('move', function (evt, data) {
-                debug(data);
-            }).on('dir:up plain:up dir:left plain:left dir:down ' +
+                debug(evt.data);
+            })
+            collection.on('move', function (evt) {
+                debug(evt.data);
+            })
+            collection.on('dir:up plain:up dir:left plain:left dir:down ' +
                 'plain:down dir:right plain:right',
-                function (evt, data) {
+                function (evt) {
                     dump(evt.type);
                 }
-            ).on('pressure', function (evt, data) {
-                debug({ pressure: data });
+            )
+            collection.on('pressure', function (evt) {
+                debug({ pressure: evt.data });
             });
         }
 
         function createNipple(evt) {
             var type = typeof evt === 'string' ?
                 evt : evt.target.getAttribute('data-type');
-            if (joystick) {
-                joystick.destroy();
+            if (collection) {
+                collection.destroy();
             }
 
             removeClass(s('.zone.active'), 'active');
@@ -289,7 +292,7 @@
             s('.highlight.' + type).className += ' active';
             s('.button.' + type).className += ' active';
             s('.zone.' + type).className += ' active';
-            joystick = nipplejs.create(joysticks[type]);
+            collection = nipplejs.create(collections[type]);
             bindNipple();
         }
 

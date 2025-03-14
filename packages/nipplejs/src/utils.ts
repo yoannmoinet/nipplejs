@@ -2,6 +2,7 @@ import type {
     AnyPosition,
     Coordinates,
     DomEvent,
+    Identifier,
     ProcessedEvent,
     SupportedElement,
     SupportedEvent,
@@ -127,12 +128,12 @@ export const unbindEvt = (
 
 export const getPressureFromEvt = (evt: ProcessedEvent): number => {
     // Compute the pressure data.
-    return 'force' in evt // Pressure on iOS 3D Touch.
+    return 'force' in evt // Pressure on Touch.
         ? evt.force
         : 'pressure' in evt // Pressure on Pointers.
           ? evt.pressure
-          : 'webkitForce' in evt // Pressure on trackpads.
-            ? (evt.webkitForce as number)
+          : 'webkitForce' in evt // Pressure on trackpads, max is 3, only in Safari.
+            ? (evt.webkitForce as number) / 3
             : 'buttons' in evt // Id of the mouse button pressed. 0 is none, 1 is left, 2 is right, ...
               ? evt.buttons !== 0
                   ? 1
@@ -144,12 +145,18 @@ export const processEvent = (evt: SupportedEvent, processedEvt: ProcessedEvent):
     // Compute identifier of the event.
     // It's especially important for touches,
     // to track the correct touch in a multitouch interaction.
-    const identifier: number =
+    const identifier: Identifier = (
         'identifier' in processedEvt
             ? processedEvt.identifier
             : 'pointerId' in processedEvt
               ? processedEvt.pointerId
-              : 0 || 0;
+              : // Using 1 as identifier, because pointerId starts at 1.
+                // Using 0 would detach our pressure detection on Safari,
+                // as the webkitForce events are triggered as MouseEvent, with no identifier.
+                // So if we have a "start" event with a pointerId of 1, we need a "pressure" event
+                // with an identifier of 1 too, so we can track the correct joystick.
+                1 || 1
+    ) as Identifier;
 
     // This is only what we need, to normalize the interaction event.
     // Everything else is based off this data.
@@ -275,3 +282,12 @@ export const clamp = (pos: Coordinates, joystickPos: Coordinates, size: number):
     //                          top-clamping           bottom-clamping
     y: Math.min(Math.max(pos.y, joystickPos.y - size), joystickPos.y + size),
 });
+
+/**
+ * Check if a value is a number.
+ * @param {unknown} value - The value to check.
+ * @returns {boolean} True if the value is a number, false otherwise.
+ */
+export const isNumber = (value: unknown): value is number => {
+    return typeof value === 'number' && !isNaN(value);
+};

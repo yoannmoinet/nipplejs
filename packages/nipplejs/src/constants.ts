@@ -17,21 +17,25 @@ const EVENTS_TO_BIND: Record<InteractType, Bindings> = {
         start: 'touchstart',
         move: 'touchmove',
         end: 'touchend, touchcancel',
+        pressure: 'webkitmouseforcechanged',
     },
     mouse: {
         start: 'mousedown',
         move: 'mousemove',
         end: 'mouseup, mouseleave',
+        pressure: 'webkitmouseforcechanged',
     },
     pointer: {
-        start: 'pointerdown, pointerenter',
+        start: 'pointerdown',
         move: 'pointermove',
         end: 'pointerup, pointercancel, pointerleave',
+        pressure: 'webkitmouseforcechanged',
     },
     MSPointer: {
         start: 'MSPointerDown',
         move: 'MSPointerMove',
         end: 'MSPointerUp, MSPointerCancel, MSPointerLeave',
+        pressure: 'webkitmouseforcechanged',
     },
 };
 
