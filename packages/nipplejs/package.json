@@ -55,6 +55,7 @@
         "@rollup/plugin-json": "6.1.0",
         "@rollup/plugin-node-resolve": "16.0.0",
         "@rollup/plugin-terser": "0.4.4",
+        "@types/web": "0.0.206",
         "esbuild": "0.24.0",
         "rollup": "4.24.2",
         "rollup-plugin-dts": "6.1.1",

@@ -4,7 +4,7 @@
         "baseUrl": "./",
         "rootDir": "./",
         "outDir": "./dist",
-        "types": ["@types/node"]
+        "types": ["@types/node", "@types/web"]
     },
     "include": ["**/*"],
     "exclude": ["dist", "node_modules"]

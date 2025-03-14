@@ -28,6 +28,7 @@
         "@types/async-retry": "1.4.8",
         "@types/chalk": "2.2.0",
         "@types/node": "^22",
+        "@types/web": "0.0.206",
         "typescript": "5.4.3"
     }
 }
