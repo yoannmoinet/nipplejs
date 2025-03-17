@@ -1,12 +1,9 @@
-// Unless explicitly stated otherwise all files in this repository are licensed under the MIT License.
-// This product includes software developed at Datadog (https://www.datadoghq.com/).
-// Copyright 2019-Present Datadog, Inc.
-
-import { rm } from '@nipple/core/helpers';
+import { PUBLIC_DIR } from '@nipple/tests/_playwright/constants';
 import type { TestOptions } from '@nipple/tests/_playwright/testParams';
-import { blue, dim } from '@nipple/tools/helpers';
+import { ROOT } from '@nipple/tools/constants';
+import { blue, dim, execute } from '@nipple/tools/helpers';
 import type { FullConfig } from '@playwright/test';
-import { glob } from 'glob';
+import fs from 'fs';
 import path from 'path';
 
 // TODO Also build and test for ESM.
@@ -15,28 +12,18 @@ const globalSetup = async (config: FullConfig<TestOptions>) => {
     const getSubPfx = (name: string) => `  ${dim(getPfx(name))}`;
     const globalPfx = getPfx('Global Setup');
     console.time(globalPfx);
-    console.log(`${globalPfx}Setting up tests.`);
 
-    // In the CI we're building before the job starts.
-    // No need to do it here.
-    if (!process.env.CI) {
-        // Build the requested bundler plugins.
-        const buildPfx = getSubPfx('Build Project');
-        console.time(buildPfx);
-        console.log(`${buildPfx}Building...`);
+    // Build nipplejs and copy to public dir
+    const buildPfx = getSubPfx('Build Project');
+    console.time(buildPfx);
+    // Execute a promisified version of the yarn build command.
+    await execute('yarn', ['build']);
 
-        // FIXME: BUILD NIPPLEJS HERE
-
-        console.timeEnd(buildPfx);
-    }
-
-    // Delete public dirs.
-    const cleanPfx = getSubPfx('Clean');
-    console.time(cleanPfx);
-    const publicDirs = await glob('public/*/', { cwd: __dirname });
-    await Promise.all(publicDirs.map((dir) => rm(path.resolve(__dirname, dir))));
-    console.timeEnd(cleanPfx);
-
+    // Move the built nipplejs to the public dir.
+    const nippleJsPath = path.resolve(ROOT, 'packages/nipplejs/dist/');
+    const publicPath = path.resolve(PUBLIC_DIR);
+    await fs.promises.cp(nippleJsPath, publicPath, { recursive: true });
+    console.timeEnd(buildPfx);
     console.timeEnd(globalPfx);
 };
 

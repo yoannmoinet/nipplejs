@@ -1,17 +1,19 @@
-// Unless explicitly stated otherwise all files in this repository are licensed under the MIT License.
-// This product includes software developed at Datadog (https://www.datadoghq.com/).
-// Copyright 2019-Present Datadog, Inc.
-
 import { DEV_SERVER_URL, PUBLIC_DIR } from '@nipple/tests/_playwright/constants';
 import { test as base } from '@playwright/test';
 import path from 'path';
 
 export type TestOptions = {};
 
+type PageConfig = {
+    head?: string;
+    body?: string;
+};
+
 type Fixtures = {
     devServerUrl: string;
     publicDir: string;
     suiteName: string;
+    pageConfig: PageConfig;
 };
 
 export const test = base.extend<TestOptions & Fixtures>({
@@ -31,4 +33,29 @@ export const test = base.extend<TestOptions & Fixtures>({
         { auto: true },
     ],
     publicDir: PUBLIC_DIR,
+    pageConfig: [
+        async (_ctx, use) => {
+            await use({
+                head: '<script src="/index.js"></script>',
+                body: '<div id="zone_joystick"></div>',
+            });
+        },
+        { auto: true },
+    ],
+    page: async ({ page, pageConfig }, use) => {
+        await page.setContent(`
+            <!DOCTYPE html>
+            <html lang="en">
+                <head>
+                    <title>NippleJS Test</title>
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    ${pageConfig.head || ''}
+                </head>
+                <body>
+                    ${pageConfig.body || ''}
+                </body>
+            </html>
+        `);
+        await use(page);
+    },
 });
