@@ -1026,25 +1026,6 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@nipple/core@workspace:*, @nipple/core@workspace:packages/core":
-  version: 0.0.0-use.local
-  resolution: "@nipple/core@workspace:packages/core"
-  dependencies:
-    "@types/chalk": "npm:2.2.0"
-    "@types/node": "npm:^22"
-    "@types/web": "npm:0.0.206"
-    chalk: "npm:2.3.1"
-    glob: "npm:11.0.0"
-    typescript: "npm:5.4.3"
-  languageName: unknown
-  linkType: soft
-
-"@nipple/examples@workspace:packages/examples":
-  version: 0.0.0-use.local
-  resolution: "@nipple/examples@workspace:packages/examples"
-  languageName: unknown
-  linkType: soft
-
 "@nipple/root@workspace:.":
   version: 0.0.0-use.local
   resolution: "@nipple/root@workspace:."
@@ -1098,7 +1079,6 @@ __metadata:
   resolution: "@nipple/tools@workspace:packages/tools"
   dependencies:
     "@nipple/assets": "workspace:*"
-    "@nipple/core": "workspace:*"
     "@types/chalk": "npm:2.2.0"
     "@types/glob": "npm:7.1.4"
     "@types/lodash.template": "npm:^4"
