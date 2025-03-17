@@ -5,7 +5,7 @@ const config: JestConfigWithTsJest = {
     clearMocks: true,
     globalSetup: '<rootDir>/src/_jest/globalSetup.ts',
     preset: 'ts-jest/presets/js-with-ts',
-    roots: ['./src/unit/'],
+    roots: ['<rootDir>../'],
     setupFilesAfterEnv: ['<rootDir>/src/_jest/setupAfterEnv.ts'],
     testEnvironment: 'jsdom',
     testMatch: ['**/*.test.*'],

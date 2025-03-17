@@ -191,7 +191,7 @@ describe('utils', () => {
             const processedEvent = u.processEvent(evt, evt);
             expect(processedEvent).toEqual(
                 expect.objectContaining({
-                    identifier: 0,
+                    identifier: 1,
                     isTouch: false,
                     position: { x: 100, y: 200 },
                     pressure: 1,

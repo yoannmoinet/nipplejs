@@ -373,7 +373,7 @@ module.exports = {
             },
         },
         {
-            files: ['packages/tests/**/*.*'],
+            files: ['packages/tests/**/*.*', 'packages/**/*.test.ts'],
             env: {
                 jest: true,
                 browser: true,

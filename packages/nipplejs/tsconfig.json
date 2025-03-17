@@ -5,7 +5,7 @@
         "lib": ["es2022"],
         "rootDir": "./",
         "outDir": "./dist",
-        "types": ["@types/web"]
+        "types": ["@types/web", "jest"]
     },
     "include": ["**/*"],
     "exclude": ["dist", "node_modules"]
