@@ -18,16 +18,16 @@
         "yarn": "1.22.19"
     },
     "scripts": {
-        "build:all": "yarn loop run build",
-        "clean:all": "yarn loop run clean",
+        "_nipplejs": "yarn workspace nipplejs",
+        "build": "yarn _nipplejs build",
+        "clean": "yarn _nipplejs clean",
         "cli": "yarn workspace @nipple/tools cli",
         "format": "yarn lint --fix",
         "format-files": "eslint ${0} --quiet --fix",
         "lint": "eslint ./packages/**/*.{ts,js} --quiet",
-        "loop": "yarn workspaces foreach -Apti --exclude \"@nipple/root\"",
-        "typecheck:all": "yarn workspaces foreach -Apti run typecheck",
-        "version:all": "yarn loop version --deferred ${0} && yarn version apply --all",
-        "watch:all": "yarn loop run watch"
+        "typecheck": "yarn workspaces foreach -Apti run typecheck",
+        "version": "yarn _nipplejs version --deferred ${0} && yarn version apply --all",
+        "watch": "yarn _nipplejs watch"
     },
     "husky": {
         "hooks": {

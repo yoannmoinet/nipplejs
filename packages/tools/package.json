@@ -28,7 +28,6 @@
     },
     "dependencies": {
         "@nipple/assets": "workspace:*",
-        "@nipple/core": "workspace:*",
         "chalk": "2.3.1",
         "clipanion": "4.0.0-rc.3",
         "conventional-changelog": "6.0.0",

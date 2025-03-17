@@ -1,6 +1,6 @@
 /* global casper */
-// const mouse = require('mouse').create(casper);
-// const u = require('utils');
+const mouse = require('mouse').create(casper);
+const u = require('nipplejs/utils');
 
 const NB_TESTS = 10;
 let nippleIndex = 0;
@@ -26,7 +26,7 @@ casper.on('remote.message', function (message) {
         casper.echo(`>> [CLIENT] ${message}`, 'WARN_BAR');
     } else {
         casper.echo('>> [CLIENT] DUMP', 'WARN_BAR');
-        // u.dump(message);
+        u.dump(message);
     }
 });
 
@@ -38,7 +38,7 @@ casper.on('resource.error', function (message) {
         casper.echo(`>> [CLIENT] ${message}`, 'RED_BAR');
     } else {
         casper.echo('>> [CLIENT] DUMP', 'RED_BAR');
-        // u.dump(message);
+        u.dump(message);
     }
 });
 
@@ -50,9 +50,9 @@ casper.on('page.error', function (message, trace) {
         casper.echo(`>> [CLIENT] ${message}`, 'RED_BAR');
     } else {
         casper.echo('>> [CLIENT] DUMP', 'RED_BAR');
-        // u.dump(message);
+        u.dump(message);
     }
-    // u.dump(trace);
+    u.dump(trace);
 });
 
 /*
@@ -60,7 +60,7 @@ casper.on('page.error', function (message, trace) {
 */
 
 function clickZone() {
-    // mouse.down('.zone.active');
+    mouse.down('.zone.active');
 }
 
 function assertNipple(test) {
@@ -94,7 +94,7 @@ casper.test.begin('NippleJS test page loads correctly', NB_TESTS, function suite
         .then(function () {
             // Get position of active zone.
             casper.evaluate(function () {
-                // return document.getElementById('zone_joystick').getBoundingClientRect();
+                return document.getElementById('zone_joystick').getBoundingClientRect();
             });
         })
         /** ********************************\
@@ -113,7 +113,7 @@ casper.test.begin('NippleJS test page loads correctly', NB_TESTS, function suite
             *
             \********************************* */
         .then(function () {
-            // mouse.click('.button.semi');
+            mouse.click('.button.semi');
             collectionIndex += 1;
         })
         .then(function () {
@@ -134,7 +134,7 @@ casper.test.begin('NippleJS test page loads correctly', NB_TESTS, function suite
             *
             \********************************* */
         .then(function () {
-            // mouse.click('.button.static');
+            mouse.click('.button.static');
             collectionIndex += 1;
         })
         .then(function () {

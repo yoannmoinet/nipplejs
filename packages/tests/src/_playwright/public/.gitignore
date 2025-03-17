@@ -1,6 +1,5 @@
-# We don't want anything else in this folder.
-# It is used for e2e tests to serve their own apps.
-*
-!.gitignore
-!404.html
-!index.html
+index.d.ts
+index.js
+index.js.map
+index.mjs
+index.mjs.map

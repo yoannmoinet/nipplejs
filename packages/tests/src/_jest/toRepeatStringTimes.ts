@@ -1,5 +1,27 @@
 import type { MatcherFunction } from 'expect';
 
+// Truncate a string to a certain length.
+// Placing a [...] placeholder in the middle.
+// "A way too long sentence could be truncated a bit." => "A way too[...]could be truncated a bit."
+export const truncateString = (
+    str: string,
+    maxLength: number = 60,
+    placeholder: string = '[...]',
+) => {
+    if (str.length <= maxLength) {
+        return str;
+    }
+
+    // We want to keep at the very least 4 characters.
+    const stringLength = Math.max(4, maxLength - placeholder.length);
+
+    // We want to keep most of the end of the string, hence the 10 chars top limit for left.
+    const leftStop = Math.min(10, Math.floor(stringLength / 2));
+    const rightStop = stringLength - leftStop;
+
+    return `${str.slice(0, leftStop)}${placeholder}${str.slice(-rightStop)}`;
+};
+
 export const toRepeatStringTimes: MatcherFunction<
     [st: string | RegExp, occurences: number | [number, number]]
 > =
@@ -15,7 +37,6 @@ export const toRepeatStringTimes: MatcherFunction<
             throw new TypeError('Need a number or an array of two numbers.');
         }
 
-        const { truncateString } = jest.requireActual('@dd/core/helpers');
         const result = actual.split(st).length - 1;
         const isRange = Array.isArray(occurences);
         const pass = isRange

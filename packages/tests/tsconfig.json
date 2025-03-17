@@ -4,6 +4,7 @@
         "allowJs": true,
         "types": ["@types/web", "jest"]
     },
+    "files": ["./src/e2e/global.d.ts"],
     "include": ["**/*"],
     "exclude": ["dist", "node_modules"]
 }

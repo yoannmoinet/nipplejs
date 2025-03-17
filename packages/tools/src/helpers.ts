@@ -1,11 +1,8 @@
-import { readJsonSync } from '@nipple/core/helpers';
 import chalk from 'chalk';
 import { execFile, execFileSync } from 'child_process';
-import path from 'path';
 import { promisify } from 'util';
 
 import { ROOT } from './constants';
-import type { SlugLessWorkspace, Workspace } from './types';
 
 export const green = chalk.bold.green;
 export const yellow = chalk.bold.yellow;
@@ -49,25 +46,6 @@ export const replaceInBetween = (content: string, mark: string, injection: strin
     return content.replace(rx, `${mark}\n${escapedInjection}\n${mark}`);
 };
 
-export const getTitle = (name: string): string =>
-    name
-        .toLowerCase()
-        .split(/-+/g)
-        .map((s) => s.charAt(0).toUpperCase() + s.slice(1))
-        .join(' ');
-
-export const getPascalCase = (name: string): string => getTitle(name).replace(/ /g, '');
-
-export const getCamelCase = (name: string): string => {
-    const pascal = getPascalCase(name);
-    return pascal.charAt(0).toLowerCase() + pascal.slice(1);
-};
-
-export const getPackageJsonData = (workspace: string = 'plugins/telemetry'): any => {
-    const packageJson = readJsonSync(path.resolve(ROOT, `packages/${workspace}/package.json`));
-    return packageJson;
-};
-
 export const runAutoFixes = async () => {
     const errors: string[] = [];
 
@@ -106,22 +84,4 @@ export const runAutoFixes = async () => {
     }
 
     return errors;
-};
-
-export const getWorkspaces = async (
-    filter?: (workspace: SlugLessWorkspace) => boolean,
-): Promise<Workspace[]> => {
-    const { stdout: rawWorkspaces } = await execute('yarn', ['workspaces', 'list', '--json']);
-    // Replace new lines with commas to make it JSON valid.
-    const jsonString = `[${rawWorkspaces.replace(/\n([^\]])/g, ',\n$1')}]`;
-    const workspacesArray = JSON.parse(jsonString) as SlugLessWorkspace[];
-    return workspacesArray
-        .filter((workspace: SlugLessWorkspace) => (filter ? filter(workspace) : true))
-        .map((workspace: SlugLessWorkspace) => {
-            const plugin: Workspace = {
-                ...workspace,
-                slug: workspace.location.split('/').pop() as string,
-            };
-            return plugin;
-        });
 };

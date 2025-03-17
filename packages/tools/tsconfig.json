@@ -7,8 +7,7 @@
         "moduleResolution": "Node",
         "outDir": "./dist",
         "paths": {
-            "@nipple/tools/*": ["./src/*"],
-            "@nipple/core/*": ["../core/src/*"]
+            "@nipple/tools/*": ["./src/*"]
         }
     },
     "include": ["**/*"],

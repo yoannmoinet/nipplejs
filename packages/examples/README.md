@@ -1,3 +1,0 @@
-# Examples
-
-Examples for NippleJS.

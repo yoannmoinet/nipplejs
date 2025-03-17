@@ -385,6 +385,7 @@ module.exports = {
                 'global-require': 'off',
                 'import/no-dynamic-require': 'off',
                 'import/no-extraneous-dependencies': 'off',
+                'no-await-in-loop': 'off',
                 'no-new': 'off',
             },
         },
