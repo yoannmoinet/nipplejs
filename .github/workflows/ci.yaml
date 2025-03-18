@@ -3,123 +3,122 @@ name: Continuous Integration
 on: pull_request
 
 jobs:
-  unit-test:
+    unit-test:
+        name: Unit tests
+        runs-on: ubuntu-latest
 
-    name: Unit tests
-    runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
 
-    steps:
-    - uses: actions/checkout@v4
+            - name: Install Node
+              uses: actions/setup-node@v4
+              with:
+                  node-version-file: 'package.json'
 
-    - name: Install Node
-      uses: actions/setup-node@v4
-      with:
-        node-version-file: 'package.json'
+            - name: Cache build
+              id: cache-build
+              uses: actions/cache@v4
+              with:
+                  path: packages/nipplejs/**/dist
+                  key: node22-cache-build-${{ hashFiles('packages/tests/**', 'packages/nipplejs/**', 'yarn.lock') }}
 
-    # - name: Cache build:all
-    #   id: cache-build
-    #   uses: actions/cache@v4
-    #   with:
-    #     path: packages/published/**/dist
-    #     key: node22-cache-build-${{ hashFiles('packages/published/**', 'yarn.lock') }}
+            - run: yarn install
 
-    - run: yarn install
+            - name: Build package
+              if: steps.cache-build.outputs.cache-hit != 'true'
+              run: yarn build
 
-    # - name: Build all plugins
-    #   if: steps.cache-build.outputs.cache-hit != 'true'
-    #   run: yarn build:all
+            - run: yarn test:unit
 
-    # - run: yarn test:unit
+    e2e:
+        timeout-minutes: 20
 
-  e2e:
-    timeout-minutes: 10
+        name: End to End
+        runs-on: ubuntu-latest
 
-    name: End to End
-    runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
 
-    steps:
-    - uses: actions/checkout@v4
+            - name: Install Node
+              uses: actions/setup-node@v4
+              with:
+                  node-version-file: 'package.json'
 
-    - name: Install Node
-      uses: actions/setup-node@v4
-      with:
-        node-version-file: 'package.json'
+            - name: Cache build
+              id: cache-build
+              uses: actions/cache@v4
+              with:
+                  path: packages/nipplejs/**/dist
+                  key: node22-cache-build-${{ hashFiles('packages/tests/**', 'packages/nipplejs/**', 'yarn.lock') }}
 
-    # - name: Cache build:all
-    #   id: cache-build
-    #   uses: actions/cache@v4
-    #   with:
-    #     path: packages/published/**/dist
-    #     key: node18-cache-build-${{ hashFiles('packages/published/**', 'yarn.lock') }}
+            - name: Cache playwright binaries
+              id: cache-playwright-binaries
+              uses: actions/cache@v4
+              with:
+                  path: |
+                      ~/.cache/ms-playwright
+                      ~/Library/Caches/ms-playwright
+                      %USERPROFILE%\AppData\Local\ms-playwright
+                  key: cache-playwright-binaries-${{ hashFiles('yarn.lock') }}
 
-    # - name: Cache playwright binaries
-    #   id: cache-playwright-binaries
-    #   uses: actions/cache@v4
-    #   with:
-    #     path: |
-    #       ~/.cache/ms-playwright
-    #       ~/Library/Caches/ms-playwright
-    #       %USERPROFILE%\AppData\Local\ms-playwright
-    #     key: cache-playwright-binaries-${{ hashFiles('yarn.lock') }}
+            - run: yarn install
 
-    - run: yarn install
+            - name: Install playwright
+              run: yarn workspace @nipple/tests playwright install --with-deps
 
-    # - name: Install playwright
-    #   run: yarn workspace @dd/tests playwright install --with-deps
+            - name: Build package
+              if: steps.cache-build.outputs.cache-hit != 'true'
+              run: yarn build
 
-    # - name: Build all plugins
-    #   if: steps.cache-build.outputs.cache-hit != 'true'
-    #   run: yarn build:all
+            - run: yarn test:e2e
 
-    # - run: yarn test:e2e
+            - name: Save playwright cache
+              if: always() && steps.cache-playwright-binaries.outputs.cache-hit != 'true'
+              id: save-playwright-cache
+              uses: actions/cache/save@v4
+              with:
+                  path: |
+                      ~/.cache/ms-playwright
+                      ~/Library/Caches/ms-playwright
+                      %USERPROFILE%\AppData\Local\ms-playwright
+                  key: cache-playwright-binaries-${{ hashFiles('yarn.lock') }}
 
-    # - name: Save playwright cache
-    #   if: always() && steps.cache-playwright-binaries.outputs.cache-hit != 'true'
-    #   id: save-playwright-cache
-    #   uses: actions/cache/save@v4
-    #   with:
-    #     path: |
-    #       ~/.cache/ms-playwright
-    #       ~/Library/Caches/ms-playwright
-    #       %USERPROFILE%\AppData\Local\ms-playwright
-    #     key: cache-playwright-binaries-${{ hashFiles('yarn.lock') }}
+            - uses: actions/upload-artifact@v4
+              if: ${{ failure() }}
+              with:
+                  name: playwright
+                  path: |
+                      packages/tests/playwright-report
+                      packages/tests/test-results
+                  retention-days: 3
 
-    # - uses: actions/upload-artifact@v4
-    #   if: ${{ !cancelled() && failure() }}
-    #   with:
-    #     name: playwright
-    #     path: |
-    #       packages/tests/playwright-report
-    #       packages/tests/test-results
-    #     retention-days: 3
+    lint:
+        name: Linting
+        runs-on: ubuntu-latest
 
-  lint:
-    name: Linting
-    runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
 
-    steps:
-    - uses: actions/checkout@v4
+            - name: Install Node
+              uses: actions/setup-node@v4
+              with:
+                  node-version-file: 'package.json'
 
-    - name: Install Node
-      uses: actions/setup-node@v4
-      with:
-        node-version-file: 'package.json'
+            - name: Cache build
+              id: cache-build
+              uses: actions/cache@v4
+              with:
+                  path: packages/nipplejs/**/dist
+                  key: node22-cache-build-${{ hashFiles('packages/nipplejs/**', '.eslintignore', '.eslintrc.js', '.prettierrc', 'yarn.lock') }}
 
-    # - name: Cache build:all
-    #   id: cache-build
-    #   uses: actions/cache@v4
-    #   with:
-    #     path: packages/published/**/dist
-    #     key: node22-cache-build-${{ hashFiles('packages/published/**', 'yarn.lock') }}
+            - run: yarn install
 
-    - run: yarn install
+            - name: Build package
+              if: steps.cache-build.outputs.cache-hit != 'true'
+              run: yarn build
 
-    # - name: Build all plugins
-    #   if: steps.cache-build.outputs.cache-hit != 'true'
-    #   run: yarn build:all
+            - run: yarn typecheck
 
-    - run: yarn typecheck:all
+            - run: yarn cli integrity
 
-    - run: yarn cli integrity
-
-    - run: git diff --exit-code && git diff --cached --exit-code || (echo "Please run 'yarn cli integrity' and commit the result." && exit 1)
+            - run: git diff --exit-code && git diff --cached --exit-code || (echo "Please run 'yarn cli integrity' and commit the result." && exit 1)
