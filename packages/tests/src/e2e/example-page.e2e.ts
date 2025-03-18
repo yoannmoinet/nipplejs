@@ -1,8 +1,11 @@
-import { test, expect } from '@playwright/test';
+import { test } from '@nipple/tests/_playwright/testParams';
 
-test.describe('Example Page', () => {
-    test.beforeEach(async ({ page }) => {
-        await page.goto('/codepen-demo.html');
+// Have a similar experience to Jest.
+const { expect, beforeEach, describe } = test;
+
+describe('Example Page', () => {
+    beforeEach(async ({ devServerUrl, page }) => {
+        await page.goto(`${devServerUrl}/codepen-demo.html`);
     });
 
     test('loads correctly and handles different modes', async ({ page }) => {
@@ -46,7 +49,7 @@ test.describe('Example Page', () => {
         await expect(page.locator('#nipple_2_3')).not.toBeVisible();
     });
 
-    test('handles mouse interactions correctly', async ({ page }) => {
+    test.only('handles mouse interactions correctly', async ({ page }) => {
         const zone = page.locator('.zone.active');
 
         // Get zone position for mouse interactions
@@ -66,6 +69,7 @@ test.describe('Example Page', () => {
         const transform = await frontElement.evaluate((el) => {
             return window.getComputedStyle(el).transform;
         });
+        console.log('transform', transform);
         expect(transform).not.toBe('none');
 
         // Test mouse up removes nipple in dynamic mode

@@ -1,13 +1,16 @@
 import { PUBLIC_DIR } from '@nipple/tests/_playwright/constants';
 import type { TestOptions } from '@nipple/tests/_playwright/testParams';
-import { ROOT } from '@nipple/tools/constants';
-import { blue, dim, execute } from '@nipple/tools/helpers';
+import { blue, dim } from '@nipple/tools/helpers';
 import type { FullConfig } from '@playwright/test';
 import fs from 'fs';
+import { getDefaultBuildConfigs } from 'nipplejs/rollup.config.mjs';
 import path from 'path';
+import { rollup } from 'rollup';
+
+const OUTPUT_DIR = path.resolve(PUBLIC_DIR, 'src');
 
 // TODO Also build and test for ESM.
-const globalSetup = async (config: FullConfig<TestOptions>) => {
+const globalSetup = async (testConfig: FullConfig<TestOptions>) => {
     const getPfx = (name: string) => `[${blue(name)}] `;
     const getSubPfx = (name: string) => `  ${dim(getPfx(name))}`;
     const globalPfx = getPfx('Global Setup');
@@ -16,13 +19,25 @@ const globalSetup = async (config: FullConfig<TestOptions>) => {
     // Build nipplejs and copy to public dir
     const buildPfx = getSubPfx('Build Project');
     console.time(buildPfx);
-    // Execute a promisified version of the yarn build command.
-    await execute('yarn', ['build']);
 
-    // Move the built nipplejs to the public dir.
-    const nippleJsPath = path.resolve(ROOT, 'packages/nipplejs/dist/');
-    const publicPath = path.resolve(PUBLIC_DIR);
-    await fs.promises.cp(nippleJsPath, publicPath, { recursive: true });
+    // Clean previous build.
+    await fs.promises.rm(OUTPUT_DIR, { recursive: true, force: true });
+
+    // Build the project.
+    const rollupConfig = getDefaultBuildConfigs();
+    await Promise.all(
+        rollupConfig.map(async (config) => {
+            const bundle = await rollup(config);
+            const outputs = Array.isArray(config.output) ? config.output : [config.output];
+
+            await Promise.all(
+                outputs.map((output) => bundle.write({ ...output, dir: OUTPUT_DIR })),
+            );
+
+            await bundle.close();
+        }),
+    );
+
     console.timeEnd(buildPfx);
     console.timeEnd(globalPfx);
 };

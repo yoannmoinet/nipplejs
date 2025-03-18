@@ -25,6 +25,7 @@
         "format": "yarn lint --fix",
         "format-files": "eslint ${0} --quiet --fix",
         "lint": "eslint ./packages/**/*.{ts,js} --quiet",
+        "playwright": "yarn workspace @nipple/tests playwright",
         "typecheck": "yarn workspaces foreach -Apti run typecheck",
         "version": "yarn _nipplejs version --deferred ${0} && yarn version apply --all",
         "watch": "yarn _nipplejs watch"

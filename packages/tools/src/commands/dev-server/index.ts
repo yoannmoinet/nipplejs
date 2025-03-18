@@ -127,9 +127,11 @@ class DevServer extends Command {
         const found = !pathTraversal && exists;
         const finalPath = found ? filePath : `${staticPath}/404.html`;
         const ext = path.extname(finalPath).substring(1).toLowerCase() as File['ext'];
-        const fileContent = template(await fs.promises.readFile(finalPath, { encoding: 'utf-8' }), {
-            interpolate: INTERPOLATE_RX,
-        })(context);
+        const fileContent = found
+            ? template(await fs.promises.readFile(finalPath, { encoding: 'utf-8' }), {
+                  interpolate: INTERPOLATE_RX,
+              })(context)
+            : '404';
 
         return { found, ext, content: fileContent };
     }

@@ -7,6 +7,7 @@ export type TestOptions = {};
 type PageConfig = {
     head?: string;
     body?: string;
+    css?: string;
 };
 
 type Fixtures = {
@@ -34,10 +35,21 @@ export const test = base.extend<TestOptions & Fixtures>({
     ],
     publicDir: PUBLIC_DIR,
     pageConfig: [
-        async (_ctx, use) => {
+        // eslint-disable-next-line no-empty-pattern
+        async ({}, use) => {
             await use({
-                head: '<script src="/index.js"></script>',
+                head: '<script src="./src/index.js"></script>',
                 body: '<div id="zone_joystick"></div>',
+                css: `<style>
+                    #zone_joystick {
+                        position: fixed;
+                        top: 0;
+                        left: 0;
+                        width: 100%;
+                        height: 100%;
+                        background-color: lightblue;
+                    }
+                </style>`,
             });
         },
         { auto: true },
@@ -50,6 +62,7 @@ export const test = base.extend<TestOptions & Fixtures>({
                     <title>NippleJS Test</title>
                     <meta name="viewport" content="width=device-width, initial-scale=1.0">
                     ${pageConfig.head || ''}
+                    ${pageConfig.css || ''}
                 </head>
                 <body>
                     ${pageConfig.body || ''}

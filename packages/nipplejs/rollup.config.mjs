@@ -16,7 +16,7 @@ import packageJson from './package.json' with { type: 'json' };
  */
 export const bundle = (config) => ({
     input: {
-        index: 'src/index.ts',
+        index: path.resolve(__dirname, 'src/index.ts'),
     },
     ...config,
     external: [
@@ -66,7 +66,7 @@ const getOutput = (overrides = {}) => {
 /**
  * @returns {import('rollup').RollupOptions[]}
  */
-export const getDefaultBuildConfigs = async () => {
+export const getDefaultBuildConfigs = () => {
     const configs = [
         // Main bundle.
         bundle({

@@ -1,0 +1,6 @@
+# Playwright stuffs
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/src/_playwright/public/src/

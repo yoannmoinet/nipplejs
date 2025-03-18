@@ -18,6 +18,7 @@
     "module": "./dist/index.mjs",
     "types": "./dist/index.d.ts",
     "exports": {
+        "./rollup.config.mjs": "./rollup.config.mjs",
         "./dist/*": "./dist/*",
         ".": "./src/index.ts",
         "./*": "./src/*.ts"

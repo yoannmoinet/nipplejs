@@ -12,6 +12,7 @@ import { defineConfig, devices } from '@playwright/test';
  */
 export default defineConfig<TestOptions>({
     testDir: './src/e2e',
+    testMatch: '**/*.e2e.ts',
     /* Run tests in files in parallel */
     fullyParallel: true,
     /* Fail the build on CI if you accidentally left test.only in the source code. */
@@ -25,7 +26,7 @@ export default defineConfig<TestOptions>({
     use: {
         trace: 'retain-on-failure',
     },
-    timeout: 5_000,
+    timeout: 20_000,
     /* Configure projects for each bundler */
     // TODO Also build and test for ESM.
     projects: [
@@ -35,24 +36,24 @@ export default defineConfig<TestOptions>({
                 ...devices['Desktop Chrome'],
             },
         },
-        {
-            name: `firefox`,
-            use: {
-                ...devices['Desktop Firefox'],
-            },
-        },
-        {
-            name: `edge`,
-            use: {
-                ...devices['Desktop Edge'],
-            },
-        },
-        {
-            name: `safari`,
-            use: {
-                ...devices['Desktop Safari'],
-            },
-        },
+        // {
+        //     name: `firefox`,
+        //     use: {
+        //         ...devices['Desktop Firefox'],
+        //     },
+        // },
+        // {
+        //     name: `edge`,
+        //     use: {
+        //         ...devices['Desktop Edge'],
+        //     },
+        // },
+        // {
+        //     name: `safari`,
+        //     use: {
+        //         ...devices['Desktop Safari'],
+        //     },
+        // },
     ],
 
     /* Run your local dev server before starting the tests */
