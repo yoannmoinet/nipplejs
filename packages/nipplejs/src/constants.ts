@@ -1,8 +1,12 @@
 import type { EventType, InteractType } from './types';
 
+/** Defines the different positioning modes available for the joystick */
 export const MODES = {
+    /** The joystick disappears on release. */
     dynamic: 'dynamic',
+    /** The joystick stays in place after first touch, and disappears if the subsequent touch is too far. */
     semi: 'semi',
+    /** The joystick stays at its initial position. */
     static: 'static',
 } as const;
 

@@ -1,5 +1,6 @@
 import { PUBLIC_DIR } from '@nipple/tests/_playwright/constants';
 import type { TestOptions } from '@nipple/tests/_playwright/testParams';
+import { ROOT } from '@nipple/tools/constants';
 import { blue, dim } from '@nipple/tools/helpers';
 import type { FullConfig } from '@playwright/test';
 import fs from 'fs';
@@ -24,7 +25,11 @@ const globalSetup = async (testConfig: FullConfig<TestOptions>) => {
     await fs.promises.rm(OUTPUT_DIR, { recursive: true, force: true });
 
     // Build the project.
-    const rollupConfig = getDefaultBuildConfigs();
+    const rollupConfig = getDefaultBuildConfigs({
+        input: {
+            index: path.resolve(ROOT, 'packages/nipplejs/src/index.ts'),
+        },
+    });
     await Promise.all(
         rollupConfig.map(async (config) => {
             const bundle = await rollup(config);

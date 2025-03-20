@@ -33,7 +33,7 @@ test.describe('NippleJS Rest Behavior', () => {
         // Wait for transition
         await page.waitForTimeout(300); // Slightly longer than default fadeTime
 
-        const frontElement = page.locator('#nipple_0_0 .front');
+        const frontElement = page.locator('#joystick_0_0 .front');
         const transform = await frontElement.evaluate((el) => {
             const style = window.getComputedStyle(el);
             const matrix = new DOMMatrixReadOnly(style.transform);
@@ -46,7 +46,7 @@ test.describe('NippleJS Rest Behavior', () => {
 
         // Check opacity
         const opacity = await page
-            .locator('#nipple_0_0')
+            .locator('#joystick_0_0')
             .evaluate((el) => window.getComputedStyle(el).opacity);
         expect(Number(opacity)).toBe(0.5);
     });
@@ -78,7 +78,7 @@ test.describe('NippleJS Rest Behavior', () => {
         // Wait for transition
         await page.waitForTimeout(300);
 
-        const frontElement = page.locator('#nipple_0_0 .front');
+        const frontElement = page.locator('#joystick_0_0 .front');
         const transform = await frontElement.evaluate((el) => {
             const style = window.getComputedStyle(el);
             const matrix = new DOMMatrixReadOnly(style.transform);
@@ -114,7 +114,7 @@ test.describe('NippleJS Rest Behavior', () => {
         await page.mouse.move(box.x + moveX, box.y + moveY);
 
         // Get position before release
-        const beforeRelease = await page.locator('#nipple_0_0 .front').evaluate((el) => {
+        const beforeRelease = await page.locator('#joystick_0_0 .front').evaluate((el) => {
             const style = window.getComputedStyle(el);
             const matrix = new DOMMatrixReadOnly(style.transform);
             return { x: matrix.m41, y: matrix.m42 };
@@ -127,7 +127,7 @@ test.describe('NippleJS Rest Behavior', () => {
         await page.waitForTimeout(300);
 
         // Get position after release
-        const afterRelease = await page.locator('#nipple_0_0 .front').evaluate((el) => {
+        const afterRelease = await page.locator('#joystick_0_0 .front').evaluate((el) => {
             const style = window.getComputedStyle(el);
             const matrix = new DOMMatrixReadOnly(style.transform);
             return { x: matrix.m41, y: matrix.m42 };

@@ -51,8 +51,8 @@ test.describe('NippleJS Multitouch', () => {
         });
 
         // Verify both joysticks exist
-        await expect(page.locator('#nipple_0_0')).toBeVisible();
-        await expect(page.locator('#nipple_0_1')).toBeVisible();
+        await expect(page.locator('#joystick_0_0')).toBeVisible();
+        await expect(page.locator('#joystick_0_1')).toBeVisible();
     });
 
     test('respects maxNumberOfJoysticks limit', async ({ page }) => {
@@ -88,9 +88,9 @@ test.describe('NippleJS Multitouch', () => {
         });
 
         // Verify only two joysticks exist
-        await expect(page.locator('#nipple_0_0')).toBeVisible();
-        await expect(page.locator('#nipple_0_1')).toBeVisible();
-        await expect(page.locator('#nipple_0_2')).not.toBeVisible();
+        await expect(page.locator('#joystick_0_0')).toBeVisible();
+        await expect(page.locator('#joystick_0_1')).toBeVisible();
+        await expect(page.locator('#joystick_0_2')).not.toBeVisible();
     });
 
     test('handles multitouch removal correctly', async ({ page }) => {
@@ -126,8 +126,8 @@ test.describe('NippleJS Multitouch', () => {
         });
 
         // Verify both exist
-        await expect(page.locator('#nipple_0_0')).toBeVisible();
-        await expect(page.locator('#nipple_0_1')).toBeVisible();
+        await expect(page.locator('#joystick_0_0')).toBeVisible();
+        await expect(page.locator('#joystick_0_1')).toBeVisible();
 
         // Remove first touch
         await page.evaluate(() => {
@@ -153,7 +153,7 @@ test.describe('NippleJS Multitouch', () => {
         await page.waitForTimeout(300);
 
         // Verify first is gone but second remains
-        await expect(page.locator('#nipple_0_0')).not.toBeVisible();
-        await expect(page.locator('#nipple_0_1')).toBeVisible();
+        await expect(page.locator('#joystick_0_0')).not.toBeVisible();
+        await expect(page.locator('#joystick_0_1')).toBeVisible();
     });
 });

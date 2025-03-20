@@ -14,6 +14,8 @@ import type {
 } from './types';
 import * as u from './utils';
 
+type SuperEventType<T extends FactoryEventType> = `${T}${string}` | `${string}${T}`;
+
 class Super {
     uid: Uid = 0 as Uid;
     name: string = 'Super';
@@ -33,21 +35,21 @@ class Super {
     }
 
     // Basic event system.
-    on(arg: `attached${string}`, cb: InternalEventHandler<AttachEventData>): void;
-    on(arg: `detached${string}`, cb: InternalEventHandler<AttachEventData>): void;
-    on(arg: `dir${string}`, cb: InternalEventHandler<JoystickEventData>): void;
-    on(arg: `plain${string}`, cb: InternalEventHandler<JoystickEventData>): void;
-    on(arg: `move${string}`, cb: InternalEventHandler<JoystickEventData>): void;
-    on(arg: `added${string}`, cb: InternalEventHandler<Joystick>): void;
-    on(arg: `removed${string}`, cb: InternalEventHandler<Joystick>): void;
-    on(arg: `start${string}`, cb: InternalEventHandler<Joystick>): void;
-    on(arg: `end${string}`, cb: InternalEventHandler<Joystick>): void;
-    on(arg: `shown${string}`, cb: InternalEventHandler<Joystick>): void;
-    on(arg: `hidden${string}`, cb: InternalEventHandler<Joystick>): void;
-    on(arg: `rested${string}`, cb: InternalEventHandler<Joystick>): void;
-    on(arg: `joystickDestroyed${string}`, cb: InternalEventHandler<Joystick>): void;
-    on(arg: `collectionDestroyed${string}`, cb: InternalEventHandler<Collection>): void;
-    on(arg: `pressure${string}`, cb: InternalEventHandler<number>): void;
+    on(arg: SuperEventType<'attached'>, cb: InternalEventHandler<AttachEventData>): void;
+    on(arg: SuperEventType<'detached'>, cb: InternalEventHandler<AttachEventData>): void;
+    on(arg: SuperEventType<'dir'>, cb: InternalEventHandler<JoystickEventData>): void;
+    on(arg: SuperEventType<'plain'>, cb: InternalEventHandler<JoystickEventData>): void;
+    on(arg: SuperEventType<'move'>, cb: InternalEventHandler<JoystickEventData>): void;
+    on(arg: SuperEventType<'added'>, cb: InternalEventHandler<Joystick>): void;
+    on(arg: SuperEventType<'removed'>, cb: InternalEventHandler<Joystick>): void;
+    on(arg: SuperEventType<'start'>, cb: InternalEventHandler<Joystick>): void;
+    on(arg: SuperEventType<'end'>, cb: InternalEventHandler<Joystick>): void;
+    on(arg: SuperEventType<'shown'>, cb: InternalEventHandler<Joystick>): void;
+    on(arg: SuperEventType<'hidden'>, cb: InternalEventHandler<Joystick>): void;
+    on(arg: SuperEventType<'rested'>, cb: InternalEventHandler<Joystick>): void;
+    on(arg: SuperEventType<'joystickDestroyed'>, cb: InternalEventHandler<Joystick>): void;
+    on(arg: SuperEventType<'collectionDestroyed'>, cb: InternalEventHandler<Collection>): void;
+    on(arg: SuperEventType<'pressure'>, cb: InternalEventHandler<number>): void;
     on<T>(arg: string, cb: InternalEventHandler<T>): void {
         this.mapOnEvents(arg, (type) => {
             this._handlers_[type] = this._handlers_[type] || new Set();
@@ -55,21 +57,21 @@ class Super {
         });
     }
 
-    off(arg?: `attached${string}`, cb?: InternalEventHandler<AttachEventData>): void;
-    off(arg?: `detached${string}`, cb?: InternalEventHandler<AttachEventData>): void;
-    off(arg?: `dir${string}`, cb?: InternalEventHandler<JoystickEventData>): void;
-    off(arg?: `plain${string}`, cb?: InternalEventHandler<JoystickEventData>): void;
-    off(arg?: `move${string}`, cb?: InternalEventHandler<JoystickEventData>): void;
-    off(arg?: `added${string}`, cb?: InternalEventHandler<Joystick>): void;
-    off(arg?: `removed${string}`, cb?: InternalEventHandler<Joystick>): void;
-    off(arg?: `start${string}`, cb?: InternalEventHandler<Joystick>): void;
-    off(arg?: `end${string}`, cb?: InternalEventHandler<Joystick>): void;
-    off(arg?: `shown${string}`, cb?: InternalEventHandler<Joystick>): void;
-    off(arg?: `hidden${string}`, cb?: InternalEventHandler<Joystick>): void;
-    off(arg?: `rested${string}`, cb?: InternalEventHandler<Joystick>): void;
-    off(arg?: `joystickDestroyed${string}`, cb?: InternalEventHandler<Joystick>): void;
-    off(arg?: `collectionDestroyed${string}`, cb?: InternalEventHandler<Collection>): void;
-    off(arg?: `pressure${string}`, cb?: InternalEventHandler<number>): void;
+    off(arg?: SuperEventType<'attached'>, cb?: InternalEventHandler<AttachEventData>): void;
+    off(arg?: SuperEventType<'detached'>, cb?: InternalEventHandler<AttachEventData>): void;
+    off(arg?: SuperEventType<'dir'>, cb?: InternalEventHandler<JoystickEventData>): void;
+    off(arg?: SuperEventType<'plain'>, cb?: InternalEventHandler<JoystickEventData>): void;
+    off(arg?: SuperEventType<'move'>, cb?: InternalEventHandler<JoystickEventData>): void;
+    off(arg?: SuperEventType<'added'>, cb?: InternalEventHandler<Joystick>): void;
+    off(arg?: SuperEventType<'removed'>, cb?: InternalEventHandler<Joystick>): void;
+    off(arg?: SuperEventType<'start'>, cb?: InternalEventHandler<Joystick>): void;
+    off(arg?: SuperEventType<'end'>, cb?: InternalEventHandler<Joystick>): void;
+    off(arg?: SuperEventType<'shown'>, cb?: InternalEventHandler<Joystick>): void;
+    off(arg?: SuperEventType<'hidden'>, cb?: InternalEventHandler<Joystick>): void;
+    off(arg?: SuperEventType<'rested'>, cb?: InternalEventHandler<Joystick>): void;
+    off(arg?: SuperEventType<'joystickDestroyed'>, cb?: InternalEventHandler<Joystick>): void;
+    off(arg?: SuperEventType<'collectionDestroyed'>, cb?: InternalEventHandler<Collection>): void;
+    off(arg?: SuperEventType<'pressure'>, cb?: InternalEventHandler<number>): void;
     off<T>(arg?: string, cb?: InternalEventHandler<T>): void {
         if (arg === undefined) {
             // If no arguments provided, clear all handlers.
@@ -87,21 +89,21 @@ class Super {
         }
     }
 
-    trigger(arg: `attached${string}`, data: AttachEventData): void;
-    trigger(arg: `detached${string}`, data: AttachEventData): void;
-    trigger(arg: `dir${string}`, data: JoystickEventData): void;
-    trigger(arg: `plain${string}`, data: JoystickEventData): void;
-    trigger(arg: `move${string}`, data: JoystickEventData): void;
-    trigger(arg: `added${string}`, data: Joystick): void;
-    trigger(arg: `removed${string}`, data: Joystick): void;
-    trigger(arg: `start${string}`, data: Joystick): void;
-    trigger(arg: `end${string}`, data: Joystick): void;
-    trigger(arg: `shown${string}`, data: Joystick): void;
-    trigger(arg: `hidden${string}`, data: Joystick): void;
-    trigger(arg: `rested${string}`, data: Joystick): void;
-    trigger(arg: `joystickDestroyed${string}`, data: Joystick): void;
-    trigger(arg: `collectionDestroyed${string}`, data: Collection): void;
-    trigger(arg: `pressure${string}`, data: number): void;
+    trigger(arg: SuperEventType<'attached'>, data: AttachEventData): void;
+    trigger(arg: SuperEventType<'detached'>, data: AttachEventData): void;
+    trigger(arg: SuperEventType<'dir'>, data: JoystickEventData): void;
+    trigger(arg: SuperEventType<'plain'>, data: JoystickEventData): void;
+    trigger(arg: SuperEventType<'move'>, data: JoystickEventData): void;
+    trigger(arg: SuperEventType<'added'>, data: Joystick): void;
+    trigger(arg: SuperEventType<'removed'>, data: Joystick): void;
+    trigger(arg: SuperEventType<'start'>, data: Joystick): void;
+    trigger(arg: SuperEventType<'end'>, data: Joystick): void;
+    trigger(arg: SuperEventType<'shown'>, data: Joystick): void;
+    trigger(arg: SuperEventType<'hidden'>, data: Joystick): void;
+    trigger(arg: SuperEventType<'rested'>, data: Joystick): void;
+    trigger(arg: SuperEventType<'joystickDestroyed'>, data: Joystick): void;
+    trigger(arg: SuperEventType<'collectionDestroyed'>, data: Collection): void;
+    trigger(arg: SuperEventType<'pressure'>, data: number): void;
     trigger<T>(arg: string, data: T): void {
         this.mapOnEvents(arg, (type) => {
             const handlers = this._handlers_[type];

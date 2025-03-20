@@ -27,7 +27,7 @@ export default defineConfig<TestOptions>({
         trace: 'retain-on-failure',
     },
     timeout: 20_000,
-    /* Configure projects for each bundler */
+    /* Configure projects for each browser */
     // TODO Also build and test for ESM.
     projects: [
         {

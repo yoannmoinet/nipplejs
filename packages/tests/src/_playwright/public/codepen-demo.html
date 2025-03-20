@@ -5,8 +5,8 @@
     <meta charset="utf-8">
     <title>NippleJS</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <link rel="stylesheet" href="../../assets/src/styles.css" media="screen" title="no title" charset="utf-8">
-    <link rel="stylesheet" href="../../assets/src/github-light.css" media="screen" title="no title" charset="utf-8">
+    <link rel="stylesheet" href="./assets/styles.css" media="screen" title="no title" charset="utf-8">
+    <link rel="stylesheet" href="./assets/github-light.css" media="screen" title="no title" charset="utf-8">
     <style>
         body {
             margin: 0;
@@ -198,38 +198,45 @@
     <div>
         <a href="https://codepen.io/YoannM/full/gapmMG" target="_blank">> Open the demo in a new window.</a>
     </div>
-    <script src="../../nipplejs/dist/index.js"></script>
+    <script src="./src/index.js"></script>
     <script>
-        var s = function (sel) { return document.querySelector(sel); };
-        var sId = function (sel) { return document.getElementById(sel); };
-        var removeClass = function (el, clss) {
-            el.className = el.className.replace(new RegExp('\\b' + clss + ' ?\\b', 'g'), '');
+        const $ = selector => document.querySelector(selector);
+        const $id = id => document.getElementById(id);
+
+        const removeClass = (el, className) => {
+            el.classList.remove(className);
         }
-        var collections = {
+
+        const addClass = (el, className) => {
+            el.classList.add(className);
+        }
+
+        const collections = {
             dynamic: {
-                zone: s('.zone.dynamic'),
+                zone: $('.zone.dynamic'),
                 color: 'blue',
                 multitouch: true
             },
             semi: {
-                zone: s('.zone.semi'),
+                zone: $('.zone.semi'),
                 mode: 'semi',
                 catchDistance: 150,
                 color: 'white'
             },
             static: {
-                zone: s('.zone.static'),
+                zone: $('.zone.static'),
                 mode: 'static',
                 position: { left: '50%', top: '50%' },
                 color: 'red'
             }
         };
-        var collection;
 
-        // Get debug elements and map them
-        var elDebug = sId('debug');
-        var elDump = elDebug.querySelector('.dump');
-        var els = {
+        let collection;
+
+        // Debug elements
+        const elDebug = $id('debug');
+        const elDump = elDebug.querySelector('.dump');
+        const els = {
             position: {
                 x: elDebug.querySelector('.position .x .data'),
                 y: elDebug.querySelector('.position .y .data')
@@ -248,84 +255,85 @@
             }
         };
 
-        var timeoutCreate;
-        function createThrottle(evt) {
+        let timeoutCreate;
+        const createThrottle = evt => {
             clearTimeout(timeoutCreate);
-            timeoutCreate = setTimeout(() => {
-                createNipple(evt);
-            }, 100);
+            timeoutCreate = setTimeout(() => createNipple(evt), 100);
         }
 
-        sId('buttons').onclick = sId('buttons').ontouchend = createThrottle;
+        $id('buttons').addEventListener('click', createThrottle);
+        $id('buttons').addEventListener('touchend', createThrottle);
 
         createNipple('dynamic');
 
         function bindNipple() {
-            collection.on('added start shown hidden rested removed end', function (evt) {
+            collection.on('added start shown hidden rested removed end', evt => {
                 dump(evt.type);
                 debug(evt.data);
-            })
-            collection.on('move', function (evt) {
+            });
+
+            collection.on('move', evt => {
                 debug(evt.data);
-            })
-            collection.on('dir:up plain:up dir:left plain:left dir:down ' +
-                'plain:down dir:right plain:right',
-                function (evt) {
+            });
+
+            collection.on('dir:up plain:up dir:left plain:left dir:down plain:down dir:right plain:right',
+                evt => {
                     dump(evt.type);
                 }
-            )
-            collection.on('pressure', function (evt) {
+            );
+
+            collection.on('pressure', evt => {
                 debug({ pressure: evt.data });
             });
         }
 
         function createNipple(evt) {
-            var type = typeof evt === 'string' ?
-                evt : evt.target.getAttribute('data-type');
+            const type = typeof evt === 'string' ? evt : evt.target.dataset.type;
+
             if (collection) {
                 collection.destroy();
             }
 
-            removeClass(s('.zone.active'), 'active');
-            removeClass(s('.button.active'), 'active');
-            removeClass(s('.highlight.active'), 'active');
-            s('.highlight.' + type).className += ' active';
-            s('.button.' + type).className += ' active';
-            s('.zone.' + type).className += ' active';
+            removeClass($('.zone.active'), 'active');
+            removeClass($('.button.active'), 'active');
+            removeClass($('.highlight.active'), 'active');
+
+            addClass($('.highlight.' + type), 'active');
+            addClass($('.button.' + type), 'active');
+            addClass($('.zone.' + type), 'active');
+
             collection = nipplejs.create(collections[type]);
             bindNipple();
         }
 
-        // Print data into elements
         function debug(obj) {
-            function parseObj(sub, el) {
-                for (var i in sub) {
-                    if (typeof sub[i] === 'object' && el) {
-                        parseObj(sub[i], el[i]);
-                    } else if (el && el[i]) {
-                        el[i].innerHTML = sub[i];
+            const parseObj = (sub, el) => {
+                for (const [key, value] of Object.entries(sub)) {
+                    if (typeof value === 'object' && el) {
+                        parseObj(value, el[key]);
+                    } else if (el && el[key]) {
+                        el[key].innerHTML = value;
                     }
                 }
             }
-            setTimeout(function () {
+
+            requestAnimationFrame(() => {
                 parseObj(obj, els);
-            }, 0);
+            });
         }
 
-        var nbEvents = 0;
+        let nbEvents = 0;
 
-        // Dump data
         function dump(evt) {
-            setTimeout(function () {
+            requestAnimationFrame(() => {
                 if (elDump.children.length > 4) {
                     elDump.removeChild(elDump.firstChild);
                 }
-                var newEvent = document.createElement('div');
-                newEvent.innerHTML = '#' + nbEvents + ' : <span class="data">' +
-                    evt + '</span>';
+                const newEvent = document.createElement('div');
+                newEvent.innerHTML = `#${nbEvents} : <span class="data">${evt}</span>`;
                 elDump.appendChild(newEvent);
-                nbEvents += 1;
-            }, 0);
+                nbEvents++;
+            });
         }
     </script>
 </body>

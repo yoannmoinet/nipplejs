@@ -23,7 +23,7 @@ test.describe('NippleJS Shape Options', () => {
 
         // Check if back element has square shape
         const borderRadius = await page
-            .locator('#nipple_0_0 .back')
+            .locator('#joystick_0_0 .back')
             .evaluate((el) => window.getComputedStyle(el).borderRadius);
         expect(borderRadius).toBe('0px');
 
@@ -33,7 +33,7 @@ test.describe('NippleJS Shape Options', () => {
         await page.mouse.move(box.x + 100, box.y + 100);
 
         // In square mode, diagonal movement should reach corners
-        const frontElement = page.locator('#nipple_0_0 .front');
+        const frontElement = page.locator('#joystick_0_0 .front');
         const transform = await frontElement.evaluate((el) => {
             const style = window.getComputedStyle(el);
             const matrix = new DOMMatrixReadOnly(style.transform);
@@ -66,7 +66,7 @@ test.describe('NippleJS Shape Options', () => {
 
         // Check if back element has circular shape
         const borderRadius = await page
-            .locator('#nipple_0_0 .back')
+            .locator('#joystick_0_0 .back')
             .evaluate((el) => window.getComputedStyle(el).borderRadius);
         expect(borderRadius).toBe('50%');
 
@@ -76,7 +76,7 @@ test.describe('NippleJS Shape Options', () => {
         await page.mouse.move(box.x + 100, box.y + 100);
 
         // In circle mode, diagonal movement should be constrained to circle radius
-        const frontElement = page.locator('#nipple_0_0 .front');
+        const frontElement = page.locator('#joystick_0_0 .front');
         const transform = await frontElement.evaluate((el) => {
             const style = window.getComputedStyle(el);
             const matrix = new DOMMatrixReadOnly(style.transform);
@@ -122,7 +122,7 @@ test.describe('NippleJS Shape Options', () => {
                 await page.mouse.down();
                 await page.mouse.move(box.x + pos.x, box.y + pos.y);
 
-                const frontElement = page.locator('#nipple_0_0 .front');
+                const frontElement = page.locator('#joystick_0_0 .front');
                 const transform = await frontElement.evaluate((el) => {
                     const style = window.getComputedStyle(el);
                     const matrix = new DOMMatrixReadOnly(style.transform);

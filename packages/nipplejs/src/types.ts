@@ -393,11 +393,20 @@ export type JoystickEventType =
     | 'hidden'
 
     /**
+     * Is triggered when the joystick is rested.
+     *
+     * Will pass the instance alongside the event.
+     *
+     * Won’t be trigger in a dataOnly configuration.
+     */
+    | 'rested'
+
+    /**
      * Is triggered at the end of destroy.
      *
      * Will pass the instance alongside the event.
      */
-    | 'destroyed'
+    | 'joystickDestroyed'
 
     /**
      * MBP’s Force Touch, iOS’s 3D Touch, Microsoft’s pressure or MDN’s force
@@ -407,6 +416,17 @@ export type JoystickEventType =
      * The value, between 0 and 1, is sent back alongside the event.
      */
     | 'pressure';
+
+/**
+ * The event types of a collection.
+ */
+export type CollectionOnlyEventType =
+    /**
+     * A collection just got destroyed.
+     *
+     * Will pass the instance alongside the event.
+     */
+    'collectionDestroyed';
 
 /**
  * The event types of a factory.
@@ -431,9 +451,14 @@ export type FactoryOnlyEventType =
     | 'removed';
 
 /**
+ * The event types of a collection.
+ */
+export type CollectionEventType = JoystickEventType | CollectionOnlyEventType;
+
+/**
  * The event triggered by a factory.
  */
-export type FactoryEventType = JoystickEventType | FactoryOnlyEventType;
+export type FactoryEventType = CollectionEventType | FactoryOnlyEventType;
 
 /**
  * The event data emitted by a joystick instance.

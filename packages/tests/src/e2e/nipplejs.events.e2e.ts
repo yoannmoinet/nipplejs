@@ -1,7 +1,10 @@
-import { test, expect } from '@playwright/test';
+import { test } from '@nipple/tests/_playwright/testParams';
 
-test.describe('NippleJS Events', () => {
-    test.beforeEach(async ({ page }) => {
+// Have a similar experience to Jest.
+const { expect, beforeEach, describe } = test;
+
+describe('NippleJS Events', () => {
+    beforeEach(async ({ page }) => {
         await page.goto('/example/codepen-demo.html');
     });
 
@@ -31,8 +34,10 @@ test.describe('NippleJS Events', () => {
         expect(events).toContain('start');
         expect(events).toContain('move');
         expect(events).toContain('end');
+
+        // Verify event order
         expect(events.indexOf('start')).toBeLessThan(events.indexOf('move'));
-        expect(events.indexOf('move')).toBeLessThan(events.indexOf('end'));
+        expect(events.lastIndexOf('move')).toBeLessThan(events.indexOf('end'));
     });
 
     test('emits directional events', async ({ page }) => {
@@ -142,7 +147,7 @@ test.describe('NippleJS Events', () => {
             const targetZone = document.querySelector('.zone.active');
             if (targetZone) {
                 const event = new PointerEvent('pointerdown', {
-                    pressure: 0.5,
+                    pressure: 2.5,
                     clientX: 50,
                     clientY: 50,
                 });
@@ -152,6 +157,6 @@ test.describe('NippleJS Events', () => {
 
         // Verify pressure event was emitted
         const events = await page.evaluate(() => window.events);
-        expect(events.some((e) => e.startsWith('pressure:'))).toBe(true);
+        expect(events.some((e) => e.startsWith('pressure:2.5'))).toBe(true);
     });
 });

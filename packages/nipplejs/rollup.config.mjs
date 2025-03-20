@@ -16,7 +16,7 @@ import packageJson from './package.json' with { type: 'json' };
  */
 export const bundle = (config) => ({
     input: {
-        index: path.resolve(__dirname, 'src/index.ts'),
+        index: './src/index.ts',
     },
     ...config,
     external: [
@@ -64,14 +64,16 @@ const getOutput = (overrides = {}) => {
 };
 
 /**
+ * @param {import('rollup').RollupOptions} config
  * @returns {import('rollup').RollupOptions[]}
  */
-export const getDefaultBuildConfigs = () => {
+export const getDefaultBuildConfigs = (overrides = {}) => {
     const configs = [
         // Main bundle.
         bundle({
             plugins: [esbuild()],
             output: [getOutput({ format: 'esm' }), getOutput({ format: 'umd', name: 'nipplejs' })],
+            ...overrides,
         }),
         // Bundle type definitions.
         bundle({
@@ -79,6 +81,7 @@ export const getDefaultBuildConfigs = () => {
             output: {
                 dir: path.dirname(packageJson.types),
             },
+            ...overrides,
         }),
     ];
     return configs;
