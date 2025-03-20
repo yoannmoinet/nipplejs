@@ -4,7 +4,8 @@ import { test } from '@nipple/tests/_playwright/testParams';
 const { expect, beforeEach, describe } = test;
 
 describe('NippleJS Dynamic Page', () => {
-    beforeEach(async ({ page, devServerUrl }) => {
+    beforeEach(async ({ page, setupPage }) => {
+        await setupPage();
         await page.evaluate(() => {
             window.joystick = window.nipplejs.create({
                 zone: document.getElementById('zone_joystick'),

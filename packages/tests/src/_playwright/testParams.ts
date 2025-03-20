@@ -15,6 +15,7 @@ type Fixtures = {
     publicDir: string;
     suiteName: string;
     pageConfig: PageConfig;
+    setupPage: (config?: Partial<PageConfig>) => Promise<void>;
 };
 
 export const test = base.extend<TestOptions & Fixtures>({
@@ -52,31 +53,33 @@ export const test = base.extend<TestOptions & Fixtures>({
         },
         { auto: true },
     ],
-    page: async ({ page, pageConfig }, use) => {
-        await page.setContent(`
-            <!DOCTYPE html>
-            <html lang="en">
-                <head>
-                    <title>NippleJS Test</title>
-                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                </head>
-                <body>
-                    ${pageConfig.body || ''}
-                </body>
-            </html>
-        `);
+    setupPage: async ({ page, pageConfig }, use) => {
+        await use(async (config?: Partial<PageConfig>) => {
+            const mergedConfig = { ...pageConfig, ...config };
+            await page.setContent(`
+                <!DOCTYPE html>
+                <html lang="en">
+                    <head>
+                        <title>NippleJS Test</title>
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    </head>
+                    <body>
+                        ${mergedConfig.body || ''}
+                    </body>
+                </html>
+            `);
 
-        if (pageConfig.css) {
-            await page.addStyleTag({
-                content: pageConfig.css,
-            });
-        }
+            if (mergedConfig.css) {
+                await page.addStyleTag({
+                    content: mergedConfig.css,
+                });
+            }
 
-        if (pageConfig.script) {
-            await page.addScriptTag({
-                path: pageConfig.script,
-            });
-        }
-        await use(page);
+            if (mergedConfig.script) {
+                await page.addScriptTag({
+                    path: mergedConfig.script,
+                });
+            }
+        });
     },
 });
