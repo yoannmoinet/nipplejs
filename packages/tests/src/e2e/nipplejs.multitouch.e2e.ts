@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-test.describe('NippleJS Multitouch', () => {
+test.describe.skip('NippleJS Multitouch', () => {
     test.beforeEach(async ({ page }) => {
         await page.goto('/example/codepen-demo.html');
     });

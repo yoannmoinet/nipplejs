@@ -5,9 +5,9 @@ import path from 'path';
 export type TestOptions = {};
 
 type PageConfig = {
-    head?: string;
     body?: string;
     css?: string;
+    script?: string;
 };
 
 type Fixtures = {
@@ -38,18 +38,16 @@ export const test = base.extend<TestOptions & Fixtures>({
         // eslint-disable-next-line no-empty-pattern
         async ({}, use) => {
             await use({
-                head: '<script src="./src/index.js"></script>',
+                css: `#zone_joystick {
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background-color: lightblue;
+                }`,
                 body: '<div id="zone_joystick"></div>',
-                css: `<style>
-                    #zone_joystick {
-                        position: fixed;
-                        top: 0;
-                        left: 0;
-                        width: 100%;
-                        height: 100%;
-                        background-color: lightblue;
-                    }
-                </style>`,
+                script: path.resolve(PUBLIC_DIR, './src/index.js'),
             });
         },
         { auto: true },
@@ -61,14 +59,24 @@ export const test = base.extend<TestOptions & Fixtures>({
                 <head>
                     <title>NippleJS Test</title>
                     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                    ${pageConfig.head || ''}
-                    ${pageConfig.css || ''}
                 </head>
                 <body>
                     ${pageConfig.body || ''}
                 </body>
             </html>
         `);
+
+        if (pageConfig.css) {
+            await page.addStyleTag({
+                content: pageConfig.css,
+            });
+        }
+
+        if (pageConfig.script) {
+            await page.addScriptTag({
+                path: pageConfig.script,
+            });
+        }
         await use(page);
     },
 });

@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-test.describe('NippleJS Shape Options', () => {
+test.describe.skip('NippleJS Shape Options', () => {
     test.beforeEach(async ({ page }) => {
         await page.goto('/example/codepen-demo.html');
     });

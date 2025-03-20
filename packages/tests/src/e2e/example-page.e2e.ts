@@ -1,10 +1,13 @@
 import { test } from '@nipple/tests/_playwright/testParams';
 import type { Locator, Page } from '@playwright/test';
+import type { CommonOptions } from 'nipplejs/types';
 
+type Mode = NonNullable<CommonOptions['mode']>;
+type Expectation = [number, number, boolean];
 // Have a similar experience to Jest.
 const { expect, beforeEach, describe } = test;
 
-describe.only('Example Page', () => {
+describe('Example Page', () => {
     beforeEach(async ({ devServerUrl, page }) => {
         await page.goto(`${devServerUrl}/codepen-demo.html`);
     });
@@ -14,7 +17,7 @@ describe.only('Example Page', () => {
         return page.locator(`#joystick_${collection}_${uid} .front`);
     };
     // Switch to different zones
-    const getZone = async (page: Page, zone: 'semi' | 'static' | 'dynamic'): Promise<Locator> => {
+    const getZone = async (page: Page, zone: Mode): Promise<Locator> => {
         await page.locator(`.button.${zone}`).click();
         await expect(page.locator(`.zone.${zone}`)).toBeVisible();
         return page.locator(`.zone.active`);
@@ -24,40 +27,55 @@ describe.only('Example Page', () => {
     const expectJoystick = async (
         page: Page,
         zone: Locator,
-        collection: number,
-        joystick: number,
+        expectations: Expectation[],
         clickOptions?: { x: number; y: number },
-        visible: boolean = true,
     ) => {
         const box = await zone.boundingBox();
+        let joysticks: string[] = [];
         if (box && clickOptions) {
-            await page.mouse.move(box.x + clickOptions.x, box.y + clickOptions.y);
+            const center = { x: box.x + box.width / 2, y: box.y + box.height / 2 };
+            const position = { x: center.x + clickOptions.x, y: center.y + clickOptions.y };
+            // Listen for the start events so we can wait for the joysticks to be rested at the end.
+            await page.evaluate(() => {
+                window.events = [];
+                window.nipplejs.factory.on(`start`, (evt) => {
+                    window.events.push(evt.data.uid.toString());
+                });
+            });
+            // Move the mouse to the position and click.
+            await page.mouse.move(position.x, position.y);
             await page.mouse.down();
-            await page.mouse.move(box.x, box.y);
+            // Move the mouse a bit.
+            await page.mouse.move(position.x + 10, position.y + 10, { steps: 15 });
+            await page.mouse.move(position.x - 10, position.y - 10, { steps: 15 });
+            // Get the list of joysticks that were created.
+            joysticks = await page.evaluate(() => window.events);
         }
 
-        if (visible) {
-            await expect(locateJoystick(page, collection, joystick)).toBeVisible();
-        } else {
-            await expect(locateJoystick(page, collection, joystick)).not.toBeVisible();
+        for (const [collection, joystick, visible] of expectations) {
+            if (visible) {
+                await expect(locateJoystick(page, collection, joystick)).toBeVisible();
+            } else {
+                await expect(locateJoystick(page, collection, joystick)).not.toBeVisible();
+            }
         }
 
         if (box && clickOptions) {
-            // Listen for the released event.
+            // Listen for the released events.
             await page.evaluate(() => {
                 window.events = [];
                 window.nipplejs.factory.on(`rested`, (evt) => {
-                    window.events?.push(evt.data.uid.toString());
+                    window.events.push(evt.data.uid.toString());
                 });
             });
             // Release the mouse.
             await page.mouse.up();
-            // Wait for the joystick to trigger its destroy event.
+            // Wait for the all the joysticks to trigger their rested events.
             await page.waitForFunction(
-                (uid) => {
-                    return window.events?.includes(uid.toString());
+                (joystickUids) => {
+                    return joystickUids.every((uid) => window.events.includes(uid));
                 },
-                joystick,
+                joysticks,
                 {
                     timeout: 500,
                 },
@@ -65,63 +83,81 @@ describe.only('Example Page', () => {
         }
     };
 
-    // [no click, click, click at 50/50, click at 100/100]
-    const expectations = {
+    const expectations: Record<Mode, Expectation[][]> = {
         // Dynamic, each new click creates a new joystick.
-        dynamic: [false, true, true, true],
+        dynamic: [
+            // No click, no joystick.
+            [[1, 0, false]],
+            // First click, create a joystick.
+            [[1, 0, true]],
+            // Second click, create a second joystick, first one is not visible.
+            [
+                [1, 0, false],
+                [1, 1, true],
+            ],
+            // Third click, create a third joystick, other two are not visible.
+            [
+                [1, 0, false],
+                [1, 1, false],
+                [1, 2, true],
+            ],
+        ],
         // Semi, each new click only creates a new joystick if close enough to the previous one.
-        semi: [false, true, false, true],
+        semi: [
+            // No click, no joystick.
+            [[1, 0, false]],
+            // First click, create a joystick.
+            [[1, 0, true]],
+            // Second click, re-use the same joystick.
+            [
+                [1, 0, true],
+                [1, 1, false],
+            ],
+            // Third click, create a new joystick, other one is not visible.
+            [
+                [1, 0, false],
+                [1, 1, true],
+            ],
+        ],
         // Static, only the first joystick.
-        static: [true, true, false, false],
+        static: [
+            // No click, one joystick.
+            [[1, 0, true]],
+            // First click, one joystick.
+            [
+                [1, 0, true],
+                [1, 1, false],
+            ],
+            // Second click, one joystick.
+            [
+                [1, 0, true],
+                [1, 1, false],
+            ],
+            // Third click, one joystick.
+            [
+                [1, 0, true],
+                [1, 1, false],
+            ],
+        ],
     };
 
     // Test a zone based on its type of joystick.
-    const testZone = async (page: Page, name: 'semi' | 'static' | 'dynamic') => {
-        // Dynamic mode is the default, so we start with a collection index of -1.
-        let collection = 0;
-        let joystick = 0;
-
+    const testZone = async (page: Page, name: Mode) => {
         // Switch to the correct zone.
         const zone = await getZone(page, name);
-        // Reset joystick index and collection index.
-        collection++;
-        joystick = 0;
+        const expectation = expectations[name];
 
         // Test without a click.
-        await expectJoystick(page, zone, collection, joystick, undefined, expectations[name][0]);
+        await expectJoystick(page, zone, expectation[0]);
 
         // Create first joystick
-        await expectJoystick(
-            page,
-            zone,
-            collection,
-            joystick,
-            { x: 0, y: 0 },
-            expectations[name][1],
-        );
-        joystick++;
+        await expectJoystick(page, zone, expectation[1], { x: 0, y: 0 });
 
         // Create second joystick
-        await expectJoystick(
-            page,
-            zone,
-            collection,
-            joystick,
-            { x: 50, y: 50 },
-            expectations[name][2],
-        );
-        joystick++;
+        await expectJoystick(page, zone, expectation[2], { x: 50, y: 50 });
 
         // Create third joystick
-        await expectJoystick(
-            page,
-            zone,
-            collection,
-            joystick,
-            { x: 100, y: 100 },
-            expectations[name][3],
-        );
-        joystick++;
+        await expectJoystick(page, zone, expectation[3], { x: -300, y: -150 });
     };
 
     test('loads correctly', async ({ page }) => {
@@ -163,7 +199,6 @@ describe.only('Example Page', () => {
         const transform = await frontElement.evaluate((el) => {
             return window.getComputedStyle(el).transform;
         });
-
         expect(transform).not.toBe('none');
 
         // Test mouse up removes joystick in dynamic mode

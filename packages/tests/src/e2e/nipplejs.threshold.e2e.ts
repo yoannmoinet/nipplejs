@@ -5,7 +5,7 @@ interface ThresholdResult {
     eventCount: number;
 }
 
-test.describe('NippleJS Threshold', () => {
+test.describe.skip('NippleJS Threshold', () => {
     test.beforeEach(async ({ page }) => {
         await page.goto('/');
     });

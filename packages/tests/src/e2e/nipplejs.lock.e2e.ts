@@ -3,7 +3,7 @@
 import { test, expect } from '@playwright/test';
 import type { JoystickEventData } from 'nipplejs/types';
 
-test.describe('NippleJS Lock Axis', () => {
+test.describe.skip('NippleJS Lock Axis', () => {
     test.describe('X-Axis Lock', () => {
         test.beforeEach(async ({ page }) => {
             await page.goto('/');

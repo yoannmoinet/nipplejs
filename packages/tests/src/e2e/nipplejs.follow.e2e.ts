@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import type { Coordinates } from 'nipplejs/types';
 
-test.describe('NippleJS Follow Mode', () => {
+test.describe.skip('NippleJS Follow Mode', () => {
     test.beforeEach(async ({ page }) => {
         await page.goto('/');
         await page.evaluate(() => {

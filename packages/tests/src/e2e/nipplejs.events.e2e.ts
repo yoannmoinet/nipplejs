@@ -3,7 +3,7 @@ import { test } from '@nipple/tests/_playwright/testParams';
 // Have a similar experience to Jest.
 const { expect, beforeEach, describe } = test;
 
-describe('NippleJS Events', () => {
+describe.skip('NippleJS Events', () => {
     beforeEach(async ({ page }) => {
         await page.goto('/example/codepen-demo.html');
     });

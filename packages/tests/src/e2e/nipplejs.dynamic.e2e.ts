@@ -1,8 +1,10 @@
-import { test, expect } from '@playwright/test';
+import { test } from '@nipple/tests/_playwright/testParams';
 
-test.describe('NippleJS Dynamic Page', () => {
-    test.beforeEach(async ({ page }) => {
-        await page.goto('/');
+// Have a similar experience to Jest.
+const { expect, beforeEach, describe } = test;
+
+describe('NippleJS Dynamic Page', () => {
+    beforeEach(async ({ page, devServerUrl }) => {
         await page.evaluate(() => {
             window.joystick = window.nipplejs.create({
                 zone: document.getElementById('zone_joystick'),
@@ -14,7 +16,7 @@ test.describe('NippleJS Dynamic Page', () => {
     test('joystick updates position on zone resize', async ({ page }) => {
         // Get initial position
         const initialPos = await page.evaluate(() => {
-            const el = document.querySelector('.nipple') as HTMLElement;
+            const el = document.querySelector('.joystick') as HTMLElement;
             return el ? { left: el.offsetLeft, top: el.offsetTop } : null;
         });
 
@@ -29,7 +31,7 @@ test.describe('NippleJS Dynamic Page', () => {
 
         // Get new position
         const newPos = await page.evaluate(() => {
-            const el = document.querySelector('.nipple') as HTMLElement;
+            const el = document.querySelector('.joystick') as HTMLElement;
             return el ? { left: el.offsetLeft, top: el.offsetTop } : null;
         });
 
@@ -48,7 +50,7 @@ test.describe('NippleJS Dynamic Page', () => {
 
         const position = await page.evaluate(() => {
             const zone = document.getElementById('zone_joystick');
-            const joystick = document.querySelector('.nipple') as HTMLElement;
+            const joystick = document.querySelector('.joystick') as HTMLElement;
             if (!zone || !joystick) {
                 return null;
             }
@@ -72,7 +74,7 @@ test.describe('NippleJS Dynamic Page', () => {
     test('joystick recalculates position on scroll', async ({ page }) => {
         // Initial position
         const initialPos = await page.evaluate(() => {
-            const el = document.querySelector('.nipple') as HTMLElement;
+            const el = document.querySelector('.joystick') as HTMLElement;
             return el ? el.getBoundingClientRect() : null;
         });
 
@@ -81,7 +83,7 @@ test.describe('NippleJS Dynamic Page', () => {
 
         // New position
         const scrolledPos = await page.evaluate(() => {
-            const el = document.querySelector('.nipple') as HTMLElement;
+            const el = document.querySelector('.joystick') as HTMLElement;
             return el ? el.getBoundingClientRect() : null;
         });
 

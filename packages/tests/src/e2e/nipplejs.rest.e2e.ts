@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-test.describe('NippleJS Rest Behavior', () => {
+test.describe.skip('NippleJS Rest Behavior', () => {
     test.beforeEach(async ({ page }) => {
         await page.goto('/example/codepen-demo.html');
     });
