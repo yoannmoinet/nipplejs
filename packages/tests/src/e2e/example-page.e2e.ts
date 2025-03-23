@@ -8,7 +8,7 @@ type Expectation = [number, number, boolean];
 // Have a similar experience to Jest.
 const { expect, beforeEach, describe } = test;
 
-describe.only('Example Page', () => {
+describe('Example Page', () => {
     beforeEach(async ({ devServerUrl, page, initPage }) => {
         await page.goto(`${devServerUrl}/codepen-demo.html`);
         await initPage();
@@ -105,9 +105,9 @@ describe.only('Example Page', () => {
 
                 for (const [collection, joystick, visible] of params) {
                     if (visible) {
-                        await expect(locateJoystick(collection, joystick)).toBeVisible();
+                        await expect(locateJoystick(collection, joystick).front).toBeVisible();
                     } else {
-                        await expect(locateJoystick(collection, joystick)).not.toBeVisible();
+                        await expect(locateJoystick(collection, joystick).front).not.toBeVisible();
                     }
                 }
 
@@ -148,7 +148,7 @@ describe.only('Example Page', () => {
             throw new Error('Could not get zone position');
         }
 
-        const frontElement = locateJoystick(0, 0);
+        const frontElement = locateJoystick(0, 0).front;
 
         // Test mouse down creates joystick
         await page.mouse.move(box.x + 50, box.y + 50);
@@ -188,7 +188,7 @@ describe.only('Example Page', () => {
 
         // Move diagonally, should only move horizontally
         await page.mouse.move(box.x + 100, box.y + 100);
-        const frontElement = locateJoystick(0, 0);
+        const frontElement = locateJoystick(0, 0).front;
         const transform = await frontElement.evaluate((el) => {
             const style = window.getComputedStyle(el);
             const matrix = new DOMMatrixReadOnly(style.transform);

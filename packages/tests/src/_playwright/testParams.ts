@@ -24,7 +24,14 @@ export type Fixtures = {
         cb?: () => void | Promise<void>,
     ) => Promise<void>;
     releaseJoystick: (ctxName: string) => Promise<void>;
-    locateJoystick: (collection: number, uid: number) => Locator;
+    locateJoystick: (
+        collection: number,
+        uid: number,
+    ) => {
+        element: Locator;
+        front: Locator;
+        base: Locator;
+    };
     initPage: () => Promise<void>;
     setupPage: (config?: Partial<PageConfig>) => Promise<void>;
 };
@@ -127,7 +134,11 @@ export const test = base.extend<TestOptions & Fixtures>({
     locateJoystick: async ({ page }, use) => {
         await use((collection, uid) => {
             // Return the .front element as the parent is not tangibly visible.
-            return page.locator(`#joystick_${collection}_${uid} .front`);
+            return {
+                element: page.locator(`#joystick_${collection}_${uid}`),
+                front: page.locator(`#joystick_${collection}_${uid} .front`),
+                base: page.locator(`#joystick_${collection}_${uid} .base`),
+            };
         });
     },
     pageConfig: [
