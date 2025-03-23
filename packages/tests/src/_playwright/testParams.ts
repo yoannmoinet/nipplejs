@@ -1,5 +1,6 @@
 import { DEV_SERVER_URL, PUBLIC_DIR } from '@nipple/tests/_playwright/constants';
 import { test as base } from '@playwright/test';
+import type Joystick from 'nipplejs/Joystick';
 import path from 'path';
 
 export type TestOptions = {};
@@ -8,6 +9,7 @@ type PageConfig = {
     body?: string;
     css?: string;
     script?: string;
+    code?: () => void;
 };
 
 type Fixtures = {
@@ -15,6 +17,7 @@ type Fixtures = {
     publicDir: string;
     suiteName: string;
     pageConfig: PageConfig;
+    moveJoystick: (position: { x: number; y: number }) => Promise<void>;
     setupPage: (config?: Partial<PageConfig>) => Promise<void>;
 };
 
@@ -35,6 +38,69 @@ export const test = base.extend<TestOptions & Fixtures>({
         { auto: true },
     ],
     publicDir: PUBLIC_DIR,
+    moveJoystick: async ({ page }, use) => {
+        await use(async (position: { x: number; y: number }) => {
+            // Listen for the shown events so we can better time our actions.
+            // And complete on the rest event.
+            const id = Math.random().toString().split('.').pop();
+            const ctxName = `moveJoystickEvents_${id}`;
+            await page.evaluate(
+                (ctx) => {
+                    window.context[ctx.name] = [];
+                    window.nipplejs.factory.on(`shown`, (evt) => {
+                        window.context[ctx.name].push(window.getJoystickUid(evt));
+                    });
+                },
+                { name: ctxName },
+            );
+
+            // Move the mouse to the position and press down.
+            await page.mouse.move(position.x, position.y);
+            await page.mouse.down();
+            // Move the mouse a bit.
+            await page.mouse.move(position.x + 10, position.y + 10, { steps: 15 });
+            await page.mouse.move(position.x - 10, position.y - 10, { steps: 15 });
+
+            // Wait for the joysticks to be shown.
+            await page.waitForFunction(
+                (ctx) => window.context[ctx.name].length > 0,
+                { name: ctxName },
+                {
+                    timeout: 500,
+                },
+            );
+
+            // Get the list of joysticks that were created.
+            const joysticks: string[] = await page.evaluate((ctx) => window.context[ctx.name], {
+                name: ctxName,
+            });
+
+            // Listen for the released events.
+            await page.evaluate(
+                (ctx) => {
+                    window.context[ctx.name] = [];
+                    window.nipplejs.factory.on(`rested`, (evt) => {
+                        window.context[ctx.name].push(window.getJoystickUid(evt));
+                    });
+                },
+                { name: ctxName },
+            );
+
+            // Release the mouse.
+            await page.mouse.up();
+
+            // Wait for the all the joysticks to trigger their rested events.
+            await page.waitForFunction(
+                (ctx) => {
+                    return ctx.joysticks.every((uid) => window.context[ctx.name].includes(uid));
+                },
+                { joysticks, name: ctxName },
+                {
+                    timeout: 500,
+                },
+            );
+        });
+    },
     pageConfig: [
         // eslint-disable-next-line no-empty-pattern
         async ({}, use) => {
@@ -49,6 +115,11 @@ export const test = base.extend<TestOptions & Fixtures>({
                 }`,
                 body: '<div id="zone_joystick"></div>',
                 script: path.resolve(PUBLIC_DIR, './src/index.js'),
+                code: () => {
+                    window.joystick = window.nipplejs.create({
+                        zone: document.getElementById('zone_joystick'),
+                    });
+                },
             });
         },
         { auto: true },
@@ -79,6 +150,19 @@ export const test = base.extend<TestOptions & Fixtures>({
                 await page.addScriptTag({
                     path: mergedConfig.script,
                 });
+            }
+
+            // Setup the global variables and helpers.
+            await page.evaluate(() => {
+                window.context = {};
+                window.events = [];
+                window.directions = [];
+                window.getJoystickUid = (evt: { data: Joystick }) =>
+                    `${evt.data.collection.uid}_${evt.data.uid}`;
+            });
+
+            if (mergedConfig.code) {
+                await page.evaluate(mergedConfig.code);
             }
         });
     },
