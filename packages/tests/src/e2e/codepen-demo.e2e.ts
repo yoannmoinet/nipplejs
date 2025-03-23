@@ -8,7 +8,7 @@ type Expectation = [number, number, boolean];
 // Have a similar experience to Jest.
 const { expect, beforeEach, describe } = test;
 
-describe('Example Page', () => {
+describe('Codepen Demo Page', () => {
     beforeEach(async ({ devServerUrl, page, initPage }) => {
         await page.goto(`${devServerUrl}/codepen-demo.html`);
         await initPage();
