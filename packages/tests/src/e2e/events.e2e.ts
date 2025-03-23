@@ -6,7 +6,7 @@ import path from 'path';
 const { expect, beforeEach, describe } = test;
 
 describe('Events', () => {
-    beforeEach(async ({ page, setupPage }) => {
+    beforeEach(async ({ setupPage }) => {
         await setupPage({
             body: '<div id="zone_joystick"></div>',
             script: path.resolve(PUBLIC_DIR, './src/index.js'),

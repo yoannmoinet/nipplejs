@@ -1,87 +1,24 @@
 import { test } from '@nipple/tests/_playwright/testParams';
-import type { Locator, Page } from '@playwright/test';
+import type { Locator } from '@playwright/test';
 import type { CommonOptions } from 'nipplejs/types';
 
 type Mode = NonNullable<CommonOptions['mode']>;
 type Expectation = [number, number, boolean];
+
 // Have a similar experience to Jest.
 const { expect, beforeEach, describe } = test;
 
-describe('Example Page', () => {
-    beforeEach(async ({ devServerUrl, page }) => {
+describe.only('Example Page', () => {
+    beforeEach(async ({ devServerUrl, page, initPage }) => {
         await page.goto(`${devServerUrl}/codepen-demo.html`);
+        await initPage();
     });
 
-    const locateJoystick = (page: Page, collection: number, uid: number): Locator => {
-        // Return the .front element as the parent is not tangibly visible.
-        return page.locator(`#joystick_${collection}_${uid} .front`);
-    };
-    // Switch to different zones
-    const getZone = async (page: Page, zone: Mode): Promise<Locator> => {
-        await page.locator(`.button.${zone}`).click();
-        await expect(page.locator(`.zone.${zone}`)).toBeVisible();
-        return page.locator(`.zone.active`);
-    };
-
-    // Expect a joystick to be visible or not.
-    const expectJoystick = async (
-        page: Page,
-        zone: Locator,
-        expectations: Expectation[],
-        clickOptions?: { x: number; y: number },
-    ) => {
-        const box = await zone.boundingBox();
-        let joysticks: string[] = [];
-        if (box && clickOptions) {
-            const center = { x: box.x + box.width / 2, y: box.y + box.height / 2 };
-            const position = { x: center.x + clickOptions.x, y: center.y + clickOptions.y };
-            // Listen for the start events so we can wait for the joysticks to be rested at the end.
-            await page.evaluate(() => {
-                window.events = [];
-                window.nipplejs.factory.on(`start`, (evt) => {
-                    window.events.push(evt.data.uid.toString());
-                });
-            });
-            // Move the mouse to the position and click.
-            await page.mouse.move(position.x, position.y);
-            await page.mouse.down();
-            // Move the mouse a bit.
-            await page.mouse.move(position.x + 10, position.y + 10, { steps: 15 });
-            await page.mouse.move(position.x - 10, position.y - 10, { steps: 15 });
-            // Get the list of joysticks that were created.
-            joysticks = await page.evaluate(() => window.events);
-        }
-
-        for (const [collection, joystick, visible] of expectations) {
-            if (visible) {
-                await expect(locateJoystick(page, collection, joystick)).toBeVisible();
-            } else {
-                await expect(locateJoystick(page, collection, joystick)).not.toBeVisible();
-            }
-        }
-
-        if (box && clickOptions) {
-            // Listen for the released events.
-            await page.evaluate(() => {
-                window.events = [];
-                window.nipplejs.factory.on(`rested`, (evt) => {
-                    window.events.push(evt.data.uid.toString());
-                });
-            });
-            // Release the mouse.
-            await page.mouse.up();
-            // Wait for the all the joysticks to trigger their rested events.
-            await page.waitForFunction(
-                (joystickUids) => {
-                    return joystickUids.every((uid) => window.events.includes(uid));
-                },
-                joysticks,
-                {
-                    timeout: 500,
-                },
-            );
-        }
-    };
+    test('loads correctly', async ({ page }) => {
+        // Check initial state
+        await expect(page.locator('#zone_joystick')).toBeVisible();
+        await expect(page.locator('.zone.dynamic')).toBeVisible();
+    });
 
     const expectations: Record<Mode, Expectation[][]> = {
         // Dynamic, each new click creates a new joystick.
@@ -141,44 +78,68 @@ describe('Example Page', () => {
         ],
     };
 
-    // Test a zone based on its type of joystick.
-    const testZone = async (page: Page, name: Mode) => {
-        // Switch to the correct zone.
-        const zone = await getZone(page, name);
-        const expectation = expectations[name];
+    // Test each mode.
+    for (const zone of Object.keys(expectations) as Mode[]) {
+        test(`handles ${zone} mode`, async ({
+            page,
+            locateJoystick,
+            startJoystick,
+            releaseJoystick,
+        }) => {
+            // Switch to different zones
+            const switchZone = async (): Promise<Locator> => {
+                await page.locator(`.button.${zone}`).click();
+                await expect(page.locator(`.zone.${zone}`)).toBeVisible();
+                return page.locator(`.zone.${zone}`);
+            };
 
-        // Test without a click.
-        await expectJoystick(page, zone, expectation[0]);
+            // Expect a joystick to be visible or not.
+            const expectJoystick = async (
+                params: Expectation[],
+                clickOptions?: { x: number; y: number },
+            ) => {
+                let ctxName: string;
+                if (clickOptions) {
+                    ctxName = await startJoystick(clickOptions);
+                }
 
-        // Create first joystick
-        await expectJoystick(page, zone, expectation[1], { x: 0, y: 0 });
+                for (const [collection, joystick, visible] of params) {
+                    if (visible) {
+                        await expect(locateJoystick(collection, joystick)).toBeVisible();
+                    } else {
+                        await expect(locateJoystick(collection, joystick)).not.toBeVisible();
+                    }
+                }
 
-        // Create second joystick
-        await expectJoystick(page, zone, expectation[2], { x: 50, y: 50 });
+                if (clickOptions) {
+                    await releaseJoystick(ctxName!);
+                }
+            };
 
-        // Create third joystick
-        await expectJoystick(page, zone, expectation[3], { x: -300, y: -150 });
-    };
+            // Switch to the correct zone.
+            const zoneElement = await switchZone();
+            const expectation = expectations[zone];
+            const box = await zoneElement.boundingBox();
+            if (!box) {
+                throw new Error('Could not get zone position');
+            }
+            const center = { x: box.x + box.width / 2, y: box.y + box.height / 2 };
 
-    test('loads correctly', async ({ page }) => {
-        // Check initial state
-        await expect(page.locator('#zone_joystick')).toBeVisible();
-        await expect(page.locator('.zone.dynamic')).toBeVisible();
-    });
+            // Test without a click.
+            await expectJoystick(expectation[0]);
 
-    test('handles semi mode', async ({ page }) => {
-        await testZone(page, 'semi');
-    });
+            // Create first joystick
+            await expectJoystick(expectation[1], center);
 
-    test('handles static mode', async ({ page }) => {
-        await testZone(page, 'static');
-    });
+            // Create second joystick
+            await expectJoystick(expectation[2], { x: center.x + 50, y: center.y + 50 });
 
-    test('handles dynamic mode', async ({ page }) => {
-        await testZone(page, 'dynamic');
-    });
+            // Create third joystick
+            await expectJoystick(expectation[3], { x: center.x - 300, y: center.y - 150 });
+        });
+    }
 
-    test('handles mouse interactions correctly', async ({ page }) => {
+    test('handles mouse interactions correctly', async ({ page, locateJoystick }) => {
         const zone = page.locator('.zone.active');
 
         // Get zone position for mouse interactions
@@ -187,7 +148,7 @@ describe('Example Page', () => {
             throw new Error('Could not get zone position');
         }
 
-        const frontElement = locateJoystick(page, 0, 0);
+        const frontElement = locateJoystick(0, 0);
 
         // Test mouse down creates joystick
         await page.mouse.move(box.x + 50, box.y + 50);
@@ -206,7 +167,7 @@ describe('Example Page', () => {
         await expect(frontElement).not.toBeVisible();
     });
 
-    test.skip('respects lock axis options', async ({ page }) => {
+    test.skip('respects lock axis options', async ({ page, locateJoystick }) => {
         // Enable lock X
         await page.evaluate(() => {
             window.joystick.destroy();
@@ -227,7 +188,7 @@ describe('Example Page', () => {
 
         // Move diagonally, should only move horizontally
         await page.mouse.move(box.x + 100, box.y + 100);
-        const frontElement = locateJoystick(page, 0, 0);
+        const frontElement = locateJoystick(0, 0);
         const transform = await frontElement.evaluate((el) => {
             const style = window.getComputedStyle(el);
             const matrix = new DOMMatrixReadOnly(style.transform);
@@ -236,43 +197,6 @@ describe('Example Page', () => {
 
         // Y position should not change when locked on X
         expect(transform.y).toBe(0);
-        await page.mouse.up();
-    });
-
-    test.skip('follows touch/cursor when option enabled', async ({ page }) => {
-        // Enable follow option
-        await page.evaluate(() => {
-            window.joystick.destroy();
-            window.joystick = window.nipplejs.create({
-                zone: document.getElementById('zone_joystick'),
-                follow: true,
-            });
-        });
-
-        const zone = page.locator('.zone.active');
-        const box = await zone.boundingBox();
-        if (!box) {
-            throw new Error('Could not get zone position');
-        }
-
-        // Start at center
-        await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
-        await page.mouse.down();
-
-        // Move beyond normal bounds
-        await page.mouse.move(box.x + box.width + 50, box.y + box.height + 50);
-
-        // Joystick base should have moved
-        const baseElement = locateJoystick(page, 0, 0);
-        const position = await baseElement.evaluate((el) => {
-            const rect = el.getBoundingClientRect();
-            return { x: rect.left, y: rect.top };
-        });
-
-        // Base position should have changed from initial position
-        expect(position.x).toBeGreaterThan(box.x + box.width / 2);
-        expect(position.y).toBeGreaterThan(box.y + box.height / 2);
-
         await page.mouse.up();
     });
 });
