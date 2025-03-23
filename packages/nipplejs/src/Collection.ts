@@ -353,6 +353,7 @@ export default class Collection extends Super {
     }
 
     processOnStart(evt: DomEvent) {
+        this.log('processOnStart', evt.identifier);
         // Refresh the box position.
         this.box = this.options.zone.getBoundingClientRect();
         // If we don't have spots available, we stop right here.
@@ -404,6 +405,7 @@ export default class Collection extends Super {
      *  This is called from the Factory.
      * */
     processOnMove(evt: DomEvent, animated: boolean = false) {
+        this.log('processOnMove', evt.identifier, evt.pressure);
         const joystick = this.actives.get(evt.identifier);
         const scroll = this.factory.scroll;
 
@@ -417,13 +419,13 @@ export default class Collection extends Super {
 
         // If it's not pressed, and not on its way out, just process it as an end event instead.
         // It can happen if the joystick is in its resting animation.
-        if (!evt.pressure && !joystick.removeTimeout) {
-            // this.error(
-            //     `Found unpressed joystick ${joystick?.uid} for identifier ${evt.identifier}`,
-            // );
-            // this.processOnEnd(evt);
-            return;
-        }
+        // if (!evt.pressure && !joystick.removeTimeout) {
+        // this.error(
+        //     `Found unpressed joystick ${joystick?.uid} for identifier ${evt.identifier}`,
+        // );
+        // this.processOnEnd(evt);
+        // return;
+        // }
 
         // If we're on a dynamic page, we need to refresh the joystick's position constantly.
         // Pretty memory intensive.
@@ -543,6 +545,7 @@ export default class Collection extends Super {
     }
 
     processOnEnd(evt: DomEvent) {
+        this.log('processOnEnd', evt.identifier);
         const joystick = this.actives.get(evt.identifier);
 
         // This should not happen.

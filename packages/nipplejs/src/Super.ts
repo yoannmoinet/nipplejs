@@ -15,14 +15,14 @@ import type {
 import * as u from './utils';
 
 type SuperEventType<T extends FactoryEventType> = `${T}${string}` | `${string}${T}`;
-
+type Name = 'super' | 'joystick' | 'collection' | 'factory';
 class Super {
     uid: Uid = 0 as Uid;
-    name: string = 'Super';
+    name: Name = 'super';
     private _domHandlers_: Map<DomEventHandler, (evt: SupportedEvent) => void> = new Map();
     private _handlers_: Partial<Record<FactoryEventType, Set<InternalEventHandler<any>>>> = {};
 
-    constructor(name: string) {
+    constructor(name: Name) {
         this.name = name;
     }
 
@@ -106,6 +106,7 @@ class Super {
     trigger(arg: SuperEventType<'pressure'>, data: number): void;
     trigger<T>(arg: string, data: T): void {
         this.mapOnEvents(arg, (type) => {
+            this.log(`- "${type}" [trigger]`);
             const handlers = this._handlers_[type];
             if (handlers && handlers.size) {
                 handlers.forEach((handler) => {
@@ -122,7 +123,7 @@ class Super {
     // Bind DOM events.
     bindEvt(el: SupportedElement, type: EventType, handler: DomEventHandler) {
         const cb = (evt: SupportedEvent) => {
-            this.log(`    - "${type}" [trigger]`);
+            this.log(`- "${type}" [dom:trigger]`);
             for (const domEvt of u.processEvents(evt)) {
                 handler.call(this, domEvt);
             }
@@ -156,20 +157,31 @@ class Super {
         }
     }
 
+    logPrefix() {
+        const prefixes: Record<Name, string> = {
+            super: '',
+            joystick: '  ',
+            collection: '    ',
+            factory: '      ',
+        };
+
+        return prefixes[this.name];
+    }
+
     logSuffix() {
         return `[${this.name}|${this.uid}]`;
     }
 
     log(...args: any[]) {
-        console.log(...args, this.logSuffix());
+        console.log(this.logPrefix(), ...args, this.logSuffix());
     }
 
     warn(...args: any[]) {
-        console.warn(...args, this.logSuffix());
+        console.warn(this.logPrefix(), ...args, this.logSuffix());
     }
 
     error(...args: any[]) {
-        console.error(...args, this.logSuffix());
+        console.error(this.logPrefix(), ...args, this.logSuffix());
     }
 }
 
