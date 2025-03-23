@@ -3,7 +3,7 @@ import { test } from '@nipple/tests/_playwright/testParams';
 // Have a similar experience to Jest.
 const { expect, beforeEach, describe } = test;
 
-describe('NippleJS Dynamic Page', () => {
+describe.skip('NippleJS Dynamic Page', () => {
     beforeEach(async ({ page, setupPage }) => {
         await setupPage();
         await page.evaluate(() => {

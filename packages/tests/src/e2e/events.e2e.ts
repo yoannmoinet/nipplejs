@@ -1,38 +1,49 @@
+import { PUBLIC_DIR } from '@nipple/tests/_playwright/constants';
 import { test } from '@nipple/tests/_playwright/testParams';
+import path from 'path';
 
 // Have a similar experience to Jest.
 const { expect, beforeEach, describe } = test;
 
-describe.skip('NippleJS Events', () => {
-    beforeEach(async ({ page }) => {
-        await page.goto('/example/codepen-demo.html');
+describe('Events', () => {
+    beforeEach(async ({ page, setupPage }) => {
+        await setupPage({
+            body: '<div id="zone_joystick"></div>',
+            script: path.resolve(PUBLIC_DIR, './src/index.js'),
+            code: () => {
+                window.joystick = window.nipplejs.create({
+                    zone: document.getElementById('zone_joystick'),
+                });
+            },
+        });
     });
 
-    test('emits basic lifecycle events', async ({ page }) => {
+    test('emits basic lifecycle events', async ({ page, moveJoystick }) => {
         // Setup event listeners
         await page.evaluate(() => {
             window.events = [];
-            window.joystick.on('start move end', (evt: { type: string }) => {
+            window.joystick.on('start move end pressure', (evt: { type: string }) => {
                 window.events.push(evt.type);
             });
         });
 
-        const zone = page.locator('.zone.active');
+        const zone = page.locator('#zone_joystick');
         const box = await zone.boundingBox();
         if (!box) {
             throw new Error('Could not get zone position');
         }
 
         // Perform basic interaction
-        await page.mouse.move(box.x + 50, box.y + 50);
-        await page.mouse.down();
-        await page.mouse.move(box.x + 100, box.y + 100);
-        await page.mouse.up();
+        await moveJoystick({ x: box.x + 50, y: box.y + 50 });
 
         // Verify events
         const events = await page.evaluate(() => window.events);
+        expect(events.filter((e) => e === 'start').length).toBe(1);
         expect(events).toContain('start');
+
+        // There can be multiple move events.
         expect(events).toContain('move');
+        expect(events.filter((e) => e === 'end').length).toBe(1);
         expect(events).toContain('end');
 
         // Verify event order
@@ -44,12 +55,15 @@ describe.skip('NippleJS Events', () => {
         // Setup event listeners
         await page.evaluate(() => {
             window.events = [];
-            window.joystick.on('dir:up dir:right dir:down dir:left', (evt: { type: string }) => {
-                window.events.push(evt.type);
-            });
+            window.joystick.on(
+                'dir:up dir:right dir:down dir:left plain:up plain:right plain:down plain:left',
+                (evt: { type: string }) => {
+                    window.events.push(evt.type);
+                },
+            );
         });
 
-        const zone = page.locator('.zone.active');
+        const zone = page.locator('#zone_joystick');
         const box = await zone.boundingBox();
         if (!box) {
             throw new Error('Could not get zone position');
@@ -68,66 +82,30 @@ describe.skip('NippleJS Events', () => {
         ];
 
         for (const move of moves) {
+            // Place the mouse on the center of the zone.
             await page.mouse.move(centerX, centerY);
             await page.mouse.down();
-            await page.mouse.move(move.x, move.y);
+
+            // Move the mouse to the direction.
+            await page.mouse.move(move.x, move.y, { steps: 10 });
             await page.mouse.up();
         }
 
         // Verify all directional events were emitted
         const events = await page.evaluate(() => window.events);
+        // Verify dir events.
         expect(events).toContain('dir:up');
         expect(events).toContain('dir:right');
         expect(events).toContain('dir:down');
         expect(events).toContain('dir:left');
-    });
-
-    test('emits plain direction events', async ({ page }) => {
-        // Setup event listeners
-        await page.evaluate(() => {
-            window.events = [];
-            window.joystick.on(
-                'plain:up plain:right plain:down plain:left',
-                (evt: { type: string }) => {
-                    window.events.push(evt.type);
-                },
-            );
-        });
-
-        const zone = page.locator('.zone.active');
-        const box = await zone.boundingBox();
-        if (!box) {
-            throw new Error('Could not get zone position');
-        }
-
-        const centerX = box.x + box.width / 2;
-        const centerY = box.y + box.height / 2;
-        const moveDistance = 50;
-
-        // Move in each plain direction
-        await page.mouse.move(centerX, centerY);
-        await page.mouse.down();
-
-        // Up
-        await page.mouse.move(centerX, centerY - moveDistance);
-        // Right
-        await page.mouse.move(centerX + moveDistance, centerY);
-        // Down
-        await page.mouse.move(centerX, centerY + moveDistance);
-        // Left
-        await page.mouse.move(centerX - moveDistance, centerY);
-
-        await page.mouse.up();
-
-        // Verify all plain direction events were emitted
-        const events = await page.evaluate(() => window.events);
+        // Verify plain events.
         expect(events).toContain('plain:up');
         expect(events).toContain('plain:right');
         expect(events).toContain('plain:down');
         expect(events).toContain('plain:left');
     });
 
-    test('emits pressure events', async ({ page }) => {
+    test('emits pressure events', async ({ page, moveJoystick }) => {
         // Setup event listeners
         await page.evaluate(() => {
             window.events = [];
@@ -136,27 +114,18 @@ describe.skip('NippleJS Events', () => {
             });
         });
 
-        const zone = page.locator('.zone.active');
+        const zone = page.locator('#zone_joystick');
         const box = await zone.boundingBox();
         if (!box) {
             throw new Error('Could not get zone position');
         }
 
-        // Simulate pressure event
-        await page.evaluate(() => {
-            const targetZone = document.querySelector('.zone.active');
-            if (targetZone) {
-                const event = new PointerEvent('pointerdown', {
-                    pressure: 2.5,
-                    clientX: 50,
-                    clientY: 50,
-                });
-                targetZone.dispatchEvent(event);
-            }
-        });
+        // Perform basic interaction
+        await moveJoystick({ x: box.x + 50, y: box.y + 50 });
 
         // Verify pressure event was emitted
         const events = await page.evaluate(() => window.events);
-        expect(events.some((e) => e.startsWith('pressure:2.5'))).toBe(true);
+        // Playwright only send zero pressure events.
+        expect(events.some((e) => e.startsWith('pressure:0'))).toBe(true);
     });
 });
