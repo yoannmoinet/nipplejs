@@ -1,1 +1,29 @@
-200
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>NippleJS Test</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        #zone_joystick {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: lightblue;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="zone_joystick"></div>
+    <script src="./src/index.js"></script>
+    <script>
+        window.joystick = window.nipplejs.create({
+            zone: document.getElementById('zone_joystick'),
+        })
+    </script>
+</body>
+
+</html>
