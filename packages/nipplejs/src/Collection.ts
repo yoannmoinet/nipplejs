@@ -353,7 +353,6 @@ export default class Collection extends Super {
     }
 
     processOnStart(evt: DomEvent) {
-        this.log('processOnStart', evt.identifier);
         // Refresh the box position.
         this.box = this.options.zone.getBoundingClientRect();
         // If we don't have spots available, we stop right here.
@@ -405,7 +404,6 @@ export default class Collection extends Super {
      *  This is called from the Factory.
      * */
     processOnMove(evt: DomEvent, animated: boolean = false) {
-        this.log('processOnMove', evt.identifier, evt.pressure);
         const joystick = this.actives.get(evt.identifier);
         const scroll = this.factory.scroll;
 
@@ -545,7 +543,6 @@ export default class Collection extends Super {
     }
 
     processOnEnd(evt: DomEvent) {
-        this.log('processOnEnd', evt.identifier);
         const joystick = this.actives.get(evt.identifier);
 
         // This should not happen.
