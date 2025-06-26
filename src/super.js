@@ -4,9 +4,6 @@
 import * as u from './utils';
 
 // Constants
-var isTouch = !!('ontouchstart' in window);
-var isPointer = window.PointerEvent ? true : false;
-var isMSPointer = window.MSPointerEvent ? true : false;
 var events = {
     touch: {
         start: 'touchstart',
@@ -29,18 +26,30 @@ var events = {
         end: 'MSPointerUp'
     }
 };
-var toBind;
-var secondBind = {};
-if (isPointer) {
-    toBind = events.pointer;
-} else if (isMSPointer) {
-    toBind = events.MSPointer;
-} else if (isTouch) {
-    toBind = events.touch;
-    secondBind = events.mouse;
-} else {
-    toBind = events.mouse;
+
+function getBindings() {
+    var toBind;
+    var secondBind = {};
+    var isTouch = !!('ontouchstart' in window);
+    var isPointer = window.PointerEvent ? true : false;
+    var isMSPointer = window.MSPointerEvent ? true : false;
+
+    if (isPointer) {
+        toBind = events.pointer;
+    } else if (isMSPointer) {
+        toBind = events.MSPointer;
+    } else if (isTouch) {
+        toBind = events.touch;
+        secondBind = events.mouse;
+    } else {
+        toBind = events.mouse;
+    }
+    return {
+        toBind,
+        secondBind
+    };
 }
+
 
 function Super () {}
 
@@ -117,6 +126,7 @@ Super.prototype.bindEvt = function (el, type) {
         }
     };
 
+    var { toBind, secondBind } = getBindings();
     u.bindEvt(el, toBind[type], self._domHandlers_[type]);
 
     if (secondBind[type]) {
@@ -132,6 +142,7 @@ Super.prototype.unbindEvt = function (el, type) {
     var self = this;
     self._domHandlers_ = self._domHandlers_ || {};
 
+    var { toBind, secondBind } = getBindings();
     u.unbindEvt(el, toBind[type], self._domHandlers_[type]);
 
     if (secondBind[type]) {
