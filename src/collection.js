@@ -294,6 +294,7 @@ Collection.prototype.processOnStart = function (evt) {
         self.manager.removeIdentifier(nipple.identifier);
     }
     nipple.identifier = identifier;
+    nipple.origEvent = evt;
 
     var process = function (nip) {
         // Trigger the start.
@@ -397,6 +398,7 @@ Collection.prototype.processOnMove = function (evt) {
     }
 
     nipple.identifier = identifier;
+    nipple.origEvent = evt;
 
     var size = nipple.options.size / 2;
     var pos = {
@@ -482,7 +484,8 @@ Collection.prototype.processOnMove = function (evt) {
         raw: raw,
         instance: nipple,
         lockX: opts.lockX,
-        lockY: opts.lockY
+        lockY: opts.lockY,
+        origEvent: nipple.origEvent
     };
 
     // Compute the direction's datas.
@@ -509,6 +512,9 @@ Collection.prototype.processOnEnd = function (evt) {
     if (!nipple) {
         return;
     }
+
+    // Store the original event
+    nipple.origEvent = evt;
 
     if (!opts.dataOnly) {
         nipple.hide(function () {

@@ -60,6 +60,11 @@
                 size: 200,
                 shape: "square"
             });
+
+            // Disable context menu
+            document.addEventListener('contextmenu', function(e) {
+                e.preventDefault();
+            });
         </script>
     </body>
 </html>

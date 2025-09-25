@@ -56,6 +56,11 @@
                 size: 200,
                 lockY: true
             });
+
+            // Disable context menu
+            document.addEventListener('contextmenu', function(e) {
+                e.preventDefault();
+            });
         </script>
     </body>
 </html>

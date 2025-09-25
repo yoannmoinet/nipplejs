@@ -208,6 +208,7 @@ export interface JoystickOutputData {
     instance: Joystick;
     position: Position;
     pressure: number;
+    origEvent: Event;
 }
 
 export type JoystickEventTypes =
