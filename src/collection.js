@@ -294,6 +294,7 @@ Collection.prototype.processOnStart = function (evt) {
         self.manager.removeIdentifier(nipple.identifier);
     }
     nipple.identifier = identifier;
+    nipple.origEvent = evt;
 
     var process = function (nip) {
         // Trigger the start.
@@ -372,6 +373,8 @@ Collection.prototype.processOnMove = function (evt) {
     var nipple = self.nipples.get(identifier);
     var scroll = self.manager.scroll;
 
+    nipple.origEvent = evt;
+
     // If we're moving without pressing
     // it's that we went out the active zone
     if (!u.isPressed(evt)) {
@@ -397,6 +400,7 @@ Collection.prototype.processOnMove = function (evt) {
     }
 
     nipple.identifier = identifier;
+    nipple.origEvent = evt;
 
     var size = nipple.options.size / 2;
     var pos = {
@@ -482,7 +486,8 @@ Collection.prototype.processOnMove = function (evt) {
         raw: raw,
         instance: nipple,
         lockX: opts.lockX,
-        lockY: opts.lockY
+        lockY: opts.lockY,
+        origEvent: nipple.origEvent
     };
 
     // Compute the direction's datas.
@@ -509,6 +514,9 @@ Collection.prototype.processOnEnd = function (evt) {
     if (!nipple) {
         return;
     }
+
+    // Store the original event
+    nipple.origEvent = evt;
 
     if (!opts.dataOnly) {
         nipple.hide(function () {

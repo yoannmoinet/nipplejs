@@ -60,6 +60,11 @@
                 size: 200,
                 restJoystick: false
             });
+
+            // Disable context menu
+            document.addEventListener('contextmenu', function(e) {
+                e.preventDefault();
+            });
         </script>
     </body>
 </html>

@@ -165,6 +165,15 @@
                             <li class="angle">angle : <span class='data'></span></li>
                         </ul>
                     </li>
+                    <li class="origEvent">
+                        origEvent :
+                        <ul>
+                            <li class="type">type : <span class='data'></span></li>
+                            <li class="buttons">buttons : <span class='data'></span></li>
+                            <li class="clientX">clientX : <span class='data'></span></li>
+                            <li class="clientY">clientY : <span class='data'></span></li>
+                        </ul>
+                    </li>
                 </ul>
                 <div class="dump"></div>
             </div>
@@ -223,6 +232,12 @@
                     x: elDebug.querySelector('.direction .x .data'),
                     y: elDebug.querySelector('.direction .y .data'),
                     angle: elDebug.querySelector('.direction .angle .data')
+                },
+                origEvent: {
+                    type: elDebug.querySelector('.origEvent .type .data'),
+                    buttons: elDebug.querySelector('.origEvent .buttons .data'),
+                    clientX: elDebug.querySelector('.origEvent .clientX .data'),
+                    clientY: elDebug.querySelector('.origEvent .clientY .data')
                 }
             };
 
@@ -237,6 +252,11 @@
             sId('buttons').onclick = sId('buttons').ontouchend = createThrottle;
 
             createNipple('dynamic');
+
+            // Disable context menu
+            document.addEventListener('contextmenu', function(e) {
+                e.preventDefault();
+            });
 
             function bindNipple () {
                 joystick.on('start end', function (evt, data) {

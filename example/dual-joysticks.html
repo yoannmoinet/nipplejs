@@ -54,6 +54,11 @@
                 color: 'red',
                 size: 200
             });
+
+            // Disable context menu
+            document.addEventListener('contextmenu', function(e) {
+                e.preventDefault();
+            });
         </script>
     </body>
 </html>

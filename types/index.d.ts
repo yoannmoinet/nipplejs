@@ -208,6 +208,7 @@ export interface JoystickOutputData {
     instance: Joystick;
     position: Position;
     pressure: number;
+    origEvent: Event;
 }
 
 export type JoystickEventTypes =
@@ -314,11 +315,11 @@ export class JoystickManager {
 
     on(
         type: JoystickManagerEventTypes | JoystickManagerEventTypes[],
-        handler: (evt: EventData, data: JoystickOutputData) => void
+        handler: (evt: EventData, data: JoystickOutputData | Joystick) => void
     ): void;
     off(
         type: JoystickManagerEventTypes | JoystickManagerEventTypes[],
-        handler: (evt: EventData, data: JoystickOutputData) => void
+        handler: (evt: EventData, data: JoystickOutputData | Joystick) => void
     ): void;
     get(identifier: number): Joystick;
     destroy(): void;
@@ -341,11 +342,11 @@ export interface Collection {
 export interface Joystick {
     on(
         type: JoystickEventTypes | JoystickEventTypes[],
-        handler: (evt: EventData, data: JoystickOutputData) => void
+        handler: (evt: EventData, data: JoystickOutputData | Joystick) => void
     ): void;
     off(
         type: JoystickEventTypes | JoystickEventTypes[],
-        handler: (evt: EventData, data: JoystickOutputData) => void
+        handler: (evt: EventData, data: JoystickOutputData | Joystick) => void
     ): void;
     el: HTMLElement;
     show(cb?: () => void): void;
@@ -367,6 +368,7 @@ export interface Joystick {
         back: HTMLElement;
     };
     options: JoystickManagerOptions;
+    origEvent: Event;
 }
 
 /**
