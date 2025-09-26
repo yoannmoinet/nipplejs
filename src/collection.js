@@ -373,6 +373,8 @@ Collection.prototype.processOnMove = function (evt) {
     var nipple = self.nipples.get(identifier);
     var scroll = self.manager.scroll;
 
+    nipple.origEvent = evt;
+
     // If we're moving without pressing
     // it's that we went out the active zone
     if (!u.isPressed(evt)) {
