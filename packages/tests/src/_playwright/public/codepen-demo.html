@@ -200,6 +200,9 @@
     </div>
     <script src="./src/index.js"></script>
     <script>
+        const log = (...args) => {
+            console.log('[p]', ...args);
+        }
         const $ = selector => document.querySelector(selector);
         const $id = id => document.getElementById(id);
 
@@ -257,16 +260,24 @@
 
         let timeoutCreate;
         const createThrottle = evt => {
+            log('Create throttle');
             clearTimeout(timeoutCreate);
-            timeoutCreate = setTimeout(() => createNipple(evt), 100);
+            timeoutCreate = setTimeout(() => createCollection(evt), 100);
         }
 
-        $id('buttons').addEventListener('click', createThrottle);
-        $id('buttons').addEventListener('touchend', createThrottle);
+        $id('buttons').addEventListener('click', (evt) => {
+            log('Click buttons');
+            createThrottle(evt);
+        });
+        $id('buttons').addEventListener('touchend', (evt) => {
+            log('Touchend buttons');
+            createThrottle(evt);
+        });
 
-        createNipple('dynamic');
+        log('Init create');
+        createThrottle('dynamic');
 
-        function bindNipple() {
+        function bindCollection() {
             collection.on('added start shown hidden rested removed end', evt => {
                 dump(evt.type);
                 debug(evt.data);
@@ -287,10 +298,13 @@
             });
         }
 
-        function createNipple(evt) {
+        function createCollection(evt) {
+            clearTimeout(timeoutCreate);
             const type = typeof evt === 'string' ? evt : evt.target.dataset.type;
+            log('Create Collection', type);
 
             if (collection) {
+                log('Destroy previous collection')
                 collection.destroy();
             }
 
@@ -303,7 +317,7 @@
             addClass($('.zone.' + type), 'active');
 
             collection = nipplejs.create(collections[type]);
-            bindNipple();
+            bindCollection();
         }
 
         function debug(obj) {

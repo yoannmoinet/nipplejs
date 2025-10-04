@@ -13,7 +13,7 @@ import type {
 } from './types';
 import * as u from './utils';
 
-export default class Collection extends Super {
+export class Collection extends Super {
     /**
      *  The static incremented ID of the Collections.
      * */
@@ -130,6 +130,10 @@ export default class Collection extends Super {
             // @ts-expect-error - msTouchAction is not a known type
             msTouchAction: 'none',
         });
+    }
+
+    init() {
+        this.trigger('collectionCreated', this);
 
         // In static mode, we create our own static Joystick.
         if (this.options.mode === MODES.static) {
@@ -184,9 +188,6 @@ export default class Collection extends Super {
 
         // Other events that will get bubbled up.
         // TODO: See if we can factorise with Factory.bindCollection.
-        joystick.on('joystickDestroyed', (evt) => {
-            this.trigger(`joystickDestroyed ${joystick.uid}:joystickDestroyed`, evt.data);
-        });
         joystick.on('pressure', (evt) => {
             this.trigger(`pressure ${joystick.uid}:pressure`, evt.data);
         });
@@ -195,17 +196,22 @@ export default class Collection extends Super {
             const type = `${evt.type} ${evt.data.joystick.uid}:${evt.type}`;
             this.trigger(type as EvtType, evt.data);
         });
-        joystick.on('added start shown hidden rested removed end', (evt) => {
-            type EvtType = `added${string}` &
-                `start${string}` &
-                `shown${string}` &
-                `hidden${string}` &
-                `rested${string}` &
-                `removed${string}` &
-                `end${string}`;
-            const type = `${evt.type} ${evt.data.uid}:${evt.type}`;
-            this.trigger(type as EvtType, evt.data);
-        });
+        joystick.on(
+            'added start shown hidden rested removed end joystickCreated joystickDestroyed',
+            (evt) => {
+                type EvtType = `added${string}` &
+                    `start${string}` &
+                    `shown${string}` &
+                    `hidden${string}` &
+                    `rested${string}` &
+                    `removed${string}` &
+                    `end${string}` &
+                    `joystickCreated${string}` &
+                    `joystickDestroyed${string}`;
+                const type = `${evt.type} ${evt.data.uid}:${evt.type}`;
+                this.trigger(type as EvtType, evt.data);
+            },
+        );
         joystick.on('move', (evt) => {
             this.trigger(`move ${evt.data.instance.uid}:move`, evt.data);
         });
@@ -240,7 +246,7 @@ export default class Collection extends Super {
         // In semi and static modes, we recycle the idle joystick.
         if (this.options.mode === MODES.semi || this.options.mode === MODES.static) {
             // If there is an idle joystick, we use it.
-            const idleUid: Uid = this.idles.values().next().value;
+            const idleUid: Uid | undefined = this.idles.values().next().value;
             if (u.isNumber(idleUid)) {
                 const joystick = this.all.get(idleUid);
                 if (!joystick) {
@@ -348,6 +354,11 @@ export default class Collection extends Super {
         this.all.set(joystick.uid, joystick);
         this.idles.add(joystick.uid);
         this.bindJoystick(joystick);
+
+        // Initialize the joystick.
+        // We do this in order to have the events triggered by the joystick during initialisation caught by the collection.
+        // Otherwise, if everything is done in the constructor, we can't listen for start/created events.
+        joystick.init();
 
         return joystick;
     }
@@ -574,3 +585,5 @@ export default class Collection extends Super {
         this.off();
     }
 }
+
+export default Collection;

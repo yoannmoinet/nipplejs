@@ -12,7 +12,7 @@ import type {
 } from './types';
 import * as u from './utils';
 
-export default class Joystick extends Super {
+export class Joystick extends Super {
     static index: number = 0;
     private _identifier?: Identifier;
     private _pressure?: number;
@@ -68,10 +68,14 @@ export default class Joystick extends Super {
             back: document.createElement('div'),
             front: document.createElement('div'),
         };
+    }
 
+    init() {
         if (!this.options.dataOnly) {
             this.buildEl();
         }
+        this.trigger('added', this);
+        this.trigger('joystickCreated', this);
     }
 
     get identifier(): Identifier | undefined {
@@ -448,3 +452,5 @@ export default class Joystick extends Super {
         this.off();
     }
 }
+
+export default Joystick;

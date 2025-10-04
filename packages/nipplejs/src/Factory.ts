@@ -5,7 +5,7 @@ import { MODES } from './constants';
 import type { CollectionOptions, DomEvent, Identifier, Uid } from './types';
 import * as u from './utils';
 
-export default class Factory extends Super {
+export class Factory extends Super {
     scroll: { x: number; y: number } = u.getScroll();
     private binded: boolean = false;
     private joysticksByUid: Map<Uid, Joystick> = new Map();
@@ -16,6 +16,7 @@ export default class Factory extends Super {
         super('factory');
         this.bindResize();
         this.bindScroll();
+        this.trigger('factoryCreated', this);
     }
 
     // Listen for resize, to reposition every joysticks
@@ -62,9 +63,14 @@ export default class Factory extends Super {
     // Collection Factory
     create(options: CollectionOptions): Collection {
         const collection = new Collection(this, options);
-
+        // Bind it to bubble the other events up.
         this.bindCollection(collection);
         this.collections.add(collection);
+
+        // Initialize the collection.
+        // We do this in order to have the events triggered by the collection during initialisation caught by the factory.
+        // Otherwise, if everything is done in the constructor, we can't listen for created events.
+        collection.init();
 
         return collection;
     }
@@ -117,26 +123,31 @@ export default class Factory extends Super {
         collection.on('pressure', (evt) => {
             this.trigger(`pressure ${evt.target.uid}:pressure`, evt.data);
         });
-        collection.on('collectionDestroyed', (evt) => {
+        collection.on('collectionCreated collectionDestroyed', (evt) => {
+            type EvtType = `collectionCreated${string}` & `collectionDestroyed${string}`;
             const type = `${evt.type} ${evt.data.uid}:${evt.type}`;
-            this.trigger(type as `collectionDestroyed${string}`, evt.data);
+            this.trigger(type as EvtType, evt.data);
         });
         collection.on('attached detached', (evt) => {
             const type = `${evt.type} ${evt.data.joystick.uid}:${evt.type}`;
             this.trigger(type as `attached${string}` & `detached${string}`, evt.data);
         });
-        collection.on('added start shown hidden rested removed end joystickDestroyed', (evt) => {
-            type EvtType = `added${string}` &
-                `start${string}` &
-                `shown${string}` &
-                `hidden${string}` &
-                `rested${string}` &
-                `removed${string}` &
-                `end${string}` &
-                `joystickDestroyed${string}`;
-            const type = `${evt.type} ${evt.data.uid}:${evt.type}`;
-            this.trigger(type as EvtType, evt.data);
-        });
+        collection.on(
+            'added start shown hidden rested removed end joystickCreated joystickDestroyed',
+            (evt) => {
+                type EvtType = `added${string}` &
+                    `start${string}` &
+                    `shown${string}` &
+                    `hidden${string}` &
+                    `rested${string}` &
+                    `removed${string}` &
+                    `end${string}` &
+                    `joystickCreated${string}` &
+                    `joystickDestroyed${string}`;
+                const type = `${evt.type} ${evt.data.uid}:${evt.type}`;
+                this.trigger(type as EvtType, evt.data);
+            },
+        );
         collection.on('move', (evt) => {
             this.trigger(`move ${evt.data.instance.uid}:move`, evt.data);
         });
@@ -155,7 +166,11 @@ export default class Factory extends Super {
             'touches' in evt.initial
                 ? Array.from(evt.initial.touches).map((t) => t.identifier)
                 : [evt.identifier];
-
+        this.log(
+            'Cleaning inactive',
+            toucheIdentifiers,
+            Array.from(this.joysticksByIdentifier.keys()),
+        );
         // Make some place in the other touches that may be dormant.
         // Search within our Factory's joysticks.
         for (const [identifier, joystick] of this.joysticksByIdentifier) {
@@ -172,7 +187,7 @@ export default class Factory extends Super {
                     this.error(`No collection found for cleaning identifier ${identifier}`);
                     return;
                 }
-
+                this.log('💣 Cleaning', identifier);
                 joystick.collection.processOnEnd(
                     u.processEvent(evt.initial, {
                         ...evt.raw,
@@ -187,6 +202,7 @@ export default class Factory extends Super {
     bindDocument() {
         // Bind only if not already binded
         if (!this.binded) {
+            this.log('bind dom');
             this.bindEvt(document, 'start', this.onstart);
             this.bindEvt(document, 'move', this.onmove);
             this.bindEvt(document, 'end', this.onend);
@@ -198,6 +214,7 @@ export default class Factory extends Super {
     unbindDocument(force: boolean = false) {
         // If there are no touch left unbind the document.
         if (this.binded && (!this.joysticksByUid.size || force === true)) {
+            this.log(`${force ? 'force ' : ''}unbind dom`);
             this.unbindEvt(document, 'start', this.onstart);
             this.unbindEvt(document, 'move', this.onmove);
             this.unbindEvt(document, 'end', this.onend);
@@ -238,6 +255,7 @@ export default class Factory extends Super {
     }
 
     private handleEventInCollection(evt: DomEvent, cb: (coll: Collection) => void) {
+        console.log('Handle dom event from factory', evt.type);
         const joystick = this.joysticksByIdentifier.get(evt.identifier);
 
         // If the event doesn't have any joystick, we don't call any.
@@ -254,7 +272,10 @@ export default class Factory extends Super {
         this.collections.forEach((collection) => {
             collection.destroy();
         });
+        this.trigger('factoryDestroyed', this);
         // Clear all the event listeners.
         this.off();
     }
 }
+
+export default Factory;

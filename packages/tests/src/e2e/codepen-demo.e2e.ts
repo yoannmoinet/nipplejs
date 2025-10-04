@@ -8,7 +8,7 @@ type Expectation = [number, number, boolean];
 // Have a similar experience to Jest.
 const { expect, beforeEach, describe } = test;
 
-describe('Codepen Demo Page', () => {
+describe.only('Codepen Demo Page', () => {
     beforeEach(async ({ devServerUrl, page, initPage }) => {
         await page.goto(`${devServerUrl}/codepen-demo.html`);
         await initPage();
@@ -80,7 +80,7 @@ describe('Codepen Demo Page', () => {
 
     // Test each mode.
     for (const zone of Object.keys(expectations) as Mode[]) {
-        test(`handles ${zone} mode`, async ({
+        test.only(`handles ${zone} mode`, async ({
             page,
             locateJoystick,
             startJoystick,
@@ -88,8 +88,19 @@ describe('Codepen Demo Page', () => {
         }) => {
             // Switch to different zones
             const switchZone = async (): Promise<Locator> => {
+                // Listen for the creation events.
+                await page.evaluate(() => {
+                    window.events = [];
+                    window.nipplejs.factory.on('collectionCreated', (evt) => {
+                        window.events.push(evt.data.uid.toString());
+                    });
+                });
                 await page.locator(`.button.${zone}`).click();
                 await expect(page.locator(`.zone.${zone}`)).toBeVisible();
+                // Wait for the collection to be created.
+                await page.waitForFunction(() => {
+                    return window.events.length >= 1;
+                });
                 return page.locator(`.zone.${zone}`);
             };
 

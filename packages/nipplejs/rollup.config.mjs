@@ -3,6 +3,7 @@ import esmShim from '@rollup/plugin-esm-shim';
 import json from '@rollup/plugin-json';
 import { nodeResolve } from '@rollup/plugin-node-resolve';
 import terser from '@rollup/plugin-terser';
+import fs from 'fs';
 import modulePackage from 'module';
 import path from 'path';
 import dts from 'rollup-plugin-dts';
@@ -40,7 +41,27 @@ export const bundle = (config) => ({
  */
 const getOutput = (overrides = {}) => {
     const filename = overrides.format === 'esm' ? packageJson.module : packageJson.main;
-    const plugins = [terser()];
+    const dir = overrides.dir || path.dirname(filename);
+    const plugins = [
+        terser(),
+        // Add a plugin to copy the output files to the e2e public folder too.
+        {
+            name: 'copy',
+            writeBundle() {
+                // Ensure the destination directory exists
+                const destDir = path.resolve(__dirname, 'e2e/public');
+                if (!fs.existsSync(destDir)) {
+                    fs.mkdirSync(destDir, { recursive: true });
+                }
+
+                // Copy the source files to the destination directory
+                fs.cpSync(dir, destDir, {
+                    recursive: true,
+                    force: true,
+                });
+            },
+        },
+    ];
 
     // Inject ESM shims to support __dirname and co.
     if (overrides.format === 'esm') {
@@ -51,7 +72,7 @@ const getOutput = (overrides = {}) => {
         exports: 'named',
         sourcemap: true,
         entryFileNames: `[name]${path.extname(filename)}`,
-        dir: path.dirname(filename),
+        dir,
         plugins,
         format: 'cjs',
         globals: {

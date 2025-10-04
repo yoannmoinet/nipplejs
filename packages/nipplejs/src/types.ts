@@ -318,6 +318,25 @@ export type Direction = {
  * The event types of a joystick.
  */
 export type JoystickEventType =
+    | 'joystickCreated'
+    /**
+     * A joystick just got added.
+     *
+     * Will pass the instance alongside the event.
+     */
+    | 'added'
+
+    /**
+     * A joystick just got removed.
+     *
+     * Fired at the end of the fade-out animation.
+     *
+     * Will pass the instance alongside the event.
+     *
+     * Won’t be trigger in a 'dataOnly' configuration.
+     */
+    | 'removed'
+
     /**
      * A joystick is attached to an event.
      *
@@ -421,34 +440,18 @@ export type JoystickEventType =
  * The event types of a collection.
  */
 export type CollectionOnlyEventType =
+    | 'collectionCreated'
     /**
      * A collection just got destroyed.
      *
      * Will pass the instance alongside the event.
      */
-    'collectionDestroyed';
+    | 'collectionDestroyed';
 
 /**
  * The event types of a factory.
  */
-export type FactoryOnlyEventType =
-    /**
-     * A joystick just got added.
-     *
-     * Will pass the instance alongside the event.
-     */
-    | 'added'
-
-    /**
-     * A joystick just got removed.
-     *
-     * Fired at the end of the fade-out animation.
-     *
-     * Will pass the instance alongside the event.
-     *
-     * Won’t be trigger in a 'dataOnly' configuration.
-     */
-    | 'removed';
+export type FactoryOnlyEventType = 'factoryCreated' | 'factoryDestroyed';
 
 /**
  * The event types of a collection.

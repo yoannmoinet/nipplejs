@@ -70,10 +70,14 @@ export const test = base.extend<TestOptions & Fixtures>({
             );
 
             // Move the mouse to the position and press down.
+            console.log('move in place');
             await page.mouse.move(position.x, position.y);
+            console.log('mouse down');
             await page.mouse.down();
             // Move the mouse a bit.
+            console.log('move a bit 1');
             await page.mouse.move(position.x + 2, position.y + 2, { steps: 15 });
+            console.log('move a bit 2');
             await page.mouse.move(position.x - 2, position.y - 2, { steps: 15 });
 
             // Wait for the joysticks to be shown.
@@ -117,6 +121,7 @@ export const test = base.extend<TestOptions & Fixtures>({
             );
 
             // Release the mouse.
+            console.log('mouse up');
             await page.mouse.up();
 
             // Wait for the all the joysticks to trigger their rested events.

@@ -1,4 +1,5 @@
 import type Collection from './Collection';
+import type Factory from './Factory';
 import type Joystick from './Joystick';
 import { PRIMARY_BIND, SECONDARY_BIND } from './constants';
 import type {
@@ -14,16 +15,19 @@ import type {
 } from './types';
 import * as u from './utils';
 
-type SuperEventType<T extends FactoryEventType> = `${T}${string}` | `${string}${T}`;
-type Name = 'super' | 'joystick' | 'collection' | 'factory';
-class Super {
+export type SuperEventType<T extends FactoryEventType> = `${T}${string}` | `${string}${T}`;
+export type Name = 'super' | 'joystick' | 'collection' | 'factory';
+
+export class Super {
     uid: Uid = 0 as Uid;
+    index: number = 0;
     name: Name = 'super';
     private _domHandlers_: Map<DomEventHandler, (evt: SupportedEvent) => void> = new Map();
     private _handlers_: Partial<Record<FactoryEventType, Set<InternalEventHandler<any>>>> = {};
 
     constructor(name: Name) {
         this.name = name;
+        this.log('construct', this.name, this.index);
     }
 
     mapOnEvents(arg: string, cb: (type: FactoryEventType) => void): void {
@@ -47,8 +51,12 @@ class Super {
     on(arg: SuperEventType<'shown'>, cb: InternalEventHandler<Joystick>): void;
     on(arg: SuperEventType<'hidden'>, cb: InternalEventHandler<Joystick>): void;
     on(arg: SuperEventType<'rested'>, cb: InternalEventHandler<Joystick>): void;
+    on(arg: SuperEventType<'joystickCreated'>, cb: InternalEventHandler<Joystick>): void;
     on(arg: SuperEventType<'joystickDestroyed'>, cb: InternalEventHandler<Joystick>): void;
+    on(arg: SuperEventType<'collectionCreated'>, cb: InternalEventHandler<Collection>): void;
     on(arg: SuperEventType<'collectionDestroyed'>, cb: InternalEventHandler<Collection>): void;
+    on(arg: SuperEventType<'factoryCreated'>, cb: InternalEventHandler<Factory>): void;
+    on(arg: SuperEventType<'factoryDestroyed'>, cb: InternalEventHandler<Factory>): void;
     on(arg: SuperEventType<'pressure'>, cb: InternalEventHandler<number>): void;
     on<T>(arg: string, cb: InternalEventHandler<T>): void {
         this.mapOnEvents(arg, (type) => {
@@ -69,8 +77,12 @@ class Super {
     off(arg?: SuperEventType<'shown'>, cb?: InternalEventHandler<Joystick>): void;
     off(arg?: SuperEventType<'hidden'>, cb?: InternalEventHandler<Joystick>): void;
     off(arg?: SuperEventType<'rested'>, cb?: InternalEventHandler<Joystick>): void;
+    off(arg?: SuperEventType<'joystickCreated'>, cb?: InternalEventHandler<Joystick>): void;
     off(arg?: SuperEventType<'joystickDestroyed'>, cb?: InternalEventHandler<Joystick>): void;
+    off(arg?: SuperEventType<'collectionCreated'>, cb?: InternalEventHandler<Collection>): void;
     off(arg?: SuperEventType<'collectionDestroyed'>, cb?: InternalEventHandler<Collection>): void;
+    off(arg?: SuperEventType<'factoryCreated'>, cb?: InternalEventHandler<Factory>): void;
+    off(arg?: SuperEventType<'factoryDestroyed'>, cb?: InternalEventHandler<Factory>): void;
     off(arg?: SuperEventType<'pressure'>, cb?: InternalEventHandler<number>): void;
     off<T>(arg?: string, cb?: InternalEventHandler<T>): void {
         if (arg === undefined) {
@@ -101,8 +113,12 @@ class Super {
     trigger(arg: SuperEventType<'shown'>, data: Joystick): void;
     trigger(arg: SuperEventType<'hidden'>, data: Joystick): void;
     trigger(arg: SuperEventType<'rested'>, data: Joystick): void;
+    trigger(arg: SuperEventType<'joystickCreated'>, data: Joystick): void;
     trigger(arg: SuperEventType<'joystickDestroyed'>, data: Joystick): void;
+    trigger(arg: SuperEventType<'collectionCreated'>, data: Collection): void;
     trigger(arg: SuperEventType<'collectionDestroyed'>, data: Collection): void;
+    trigger(arg: SuperEventType<'factoryCreated'>, data: Factory): void;
+    trigger(arg: SuperEventType<'factoryDestroyed'>, data: Factory): void;
     trigger(arg: SuperEventType<'pressure'>, data: number): void;
     trigger<T>(arg: string, data: T): void {
         this.mapOnEvents(arg, (type) => {
@@ -122,9 +138,10 @@ class Super {
 
     // Bind DOM events.
     bindEvt(el: SupportedElement, type: EventType, handler: DomEventHandler) {
+        console.log('bind event', this.name, type, el);
         const cb = (evt: SupportedEvent) => {
-            this.log(`- "${type}" [dom:trigger]`);
             for (const domEvt of u.processEvents(evt)) {
+                this.log(`- "${type}" [dom:trigger:${domEvt.identifier}]`);
                 handler.call(this, domEvt);
             }
         };
