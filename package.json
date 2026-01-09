@@ -46,7 +46,7 @@
     "eslint": "5.10.0",
     "eslint-loader": "2.2.1",
     "markdown-toc": "1.2.0",
-    "webpack": "4.39.2",
+    "webpack": "5.104.1",
     "webpack-cli": "3.3.7",
     "webpack-dev-server": "4.11.1"
   }
