@@ -8,7 +8,7 @@ type Expectation = [number, number, boolean];
 // Have a similar experience to Jest.
 const { expect, beforeEach, describe } = test;
 
-describe.only('Codepen Demo Page', () => {
+describe('Codepen Demo Page', () => {
     beforeEach(async ({ devServerUrl, page, initPage }) => {
         await page.goto(`${devServerUrl}/codepen-demo.html`);
         await initPage();
@@ -80,7 +80,7 @@ describe.only('Codepen Demo Page', () => {
 
     // Test each mode.
     for (const zone of Object.keys(expectations) as Mode[]) {
-        test.only(`handles ${zone} mode`, async ({
+        test(`handles ${zone} mode`, async ({
             page,
             locateJoystick,
             startJoystick,

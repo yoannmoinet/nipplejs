@@ -1,13 +1,17 @@
-import { test, expect } from '@playwright/test';
+import { test } from '@nipple/tests/_playwright/testParams';
+
+const { expect } = test;
 
 interface ThresholdResult {
     threshold: number;
     eventCount: number;
 }
 
-test.describe.skip('NippleJS Threshold', () => {
-    test.beforeEach(async ({ page }) => {
-        await page.goto('/');
+test.describe('NippleJS Threshold', () => {
+    test.beforeEach(async ({ setupPage }) => {
+        await setupPage({
+            body: '<div id="zone_joystick"></div>',
+        });
     });
 
     test('events not triggered below threshold', async ({ page }) => {

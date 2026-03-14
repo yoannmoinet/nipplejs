@@ -4,7 +4,6 @@ import { ROOT } from '@nipple/tools/constants';
 import { blue, dim } from '@nipple/tools/helpers';
 import type { FullConfig } from '@playwright/test';
 import fs from 'fs';
-import { getDefaultBuildConfigs } from 'nipplejs/rollup.config.mjs';
 import path from 'path';
 import { rollup } from 'rollup';
 
@@ -24,7 +23,8 @@ const globalSetup = async (testConfig: FullConfig<TestOptions>) => {
     // Clean previous build.
     await fs.promises.rm(OUTPUT_DIR, { recursive: true, force: true });
 
-    // Build the project.
+    // Build the project using dynamic import for ES module
+    const { getDefaultBuildConfigs } = await import('nipplejs/rollup.config.mjs');
     const rollupConfig = getDefaultBuildConfigs({
         input: {
             index: path.resolve(ROOT, 'packages/nipplejs/src/index.ts'),

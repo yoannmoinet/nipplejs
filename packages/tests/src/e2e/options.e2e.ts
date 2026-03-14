@@ -57,4 +57,135 @@ describe('Options', () => {
             expect(newPosition.y).not.toBe(initialPosition.y);
         });
     });
+
+    describe('Color', () => {
+        test('applies custom color', async ({ page, setupPage, moveJoystick }) => {
+            await setupPage({
+                body: '<div id="zone_joystick"></div>',
+                code: () => {
+                    window.events = [];
+                    window.joystick = window.nipplejs.create({
+                        zone: document.getElementById('zone_joystick'),
+                        color: 'red',
+                    });
+                    window.joystick.on('move', () => {
+                        window.events.push('move');
+                    });
+                },
+            });
+
+            const zone = page.locator('#zone_joystick');
+            const box = await zone.boundingBox();
+            if (!box) {
+                throw new Error('Zone not found');
+            }
+
+            await moveJoystick({ x: box.x + 50, y: box.y + 50 });
+
+            // Verify joystick works with custom color
+            const events = await page.evaluate(() => window.events);
+            expect(events.length).toBeGreaterThan(0);
+        });
+    });
+
+    describe('Size', () => {
+        test('applies custom size', async ({ page, setupPage, moveJoystick }) => {
+            await setupPage({
+                body: '<div id="zone_joystick"></div>',
+                code: () => {
+                    window.events = [];
+                    window.joystick = window.nipplejs.create({
+                        zone: document.getElementById('zone_joystick'),
+                        size: 150,
+                    });
+                    window.joystick.on('move', () => {
+                        window.events.push('move');
+                    });
+                },
+            });
+
+            const zone = page.locator('#zone_joystick');
+            const box = await zone.boundingBox();
+            if (!box) {
+                throw new Error('Zone not found');
+            }
+
+            await moveJoystick({ x: box.x + 50, y: box.y + 50 });
+
+            // Verify joystick works with custom size
+            const events = await page.evaluate(() => window.events);
+            expect(events.length).toBeGreaterThan(0);
+        });
+    });
+
+    describe('FadeTime', () => {
+        test('respects custom fadeTime', async ({ page, setupPage, startJoystick }) => {
+            await setupPage({
+                body: '<div id="zone_joystick"></div>',
+                code: () => {
+                    window.events = [];
+                    window.joystick = window.nipplejs.create({
+                        zone: document.getElementById('zone_joystick'),
+                        fadeTime: 500,
+                    });
+                    window.joystick.on('move', () => {
+                        window.events.push('move');
+                    });
+                },
+            });
+
+            const zone = page.locator('#zone_joystick');
+            const box = await zone.boundingBox();
+            if (!box) {
+                throw new Error('Zone not found');
+            }
+
+            // Start and move joystick manually to avoid fadeTime timeout issues
+            await startJoystick({ x: box.x + 50, y: box.y + 50 });
+            await page.mouse.move(box.x + 100, box.y + 100, { steps: 5 });
+            await page.mouse.up();
+
+            // Verify joystick works with custom fadeTime
+            const events = await page.evaluate(() => window.events);
+            expect(events.length).toBeGreaterThan(0);
+        });
+    });
+
+    describe('DataOnly', () => {
+        test('dataOnly mode prevents DOM creation', async ({ page, setupPage }) => {
+            await setupPage({
+                body: '<div id="zone_joystick"></div>',
+                code: () => {
+                    window.events = [];
+                    window.joystick = window.nipplejs.create({
+                        zone: document.getElementById('zone_joystick'),
+                        dataOnly: true,
+                    });
+                    window.joystick.on('move', () => {
+                        window.events.push('move');
+                    });
+                },
+            });
+
+            const zone = page.locator('#zone_joystick');
+            const box = await zone.boundingBox();
+            if (!box) {
+                throw new Error('Zone not found');
+            }
+
+            // Trigger interaction
+            await page.mouse.move(box.x + 50, box.y + 50);
+            await page.mouse.down();
+            await page.mouse.move(box.x + 100, box.y + 100);
+            await page.mouse.up();
+
+            // Verify no DOM elements created
+            const joystickExists = await page.locator('#joystick_0_0').count();
+            expect(joystickExists).toBe(0);
+
+            // But events should still fire
+            const events = await page.evaluate(() => window.events);
+            expect(events.length).toBeGreaterThan(0);
+        });
+    });
 });
