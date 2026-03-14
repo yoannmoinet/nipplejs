@@ -168,7 +168,7 @@ export class Joystick extends Super {
             return;
         }
 
-        this.pressureInterval = setInterval(() => {
+        this.pressureInterval = window.setInterval(() => {
             this.pressure = u.getPressureFromEvt(evt);
         }, 100);
     }
@@ -231,7 +231,7 @@ export class Joystick extends Super {
             this.ui.el.style.opacity = '1';
         });
 
-        this.showTimeout = setTimeout(() => {
+        this.showTimeout = window.setTimeout(() => {
             this.showTimeout = undefined;
             this.trigger('shown', this);
             if (typeof cb === 'function') {
@@ -273,7 +273,7 @@ export class Joystick extends Super {
         // Create a timeout to trigger an event after the fadeTime.
         // And destroy it if it's a dynamic Joystick.
         clearTimeout(this.removeTimeout);
-        this.removeTimeout = setTimeout(() => {
+        this.removeTimeout = window.setTimeout(() => {
             this.removeTimeout = undefined;
             // If dynamic, we'll completely hide the Joystick (display: none).
             this.ui.el.style.display = this.options.mode === MODES.dynamic ? 'none' : 'block';
@@ -310,7 +310,7 @@ export class Joystick extends Super {
             u.extend(this.ui.front.style, transitStyle);
 
             clearTimeout(this.activeTimeout);
-            this.activeTimeout = setTimeout(() => {
+            this.activeTimeout = window.setTimeout(() => {
                 this.activeTimeout = undefined;
                 if (typeof cb === 'function') {
                     cb.call(this);
@@ -331,7 +331,7 @@ export class Joystick extends Super {
         this.setTransition(true);
 
         clearTimeout(this.restTimeout);
-        this.restTimeout = setTimeout(() => {
+        this.restTimeout = window.setTimeout(() => {
             this.restTimeout = undefined;
             if (typeof cb === 'function') {
                 cb.call(this);

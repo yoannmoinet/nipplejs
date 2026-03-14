@@ -8,8 +8,13 @@ import modulePackage from 'module';
 import path from 'path';
 import dts from 'rollup-plugin-dts';
 import esbuild from 'rollup-plugin-esbuild';
+import { fileURLToPath } from 'url';
 
 import packageJson from './package.json' with { type: 'json' };
+
+// ES module equivalent of __dirname
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 /**
  * @param {import('rollup').RollupOptions} config
@@ -48,8 +53,15 @@ const getOutput = (overrides = {}) => {
         {
             name: 'copy',
             writeBundle() {
-                // Ensure the destination directory exists
+                // Only copy if source directory exists and is not already the destination
                 const destDir = path.resolve(__dirname, 'e2e/public');
+
+                // Skip if source doesn't exist or is the same as dest
+                if (!fs.existsSync(dir) || path.resolve(dir) === destDir) {
+                    return;
+                }
+
+                // Ensure the destination directory exists
                 if (!fs.existsSync(destDir)) {
                     fs.mkdirSync(destDir, { recursive: true });
                 }

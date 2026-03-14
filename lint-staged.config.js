@@ -1,6 +1,6 @@
 module.exports = {
     '*.{ts,tsx}': (filenames) => [
-        'yarn typecheck:all',
+        'yarn typecheck',
         `eslint ${filenames.join(' ')} --quiet --fix`,
         'git add',
     ],

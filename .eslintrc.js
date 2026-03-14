@@ -206,7 +206,7 @@ module.exports = {
                 allowAfterThis: true,
                 allowAfterSuper: false,
                 enforceInMethodNames: false,
-                allow: ['_handlers_', '_domHandlers_', '_found_'],
+                allow: ['_handlers_', '_domHandlers_', '_found_', '__filename', '__dirname'],
             },
         ],
         'no-unneeded-ternary': [
