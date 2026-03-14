@@ -178,12 +178,13 @@ describe('Codepen Demo Page', () => {
         await expect(frontElement).not.toBeVisible();
     });
 
-    test.skip('respects lock axis options', async ({ page, locateJoystick }) => {
-        // Enable lock X
+    test('respects lock axis options', async ({ page }) => {
+        // Destroy existing collections and clean up any leftover DOM
         await page.evaluate(() => {
-            window.joystick.destroy();
-            window.joystick = window.nipplejs.create({
-                zone: document.getElementById('zone_joystick'),
+            window.nipplejs.factory.destroy();
+            document.querySelectorAll('.joystick').forEach((el) => el.remove());
+            window.nipplejs.create({
+                zone: document.querySelector('.zone.active') as HTMLElement,
                 lockX: true,
             });
         });
@@ -197,17 +198,22 @@ describe('Codepen Demo Page', () => {
         await page.mouse.move(box.x + 50, box.y + 50);
         await page.mouse.down();
 
-        // Move diagonally, should only move horizontally
-        await page.mouse.move(box.x + 100, box.y + 100);
-        const frontElement = locateJoystick(0, 0).front;
-        const transform = await frontElement.evaluate((el) => {
-            const style = window.getComputedStyle(el);
+        // Move diagonally — lockX freezes Y so only horizontal movement
+        await page.mouse.move(box.x + 100, box.y + 100, { steps: 5 });
+
+        const transform = await page.evaluate(() => {
+            const front = document.querySelector('.zone.active .joystick .front') as HTMLElement;
+            if (!front) {
+                return null;
+            }
+            const style = window.getComputedStyle(front);
             const matrix = new DOMMatrixReadOnly(style.transform);
             return { x: matrix.m41, y: matrix.m42 };
         });
 
+        expect(transform).not.toBeNull();
         // Y position should not change when locked on X
-        expect(transform.y).toBe(0);
+        expect(transform!.y).toBe(0);
         await page.mouse.up();
     });
 });
