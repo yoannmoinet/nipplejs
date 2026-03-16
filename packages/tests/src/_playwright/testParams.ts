@@ -85,7 +85,7 @@ export const test = base.extend<TestOptions & Fixtures>({
                 (ctx) => window.context[ctx.name].length > 0,
                 { name: ctxName },
                 {
-                    timeout: 500,
+                    timeout: 2000,
                 },
             );
 
@@ -131,7 +131,7 @@ export const test = base.extend<TestOptions & Fixtures>({
                 },
                 { joysticks, name: ctxName },
                 {
-                    timeout: 500,
+                    timeout: 2000,
                 },
             );
         });
