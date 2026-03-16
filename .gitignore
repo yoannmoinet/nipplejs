@@ -10,5 +10,4 @@ yarn-error.log
 node_modules/
 dist/
 packages/nipplejs/e2e/public/
-.aider*
-!.aider.conf.yml
+.claude/
