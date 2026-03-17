@@ -363,15 +363,7 @@ export default [
             ],
             'arca/import-ordering': ['error', { sections: ['^\\.\\./', '^\\./'] }],
             'arca/newline-after-import-section': ['error', { sections: ['^\\.\\./', '^\\./'] }],
-            'prettier/prettier': [
-                'error',
-                {},
-                {
-                    fileInfoOptions: {
-                        ignorePath: '.eslintignore',
-                    },
-                },
-            ],
+            'prettier/prettier': ['error'],
         },
     },
     // TypeScript files.

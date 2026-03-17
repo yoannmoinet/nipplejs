@@ -19,7 +19,7 @@
     -   [`options.threshold` defaults to 0.1](#optionsthreshold-defaults-to-01)
     -   [`options.fadeTime` defaults to 250](#optionsfadetime-defaults-to-250)
     -   [`options.multitouch` defaults to false](#optionsmultitouch-defaults-to-false)
-    -   [`options.maxNumberOfNipples` defaults to 1](#optionsmaxnumberofnipples-defaults-to-1)
+    -   [`options.maxNumberOfJoysticks` defaults to 1](#optionsmaxnumberofjoysticks-defaults-to-1)
     -   [`options.dataOnly` defaults to false](#optionsdataonly-defaults-to-false)
     -   [`options.position` defaults to `{top: 0, left: 0}`](#optionsposition-defaults-to-top-0-left-0)
     -   [`options.mode` defaults to 'dynamic'.](#optionsmode-defaults-to-dynamic)
@@ -35,18 +35,13 @@
     -   [NippleJS instance (manager)](#nipplejs-instance-manager)
     -   [nipple instance (joystick)](#nipple-instance-joystick)
     -   [`joystick.on`, `joystick.off`](#joystickon-joystickoff)
-    -   [`joystick.el`](#joystickel)
-    -   [`joystick.show([cb])`](#joystickshowcb)
-    -   [`joystick.hide([cb])`](#joystickhidecb)
-    -   [`joystick.add()`](#joystickadd)
-    -   [`joystick.remove()`](#joystickremove)
+    -   [`joystick.ui`](#joystickui)
     -   [`joystick.destroy()`](#joystickdestroy)
     -   [`joystick.setPosition(cb, { x, y })`](#joysticksetpositioncb-x-y-)
     -   [`joystick.identifier`](#joystickidentifier)
     -   [`joystick.trigger(type [, data])`](#joysticktriggertype-data)
     -   [`joystick.position`](#joystickposition)
     -   [`joystick.frontPosition`](#joystickfrontposition)
-    -   [`joystick.ui`](#joystickui)
 -   [Events](#events)
     -   [manager only](#manager-only)
     -   [manager and joysticks](#manager-and-joysticks)
@@ -114,7 +109,7 @@ var options = {
     threshold: Float,               // before triggering a directional event
     fadeTime: Integer,              // transition time
     multitouch: Boolean,
-    maxNumberOfNipples: Number,     // when multitouch, what is too many?
+    maxNumberOfJoysticks: Number,   // when multitouch, what is too many?
     dataOnly: Boolean,              // no dom element whatsoever
     position: Object,               // preset position for 'static' mode
     mode: String,                   // 'dynamic', 'static' or 'semi'
@@ -179,7 +174,7 @@ Otherwise, it will only get one, and all new touches won't do a thing.
 
 Please note that multitouch is off when in `static` or `semi` modes.
 
-### `options.maxNumberOfNipples` defaults to 1
+### `options.maxNumberOfJoysticks` defaults to 1
 If you need to, you can also control the maximum number of instances that could be created.
 
 Obviously in a multitouch configuration.
@@ -287,14 +282,13 @@ Your manager has the following signature :
 {
     on: Function,                       // handle internal event
     off: Function,                      // un-handle internal event
-    get: Function,                      // get a specific joystick
     destroy: Function,                  // destroy everything
-    ids: Array                          // array of assigned ids
-    id: Number                          // id of the manager
+    uid: Number,                        // unique id of the manager
+    all: Map,                           // map of all joysticks by uid
     options: {
         zone: Element,                  // reactive zone
         multitouch: Boolean,
-        maxNumberOfNipples: Number,
+        maxNumberOfJoysticks: Number,
         mode: String,
         position: Object,
         catchDistance: Number,
@@ -334,30 +328,17 @@ If you call off without arguments, all handlers will be removed.
 
 If you don't specify the handler but just a type, all handlers for that type will be removed.
 
-#### `manager.get(identifier)`
-
-A helper to get an instance via its identifier.
-
-```javascript
-// Will return the nipple instantiated by the touch identified by 0
-manager.get(0);
-```
-
 #### `manager.destroy()`
 
-Gently remove all nipples from the DOM and unbind all events.
+Gently remove all joysticks from the DOM and unbind all events.
 
 ```javascript
 manager.destroy();
 ```
 
-#### `manager.ids`
+#### `manager.uid`
 
-The array of nipples' ids under this manager.
-
-#### `manager.id`
-
-The incremented id of this manager.
+The unique id of this manager.
 
 ### nipple instance (joystick)
 
@@ -367,11 +348,6 @@ Each joystick has the following signature :
 {
     on: Function,
     off: Function,
-    el: Element,
-    show: Function,         // fade-in
-    hide: Function,         // fade-out
-    add: Function,          // inject into dom
-    remove: Function,       // remove from dom
     destroy: Function,
     setPosition: Function,
     identifier: Number,
@@ -385,9 +361,9 @@ Each joystick has the following signature :
         y: Number
     },
     ui: {
-        el: Element,
-        front: Element,
-        back: Element
+        el: Element,        // the joystick container element
+        front: Element,     // the inner (movable) part
+        back: Element       // the outer (static) part
     },
     options: {
         color: String,
@@ -402,40 +378,21 @@ Each joystick has the following signature :
 
 The same as the manager.
 
-### `joystick.el`
+### `joystick.ui`
 
-Dom element in which the joystick gets created.
+The object that stores the joystick's DOM elements.
 
-```html
-<div class="nipple">
-    <div class="front"></div>
-    <div class="back"></div>
-</div>
+```javascript
+{
+    el: Element,    // <div class="joystick"> — the container
+    back: Element,  // <div class="back"> — the outer circle
+    front: Element  // <div class="front"> — the inner circle
+}
 ```
-
-### `joystick.show([cb])`
-
-Will show the joystick at the last known place.
-
-You can pass a callback that will be executed at the end of the fade-in animation.
-
-### `joystick.hide([cb])`
-
-Will fade-out the joystick.
-
-You can pass a callback that will be executed at the end of the fade-out animation.
-
-### `joystick.add()`
-
-Add the joystick's element to the dom.
-
-### `joystick.remove()`
-
-Remove the joystick's element from the dom.
 
 ### `joystick.destroy()`
 
-Gently remove this nipple from the DOM and unbind all related events.
+Gently remove this joystick from the DOM and unbind all related events.
 
 ### `joystick.setPosition(cb, { x, y })`
 
@@ -459,19 +416,7 @@ The absolute position of the center of the joystick.
 
 ### `joystick.frontPosition`
 
-The absolute position of the back part of the joystick's ui.
-
-### `joystick.ui`
-
-The object that store its ui elements
-
-```html
-{
-    el: <div class="nipple"></div>
-    back: <div class="back"></div>
-    front: <div class="front"></div>
-}
-```
+The absolute position of the front part of the joystick's ui.
 
 ----
 

@@ -126,6 +126,11 @@ export const unbindEvt = (
     }
 };
 
+/**
+ * Extract pressure/force value from a processed event.
+ * Handles Touch (force), Pointer (pressure), Safari trackpad (webkitForce),
+ * and falls back to binary mouse-button detection.
+ */
 export const getPressureFromEvt = (evt: ProcessedEvent): number => {
     // Compute the pressure data.
     return 'force' in evt // Pressure on Touch.
@@ -141,6 +146,10 @@ export const getPressureFromEvt = (evt: ProcessedEvent): number => {
               : 0;
 };
 
+/**
+ * Normalize a single interaction event (touch, pointer, or mouse) into
+ * a unified DomEvent with identifier, position, pressure, and type.
+ */
 export const processEvent = (evt: SupportedEvent, processedEvt: ProcessedEvent): DomEvent => {
     // Compute identifier of the event.
     // It's especially important for touches,
@@ -174,8 +183,11 @@ export const processEvent = (evt: SupportedEvent, processedEvt: ProcessedEvent):
     };
 };
 
-// Reconciliation layer for MouseEvent, TouchEvent and PointerEvent.
-// It will ease the process later down the line.
+/**
+ * Reconciliation layer for MouseEvent, TouchEvent and PointerEvent.
+ * Splits multi-touch events into individual DomEvent items and calls
+ * preventDefault() to suppress default browser gestures.
+ */
 export const processEvents = (evt: SupportedEvent): DomEvent[] => {
     // Prevent the browser default action.
     evt.preventDefault();

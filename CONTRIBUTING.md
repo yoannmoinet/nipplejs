@@ -14,9 +14,8 @@ We follow a **4 spaces** rule around here.
 ### Workflow
 You can use the available scripts if needed.
 
-- `npm start` will start the webpack server on [`localhost:9000`](http://localhost:9000) and build the library.
-    - You can navigate examples if needed:
-        - [./example/codepen-demo.html](http://localhost:9000/example/codepen-demo.html)
-        - [./example/dual-joysticks.html](http://localhost:9000/example/dual-joysticks.html)
-        - [./example/lock-axes.html](http://localhost:9000/example/lock-axes.html)
-- `npm test` will test using CasperJS, you have to run `npm start` in another window to have a local server available to CasperJS. You need to install CasperJS and PhantomJS globally for it to run `npm install -g casperjs phantomjs`
+- `yarn dev` will start the dev server and build the library in watch mode.
+- `yarn build` will build the library.
+- `yarn lint` will lint the code using ESLint.
+- `yarn test:e2e` will run end-to-end tests using Playwright.
+- `yarn test:unit` will run unit tests.

@@ -5,7 +5,15 @@ import { MODES } from './constants';
 import type { CollectionOptions, DomEvent, Identifier, Uid } from './types';
 import * as u from './utils';
 
+/**
+ * Singleton that manages all joystick Collections.
+ *
+ * Responsible for creating/destroying collections, tracking joysticks across
+ * collections, and binding document-level move/end events so that interactions
+ * that leave a collection's zone are still handled.
+ */
 export class Factory extends Super {
+    /** Current window scroll position, kept in sync via a scroll listener. */
     scroll: { x: number; y: number } = u.getScroll();
     private binded: boolean = false;
     private joysticksByUid: Map<Uid, Joystick> = new Map();
@@ -255,7 +263,6 @@ export class Factory extends Super {
     }
 
     private handleEventInCollection(evt: DomEvent, cb: (coll: Collection) => void) {
-        console.log('Handle dom event from factory', evt.type);
         const joystick = this.joysticksByIdentifier.get(evt.identifier);
 
         // If the event doesn't have any joystick, we don't call any.

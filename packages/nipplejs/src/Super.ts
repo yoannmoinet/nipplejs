@@ -18,6 +18,13 @@ import * as u from './utils';
 export type SuperEventType<T extends FactoryEventType> = `${T}${string}` | `${string}${T}`;
 export type Name = 'super' | 'joystick' | 'collection' | 'factory';
 
+/**
+ * Base class providing the event system and DOM event binding used by
+ * Joystick, Collection, and Factory.
+ *
+ * Events are strings that can be space/comma separated to listen to multiple
+ * at once (e.g. `"start end"`). Handlers are stored in a `Set` per event type.
+ */
 export class Super {
     uid: Uid = 0 as Uid;
     index: number = 0;
@@ -138,7 +145,6 @@ export class Super {
 
     // Bind DOM events.
     bindEvt(el: SupportedElement, type: EventType, handler: DomEventHandler) {
-        console.log('bind event', this.name, type, el);
         const cb = (evt: SupportedEvent) => {
             for (const domEvt of u.processEvents(evt)) {
                 this.log(`- "${type}" [dom:trigger:${domEvt.identifier}]`);

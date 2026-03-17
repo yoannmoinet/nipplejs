@@ -12,6 +12,13 @@ import type {
 } from './types';
 import * as u from './utils';
 
+/**
+ * A single virtual joystick element.
+ *
+ * Manages its own DOM (outer circle + inner thumb), position tracking,
+ * direction computation, and fade-in/fade-out lifecycle. Created and
+ * owned by a Collection.
+ */
 export class Joystick extends Super {
     static index: number = 0;
     private _identifier?: Identifier;
