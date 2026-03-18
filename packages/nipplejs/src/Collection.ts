@@ -71,6 +71,10 @@ export class Collection extends Super {
      * */
     box: DOMRect;
     /**
+     *  ResizeObserver watching the zone element for automatic repositioning.
+     * */
+    private resizeObserver?: ResizeObserver;
+    /**
      *  The default options of a Collection.
      * */
     defaults: Required<CollectionOptions> = {
@@ -130,6 +134,14 @@ export class Collection extends Super {
             // @ts-expect-error - msTouchAction is not a known type
             msTouchAction: 'none',
         });
+
+        // Automatically reposition when the zone element resizes.
+        if (typeof ResizeObserver !== 'undefined') {
+            this.resizeObserver = new ResizeObserver(() => {
+                this.reposition();
+            });
+            this.resizeObserver.observe(this.options.zone);
+        }
     }
 
     init() {
@@ -436,14 +448,9 @@ export class Collection extends Super {
         // return;
         // }
 
-        // If we're on a dynamic page, we need to refresh the joystick's position constantly.
-        // Pretty memory intensive.
+        // If we're on a dynamic page, we need to refresh positions constantly.
         if (this.options.dynamicPage) {
-            const elBox = joystick.ui.el.getBoundingClientRect();
-            joystick.position = {
-                x: scroll.x + elBox.left,
-                y: scroll.y + elBox.top,
-            };
+            this.reposition();
         }
 
         const size = joystick.options.size / 2;
@@ -567,7 +574,35 @@ export class Collection extends Super {
         joystick.end();
     }
 
+    /**
+     * Recalculate the zone bounding box and all joystick positions.
+     * Call this after the zone element has been moved, resized, or
+     * when its layout has changed (e.g. entering fullscreen).
+     * This is a lighter alternative to `dynamicPage: true` which
+     * recalculates on every move event.
+     */
+    reposition() {
+        // Refresh scroll position in case layout context changed (e.g. fullscreen)
+        this.factory.scroll = u.getScroll();
+        this.box = this.options.zone.getBoundingClientRect();
+        const scroll = this.factory.scroll;
+        this.all.forEach((joystick) => {
+            if (joystick.options.dataOnly) {
+                return;
+            }
+            const elBox = joystick.ui.el.getBoundingClientRect();
+            joystick.position = {
+                x: scroll.x + elBox.left,
+                y: scroll.y + elBox.top,
+            };
+        });
+    }
+
     destroy() {
+        if (this.resizeObserver) {
+            this.resizeObserver.disconnect();
+            this.resizeObserver = undefined;
+        }
         this.unbindEvt(this.options.zone, 'start', this.processOnStart);
         // Destroy all joysticks.
         this.all.forEach((joystick) => {

@@ -27,21 +27,14 @@ export class Factory extends Super {
         this.trigger('factoryCreated', this);
     }
 
-    // Listen for resize, to reposition every joysticks
+    // Listen for resize, to reposition every joystick
     private bindResize() {
-        const resizeHandler = () => {
-            this.collections.forEach((collection) => {
-                collection.all.forEach((joystick) => {
-                    const pos = joystick.ui.el.getBoundingClientRect();
-                    joystick.position = {
-                        x: this.scroll.x + pos.left,
-                        y: this.scroll.y + pos.top,
-                    };
+        u.bindEvt(window, 'resize', () => {
+            u.throttle(() => {
+                this.collections.forEach((collection) => {
+                    collection.reposition();
                 });
             });
-        };
-        u.bindEvt(window, 'resize', () => {
-            u.throttle(resizeHandler);
         });
     }
 
