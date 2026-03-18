@@ -1,9 +1,112 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import JoystickDemo from '../components/JoystickDemo.astro';
+
+const base = import.meta.env.BASE_URL;
+
+const games = [
+  {
+    name: 'Fog Explorer',
+    slug: 'fog-explorer',
+    description: 'Navigate through fog to discover hidden orbs.',
+    highlights: ['mode'],
+    badges: ["mode: 'static'"],
+  },
+  {
+    name: 'Asteroid Dodge',
+    slug: 'asteroid-dodge',
+    description: 'Dodge falling asteroids with horizontal-only movement.',
+    highlights: ['lockX'],
+    badges: ["lockX: true"],
+  },
+  {
+    name: 'Dual-Stick Arena',
+    slug: 'dual-stick-arena',
+    description: 'Move and shoot with two joysticks.',
+    highlights: ['multitouch'],
+    badges: ["multitouch: true"],
+  },
+  {
+    name: 'Endless Chase',
+    slug: 'endless-chase',
+    description: 'Flee a relentless pursuer — your joystick follows your thumb.',
+    highlights: ['follow'],
+    badges: ["follow: true"],
+  },
+  {
+    name: 'Space Drift',
+    slug: 'space-drift',
+    description: 'Set your heading and drift through space.',
+    highlights: ['restJoystick'],
+    badges: ["restJoystick: false"],
+  },
+];
 ---
 <BaseLayout title="NippleJS — Virtual Joystick">
-  <main class="max-w-4xl mx-auto px-6 py-20">
-    <h1 class="text-heading text-5xl font-extrabold tracking-tight">NippleJS</h1>
-    <p class="text-muted mt-4 font-mono text-sm">// scaffold working</p>
+  <main class="max-w-5xl mx-auto px-6">
+
+    <!-- Hero -->
+    <section class="text-center py-28">
+      <h1 class="text-5xl sm:text-6xl md:text-7xl font-extrabold tracking-tight leading-tight">
+        <span class="block bg-gradient-to-r from-accent-indigo to-accent-cyan bg-clip-text text-transparent" style="-webkit-background-clip: text; -webkit-text-fill-color: transparent;">Virtual joysticks</span>
+        <span class="block bg-gradient-to-r from-accent-indigo to-accent-cyan bg-clip-text text-transparent" style="-webkit-background-clip: text; -webkit-text-fill-color: transparent;">for the modern web</span>
+      </h1>
+      <p class="mt-6 font-mono text-sm text-muted">
+        // zero deps &middot; typescript &middot; touch &amp; mouse
+      </p>
+      <div class="mt-10 flex items-center justify-center gap-4 flex-wrap">
+        <a
+          href={`${base}getting-started`}
+          class="inline-flex items-center px-6 py-3 rounded-full bg-gradient-to-r from-accent-indigo to-accent-cyan text-white font-semibold text-sm shadow-[0_0_24px_rgba(99,102,241,0.4)] hover:shadow-[0_0_32px_rgba(99,102,241,0.6)] transition-shadow"
+        >
+          Get Started &rarr;
+        </a>
+        <span class="glass inline-flex items-center px-5 py-3 rounded-full font-mono text-sm text-muted border border-border">
+          npm i nipplejs
+        </span>
+      </div>
+    </section>
+
+    <!-- Stats -->
+    <section class="flex flex-col sm:flex-row gap-4 justify-center mb-24">
+      <div class="glass flex-1 p-6 text-center">
+        <div class="flex items-center justify-center gap-2">
+          <span class="w-1.5 h-1.5 rounded-full bg-accent-indigo shadow-[0_0_8px_rgba(129,140,248,0.8)]"></span>
+          <span class="font-mono text-4xl font-bold text-heading" style="text-shadow: 0 0 20px rgba(129,140,248,0.6);">3</span>
+        </div>
+        <p class="mt-2 text-xs uppercase tracking-widest text-muted">Modes</p>
+      </div>
+      <div class="glass flex-1 p-6 text-center">
+        <div class="flex items-center justify-center gap-2">
+          <span class="w-1.5 h-1.5 rounded-full bg-accent-cyan shadow-[0_0_8px_rgba(56,189,248,0.8)]"></span>
+          <span class="font-mono text-4xl font-bold text-heading" style="text-shadow: 0 0 20px rgba(56,189,248,0.6);">0</span>
+        </div>
+        <p class="mt-2 text-xs uppercase tracking-widest text-muted">Dependencies</p>
+      </div>
+      <div class="glass flex-1 p-6 text-center">
+        <div class="flex items-center justify-center gap-2">
+          <span class="w-1.5 h-1.5 rounded-full bg-accent-purple shadow-[0_0_8px_rgba(167,139,250,0.8)]"></span>
+          <span class="font-mono text-4xl font-bold text-heading" style="text-shadow: 0 0 20px rgba(167,139,250,0.6);">TS</span>
+        </div>
+        <p class="mt-2 text-xs uppercase tracking-widest text-muted">Native</p>
+      </div>
+    </section>
+
+    <!-- Games Showcase -->
+    <section class="space-y-16 pb-24">
+      {games.map((game) => (
+        <div>
+          <h3 class="text-heading text-2xl font-bold mb-2">{game.name}</h3>
+          <p class="text-body mb-3">{game.description}</p>
+          <div class="flex flex-wrap gap-2 mb-4">
+            {game.badges.map((badge) => (
+              <span class="glass px-3 py-1 text-xs font-mono text-muted">{badge}</span>
+            ))}
+          </div>
+          <JoystickDemo game={game.slug} highlight={game.highlights} />
+        </div>
+      ))}
+    </section>
+
   </main>
 </BaseLayout>
