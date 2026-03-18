@@ -122,6 +122,16 @@ export class Collection extends Super {
             this.parentIsFlex = true;
         }
 
+        // Warn if the zone has no CSS positioning set.
+        const zonePosition = getComputedStyle(this.options.zone).position;
+        if (zonePosition === 'static') {
+            this.warn(
+                'The zone element has no CSS "position" set (it is "static").',
+                'Joysticks may not be positioned correctly.',
+                'Set "position: relative" (or absolute/fixed) on the zone element.',
+            );
+        }
+
         // Compute the bounding box of the zone.
         this.box = this.options.zone.getBoundingClientRect();
 
