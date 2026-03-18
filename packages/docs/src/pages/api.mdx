@@ -20,12 +20,12 @@ Subscribe to events. Supports space-separated event types to bind multiple at on
 ```javascript
 const manager = nipplejs.create(options);
 
-manager.on('start', (evt, data) => {
-    console.log('Joystick activated');
+manager.on('start', (evt) => {
+    console.log('Joystick activated', evt.data.uid);
 });
 
 // Multiple events at once
-manager.on('start end', (evt, data) => {
+manager.on('start end', (evt) => {
     console.log(evt.type);
 });
 ```
@@ -61,6 +61,16 @@ Retrieve a joystick by its unique ID. If no `uid` is provided, returns the first
 const joystick = manager.getJoystickByUid(0);
 ```
 
+#### `reposition()`
+
+Recalculate the zone bounding box and all joystick positions. Call this after the zone element has been moved or when its layout has changed (e.g. entering fullscreen).
+
+The zone is automatically watched with a `ResizeObserver`, so `reposition()` is only needed for position changes that don't involve a resize.
+
+```javascript
+manager.reposition();
+```
+
 ### Properties
 
 | Property | Type | Description |
@@ -74,8 +84,8 @@ const joystick = manager.getJoystickByUid(0);
 Individual joystick instances are accessed through events or via `collection.all`.
 
 ```javascript
-manager.on('move', (evt, data) => {
-    const joystick = data.instance;
+manager.on('move', (evt) => {
+    const joystick = evt.data.instance;
     console.log(joystick.uid, joystick.frontPosition);
 });
 
@@ -158,3 +168,19 @@ const joystick = nipplejs.factory.getJoystickByIdentifier(identifier);
 ```
 
 > **Note:** The factory is intended for advanced use cases such as coordinating multiple independent collections (e.g. separate zones for movement and aiming). For most applications, working directly with the collection returned by `nipplejs.create()` is sufficient.
+
+## Logging
+
+Control the library's console output via `setLogLevel`.
+
+```javascript
+import nipplejs from 'nipplejs';
+
+nipplejs.setLogLevel('debug');   // all logs (verbose)
+nipplejs.setLogLevel('info');    // info, warnings, errors
+nipplejs.setLogLevel('warning'); // warnings and errors (default)
+nipplejs.setLogLevel('error');   // errors only
+nipplejs.setLogLevel('none');    // silent
+
+nipplejs.getLogLevel(); // returns current level
+```

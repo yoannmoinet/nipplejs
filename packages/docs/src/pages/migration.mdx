@@ -156,3 +156,43 @@ manager.all.forEach((joystick, uid) => {
     console.log(uid, joystick);
 });
 ```
+
+### `move` event now fires continuously
+
+In v0, the `move` event only fired when the joystick's direction changed. In v1, it fires on **every** pointer/touch move event while the joystick is active, giving smooth, continuous input data.
+
+**Before (v0)** — `move` fired sporadically (only on direction changes).
+
+**After (v1)** — `move` fires at the browser's pointer event rate (~60Hz), regardless of direction changes. Directional events (`dir`, `plain`) still only fire on direction transitions.
+
+### Event handler signature
+
+Event handlers now receive a single `evt` argument. Access data via `evt.data`.
+
+**Before (v0)**
+
+```javascript
+manager.on('move', function (evt, data) {
+    console.log(data.vector);
+});
+```
+
+**After (v1)**
+
+```javascript
+manager.on('move', function (evt) {
+    console.log(evt.data.vector);
+});
+```
+
+### New: `reposition()` and automatic `ResizeObserver`
+
+Collections now automatically watch their zone element with a `ResizeObserver`. For manual repositioning after layout changes that don't involve a resize, use `manager.reposition()`.
+
+### New: `setLogLevel()` / `getLogLevel()`
+
+Control library console output. Default level is `'warning'`.
+
+```javascript
+nipplejs.setLogLevel('debug'); // see all internal logs
+```

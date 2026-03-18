@@ -67,8 +67,8 @@ const manager = nipplejs.create({
     position: { left: '50%', top: '50%' },
 });
 
-manager.on('move', (evt, data) => {
-    console.log(data.vector);
+manager.on('move', (evt) => {
+    console.log(evt.data.vector);
 });
 ```
 

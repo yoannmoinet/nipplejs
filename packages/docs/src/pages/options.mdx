@@ -192,9 +192,9 @@ When `true`, the joystick base follows the user's thumb when the touch moves bey
 | **Type** | `boolean` |
 | **Default** | `false` |
 
-Enable this when your page has dynamically visible elements (e.g. elements toggled by Vue, React, Angular, or CSS). It forces a recalculation of the joystick position on every move event.
+Enable this when your page has dynamically visible elements (e.g. elements toggled by Vue, React, Angular, or CSS) that shift the zone's position without resizing it. It forces a recalculation of the joystick position on every move event.
 
-This has a notable performance cost, so only enable it when necessary.
+This has a notable performance cost. In most cases you won't need it — the zone is automatically watched with a `ResizeObserver` that handles size changes. For one-off layout changes (e.g. entering fullscreen), call `manager.reposition()` instead.
 
 ## dataOnly
 

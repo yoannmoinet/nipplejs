@@ -283,6 +283,7 @@ Your manager has the following signature :
     on: Function,                       // handle internal event
     off: Function,                      // un-handle internal event
     destroy: Function,                  // destroy everything
+    reposition: Function,               // recalculate joystick positions
     uid: Number,                        // unique id of the manager
     all: Map,                           // map of all joysticks by uid
     options: {
@@ -308,8 +309,8 @@ Your manager has the following signature :
 If you wish to listen to internal events like :
 
 ```javascript
-manager.on('event#1 event#2', function (evt, data) {
-    // Do something.
+manager.on('event#1 event#2', function (evt) {
+    // evt.type, evt.data
 });
 ```
 
@@ -339,6 +340,30 @@ manager.destroy();
 #### `manager.uid`
 
 The unique id of this manager.
+
+#### `manager.reposition()`
+
+Recalculate the zone bounding box and all joystick positions. Call this after the zone element has been moved, resized, or when its layout has changed (e.g. entering fullscreen).
+
+Note: the zone is automatically watched with a `ResizeObserver`, so you only need to call this manually for position changes that don't involve a resize.
+
+```javascript
+manager.reposition();
+```
+
+### Logging
+
+Control the library's console output.
+
+```javascript
+nipplejs.setLogLevel('debug');   // all logs
+nipplejs.setLogLevel('info');    // info, warnings, errors
+nipplejs.setLogLevel('warning'); // warnings and errors (default)
+nipplejs.setLogLevel('error');   // errors only
+nipplejs.setLogLevel('none');    // silent
+
+nipplejs.getLogLevel(); // returns current level
+```
 
 ### nipple instance (joystick)
 
