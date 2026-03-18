@@ -1,0 +1,158 @@
+---
+layout: ../layouts/DocsLayout.astro
+title: Migration Guide
+---
+
+# Migration Guide
+
+## v0 → v1
+
+nipplejs v1 includes several breaking changes to improve naming consistency and simplify the API. This guide covers every breaking change with before/after code comparisons.
+
+### `maxNumberOfNipples` → `maxNumberOfJoysticks`
+
+The option was renamed to align with the updated terminology.
+
+**Before (v0)**
+
+```javascript
+const manager = nipplejs.create({
+    maxNumberOfNipples: 5,
+});
+```
+
+**After (v1)**
+
+```javascript
+const manager = nipplejs.create({
+    maxNumberOfJoysticks: 5,
+});
+```
+
+### `destroyed` event → `joystickDestroyed`
+
+The event name was made more specific to avoid ambiguity with collection and factory destruction events.
+
+**Before (v0)**
+
+```javascript
+manager.on('destroyed', (evt, data) => {
+    console.log('A joystick was destroyed');
+});
+```
+
+**After (v1)**
+
+```javascript
+manager.on('joystickDestroyed', (evt, data) => {
+    console.log('A joystick was destroyed');
+});
+```
+
+### `joystick.el` → `joystick.ui.el`
+
+DOM element references are now grouped under the `ui` property, alongside `ui.front` (thumb) and `ui.back` (outer circle).
+
+**Before (v0)**
+
+```javascript
+manager.on('added', (evt, joystick) => {
+    joystick.el.style.background = 'red';
+});
+```
+
+**After (v1)**
+
+```javascript
+manager.on('added', (evt, joystick) => {
+    joystick.ui.el.style.background = 'red';
+});
+```
+
+### `show()`, `hide()`, `add()`, `remove()` methods removed
+
+These methods have been removed. Joystick visibility and lifecycle are now managed entirely through the mode system (`dynamic`, `semi`, `static`) and the `destroy()` method.
+
+**Before (v0)**
+
+```javascript
+joystick.show();
+joystick.hide();
+manager.add();
+manager.remove();
+```
+
+**After (v1)**
+
+```javascript
+// Visibility is controlled by mode and fade transitions.
+// To remove a joystick, destroy it:
+joystick.destroy();
+
+// To remove all joysticks, destroy the collection:
+manager.destroy();
+```
+
+### `manager.get(id)` → `manager.getJoystickByUid(uid)`
+
+The lookup method was renamed for clarity. You can also iterate the `all` map directly.
+
+**Before (v0)**
+
+```javascript
+const joystick = manager.get(0);
+```
+
+**After (v1)**
+
+```javascript
+const joystick = manager.getJoystickByUid(0);
+
+// Or iterate all joysticks
+manager.all.forEach((joystick, uid) => {
+    console.log(uid, joystick);
+});
+```
+
+### `manager.id` → `manager.uid`
+
+The identifier property was renamed to `uid` for consistency across all layers (factory, collection, joystick).
+
+**Before (v0)**
+
+```javascript
+console.log(manager.id);
+```
+
+**After (v1)**
+
+```javascript
+console.log(manager.uid);
+```
+
+### `manager.ids` removed
+
+The `ids` array was removed. Use `manager.all` (a `Map<Uid, Joystick>`) to get joystick identifiers.
+
+**Before (v0)**
+
+```javascript
+const ids = manager.ids;
+ids.forEach((id) => {
+    const joystick = manager.get(id);
+});
+```
+
+**After (v1)**
+
+```javascript
+const uids = Array.from(manager.all.keys());
+uids.forEach((uid) => {
+    const joystick = manager.all.get(uid);
+});
+
+// Or simply iterate the map
+manager.all.forEach((joystick, uid) => {
+    console.log(uid, joystick);
+});
+```

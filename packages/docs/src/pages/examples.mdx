@@ -1,0 +1,107 @@
+---
+layout: ../layouts/DocsLayout.astro
+title: Examples
+---
+
+import JoystickDemo from '../components/JoystickDemo.astro';
+
+# Examples
+
+Interactive cookbook entries demonstrating key nipplejs features. Each game highlights a specific option or combination of options. Try them on a touch device for the best experience -- on desktop, click and drag to control the joystick.
+
+## Fog Explorer
+
+Navigate a glowing orb through a fog-covered arena and collect pulsing orbs to score points. The fog lifts only around the player, forcing exploration by feel.
+
+This demo uses a **static** joystick centered in the zone, which is ideal for single-stick games where the control should always be visible.
+
+<JoystickDemo game="fog-explorer" highlight={['mode']} />
+
+```javascript
+const manager = nipplejs.create({
+    zone: document.getElementById('zone'),
+    mode: 'static',
+    position: { left: '50%', top: '50%' },
+    color: 'rgba(99,102,241,0.5)',
+});
+```
+
+## Asteroid Dodge
+
+Pilot a ship left and right to dodge falling asteroids. The difficulty ramps up over time with faster and more frequent obstacles.
+
+This demo uses **lockX** to restrict the joystick to horizontal movement only, which maps naturally to a lane-dodging mechanic.
+
+<JoystickDemo game="asteroid-dodge" highlight={['lockX']} />
+
+```javascript
+const manager = nipplejs.create({
+    zone: document.getElementById('zone'),
+    mode: 'static',
+    position: { left: '50%', bottom: '15%' },
+    lockX: true,
+    color: 'rgba(56,189,248,0.5)',
+});
+```
+
+## Dual-Stick Arena
+
+Control movement with the left stick and aim/fire with the right stick. Enemies swarm in from every edge -- survive as long as you can.
+
+This demo creates **two separate collections** in split zones, which is the standard pattern for dual-stick controls. Each zone gets its own `nipplejs.create()` call with `multitouch` support.
+
+<JoystickDemo game="dual-stick-arena" highlight={['multitouch']} />
+
+```javascript
+// Left stick: movement
+const moveStick = nipplejs.create({
+    zone: document.getElementById('left-zone'),
+    mode: 'static',
+    position: { left: '20%', bottom: '20%' },
+    color: 'rgba(99,102,241,0.5)',
+});
+
+// Right stick: aim and shoot
+const aimStick = nipplejs.create({
+    zone: document.getElementById('right-zone'),
+    mode: 'static',
+    position: { left: '80%', bottom: '20%' },
+    color: 'rgba(236,72,153,0.5)',
+});
+```
+
+## Endless Chase
+
+Outrun a glowing pursuer that accelerates over time. The arena is infinite -- the camera follows the player as they fly through a star field.
+
+This demo uses **follow** mode, which lets the joystick base follow the user's thumb when they drag beyond the joystick radius. This enables unlimited directional travel without lifting and repositioning.
+
+<JoystickDemo game="endless-chase" highlight={['follow']} />
+
+```javascript
+const manager = nipplejs.create({
+    zone: document.getElementById('zone'),
+    mode: 'static',
+    position: { left: '50%', bottom: '15%' },
+    follow: true,
+    color: 'rgba(56,189,248,0.5)',
+});
+```
+
+## Space Drift
+
+Fly a drifting ship through space collecting waypoints. The ship maintains its last heading when you release the joystick, creating a momentum-like feel.
+
+This demo uses **restJoystick: false** so the joystick thumb stays at its last position instead of snapping back to center. This visual cue reinforces the "drift" mechanic -- the ship keeps moving in the last direction.
+
+<JoystickDemo game="space-drift" highlight={['restJoystick']} />
+
+```javascript
+const manager = nipplejs.create({
+    zone: document.getElementById('zone'),
+    mode: 'static',
+    position: { left: '50%', bottom: '15%' },
+    restJoystick: false,
+    color: 'rgba(167,139,250,0.5)',
+});
+```
