@@ -216,7 +216,12 @@ describe('Super', () => {
     });
 
     describe('Utility Methods', () => {
+        afterEach(() => {
+            Super.logLevel = 'warning';
+        });
+
         it('log() includes correct prefix based on name', () => {
+            Super.logLevel = 'debug';
             const instance = new Super('super');
             const consoleSpy = jest.spyOn(console, 'log').mockImplementation();
 
@@ -233,6 +238,7 @@ describe('Super', () => {
         });
 
         it('log() includes uid in suffix', () => {
+            Super.logLevel = 'debug';
             const instance = new Super('super');
             instance.uid = 5 as any;
             const consoleSpy = jest.spyOn(console, 'log').mockImplementation();

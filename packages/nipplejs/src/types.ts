@@ -3,6 +3,8 @@ import type Joystick from './Joystick';
 import type Super from './Super';
 import type { MODES } from './constants';
 
+export type LogLevel = 'debug' | 'info' | 'warning' | 'error' | 'none';
+
 // Make it unique so we can better type it.
 declare const identifierSymbol: unique symbol;
 export type Identifier = number & { [identifierSymbol]: never };

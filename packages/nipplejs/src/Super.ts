@@ -5,6 +5,7 @@ import { PRIMARY_BIND, SECONDARY_BIND } from './constants';
 import type {
     FactoryEventType,
     EventType,
+    LogLevel,
     SupportedElement,
     InternalEventHandler,
     JoystickEventData,
@@ -17,6 +18,16 @@ import * as u from './utils';
 
 export type SuperEventType<T extends FactoryEventType> = `${T}${string}` | `${string}${T}`;
 export type Name = 'super' | 'joystick' | 'collection' | 'factory';
+
+const LOG_LEVELS: Record<LogLevel, number> = {
+    debug: 0,
+    info: 1,
+    warning: 2,
+    error: 3,
+    none: 4,
+};
+
+let currentLogLevel: LogLevel = 'warning';
 
 /**
  * Base class providing the event system and DOM event binding used by
@@ -195,16 +206,30 @@ export class Super {
         return `[${this.name}|${this.uid}]`;
     }
 
+    static get logLevel(): LogLevel {
+        return currentLogLevel;
+    }
+
+    static set logLevel(level: LogLevel) {
+        currentLogLevel = level;
+    }
+
     log(...args: any[]) {
-        console.log(this.logPrefix(), ...args, this.logSuffix());
+        if (LOG_LEVELS[currentLogLevel] <= LOG_LEVELS.debug) {
+            console.log(this.logPrefix(), ...args, this.logSuffix());
+        }
     }
 
     warn(...args: any[]) {
-        console.warn(this.logPrefix(), ...args, this.logSuffix());
+        if (LOG_LEVELS[currentLogLevel] <= LOG_LEVELS.warning) {
+            console.warn(this.logPrefix(), ...args, this.logSuffix());
+        }
     }
 
     error(...args: any[]) {
-        console.error(this.logPrefix(), ...args, this.logSuffix());
+        if (LOG_LEVELS[currentLogLevel] <= LOG_LEVELS.error) {
+            console.error(this.logPrefix(), ...args, this.logSuffix());
+        }
     }
 }
 
