@@ -15,6 +15,21 @@ interface Props {
 const { frontmatter = {}, headings = [] } = Astro.props;
 const title = frontmatter.title ? `${frontmatter.title} — NippleJS` : 'NippleJS Docs';
 const description = frontmatter.description ?? 'NippleJS documentation';
+
+const base = import.meta.env.BASE_URL;
+const pageOrder = [
+  { href: `${base}getting-started`, label: 'Getting Started' },
+  { href: `${base}options`, label: 'Options' },
+  { href: `${base}api`, label: 'API Reference' },
+  { href: `${base}events`, label: 'Events' },
+  { href: `${base}examples`, label: 'Examples' },
+  { href: `${base}migration`, label: 'Migration Guide' },
+];
+
+const currentPath = Astro.url.pathname.replace(/\/$/, '');
+const currentIndex = pageOrder.findIndex((p) => p.href.replace(/\/$/, '') === currentPath);
+const prevPage = currentIndex > 0 ? pageOrder[currentIndex - 1] : null;
+const nextPage = currentIndex < pageOrder.length - 1 ? pageOrder[currentIndex + 1] : null;
 ---
 <BaseLayout title={title} description={description}>
   <div class="max-w-7xl mx-auto px-4 xl:pr-[220px] overflow-visible">
@@ -28,6 +43,23 @@ const description = frontmatter.description ?? 'NippleJS documentation';
       <Sidebar />
       <article class="docs-prose flex-1 min-w-0 py-8 md:px-8 overflow-visible">
         <slot />
+
+        {(prevPage || nextPage) && (
+          <nav class="flex items-center justify-between mt-16 pt-6 border-t border-border" aria-label="Page navigation">
+            {prevPage ? (
+              <a href={prevPage.href} class="group flex flex-col gap-1">
+                <span class="text-[11px] font-mono uppercase tracking-wider text-muted">Previous</span>
+                <span class="text-sm text-accent-indigo group-hover:text-heading transition-colors">&larr; {prevPage.label}</span>
+              </a>
+            ) : <div />}
+            {nextPage ? (
+              <a href={nextPage.href} class="group flex flex-col gap-1 text-right">
+                <span class="text-[11px] font-mono uppercase tracking-wider text-muted">Next</span>
+                <span class="text-sm text-accent-indigo group-hover:text-heading transition-colors">{nextPage.label} &rarr;</span>
+              </a>
+            ) : <div />}
+          </nav>
+        )}
       </article>
     </div>
     <TableOfContents headings={headings} />
