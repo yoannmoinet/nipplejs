@@ -6,9 +6,9 @@ const base = import.meta.env.BASE_URL;
 
 const games = [
   {
-    name: 'Fog Explorer',
+    name: 'Neon Snake',
     slug: 'fog-explorer',
-    description: 'Navigate through fog to discover hidden orbs.',
+    description: 'Collect orbs to grow your glowing snake.',
     highlights: ['mode'],
     badges: ["mode: 'static'"],
   },
@@ -22,7 +22,7 @@ const games = [
   {
     name: 'Dual-Stick Arena',
     slug: 'dual-stick-arena',
-    description: 'Move and shoot with two joysticks.',
+    description: 'Move and shoot with two joysticks. Best on mobile.',
     highlights: ['multitouch'],
     badges: ["multitouch: true"],
   },
@@ -46,10 +46,138 @@ const games = [
   <main class="max-w-5xl mx-auto px-6">
 
     <!-- Hero -->
-    <section class="text-center py-28">
+    <section class="text-center py-28 relative">
+      <!-- Logo with particles emitted from text -->
+      <div class="flex items-center justify-center gap-5 mb-10 relative" id="hero-logo">
+        <canvas id="logo-particles" class="absolute inset-0 w-full h-full pointer-events-none" style="z-index:0;"></canvas>
+        <div class="relative z-[1] flex items-center gap-5">
+          <div id="hero-joystick-back" class="w-28 h-28 rounded-full relative flex items-center justify-center" style="background: rgba(99,102,241,0.2);">
+            <div id="hero-joystick-front" class="w-14 h-14 rounded-full absolute" style="background: rgba(129,140,248,0.7); transition: transform 0.1s ease-out;"></div>
+          </div>
+          <span id="logo-text" class="text-heading font-bold text-6xl tracking-tight" style="text-shadow: 0 0 20px rgba(129,140,248,0.4), 0 0 40px rgba(99,102,241,0.2);">nipplejs</span>
+        </div>
+      </div>
+
+      <script>
+        // --- Particles emitted from the text bounding box ---
+        const logoCanvas = document.getElementById('logo-particles') as HTMLCanvasElement;
+        const logoText = document.getElementById('logo-text');
+        const logoContainer = document.getElementById('hero-logo');
+        if (logoCanvas && logoText && logoContainer) {
+          const lctx = logoCanvas.getContext('2d')!;
+          const colors = ['#818cf8', '#38bdf8', '#a78bfa', '#c7d2fe'];
+
+          function resizeLogoCanvas() {
+            const rect = logoContainer!.getBoundingClientRect();
+            logoCanvas.width = rect.width;
+            logoCanvas.height = rect.height;
+          }
+          resizeLogoCanvas();
+          window.addEventListener('resize', resizeLogoCanvas);
+
+          interface Particle {
+            x: number; y: number;
+            vx: number; vy: number;
+            size: number; alpha: number;
+            color: string; decay: number;
+          }
+          const parts: Particle[] = [];
+
+          function getTextRect() {
+            const containerRect = logoContainer!.getBoundingClientRect();
+            const textRect = logoText!.getBoundingClientRect();
+            return {
+              x: textRect.left - containerRect.left,
+              y: textRect.top - containerRect.top,
+              w: textRect.width,
+              h: textRect.height,
+            };
+          }
+
+          function spawn() {
+            const r = getTextRect();
+            // Spawn along the edges and surface of the text
+            const x = r.x + Math.random() * r.w;
+            const y = r.y + Math.random() * r.h;
+
+            parts.push({
+              x,
+              y,
+              vx: (Math.random() - 0.5) * 0.08,
+              vy: -(0.03 + Math.random() * 0.08),
+              size: 0.5 + Math.random() * 1.5,
+              alpha: 0.2 + Math.random() * 0.35,
+              color: colors[Math.floor(Math.random() * colors.length)],
+              decay: 0.0008 + Math.random() * 0.001,
+            });
+          }
+
+          let f = 0;
+          let logoVisible = true;
+          let logoAnimId: number | null = null;
+
+          function loop() {
+            if (!logoVisible) { logoAnimId = null; return; }
+            lctx.clearRect(0, 0, logoCanvas.width, logoCanvas.height);
+            if (f % 4 === 0) spawn();
+
+            for (let i = parts.length - 1; i >= 0; i--) {
+              const p = parts[i];
+              p.x += p.vx;
+              p.y += p.vy;
+              p.alpha -= p.decay;
+              if (p.alpha <= 0) { parts.splice(i, 1); continue; }
+
+              lctx.save();
+              lctx.globalAlpha = p.alpha;
+              lctx.shadowBlur = 6;
+              lctx.shadowColor = p.color;
+              lctx.fillStyle = p.color;
+              lctx.beginPath();
+              lctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+              lctx.fill();
+              lctx.restore();
+            }
+            f++;
+            logoAnimId = requestAnimationFrame(loop);
+          }
+
+          const logoObserver = new IntersectionObserver((entries) => {
+            logoVisible = entries[0].isIntersecting;
+            if (logoVisible && !logoAnimId) loop();
+          });
+          logoObserver.observe(logoContainer);
+          loop();
+
+          // --- Joystick front follows cursor ---
+          const back = document.getElementById('hero-joystick-back');
+          const front = document.getElementById('hero-joystick-front');
+          if (back && front) {
+            const maxDist = back.offsetWidth / 2; // front center can reach the back's edge
+            document.addEventListener('mousemove', (e) => {
+              const rect = back.getBoundingClientRect();
+              const cx = rect.left + rect.width / 2;
+              const cy = rect.top + rect.height / 2;
+              const dx = e.clientX - cx;
+              const dy = e.clientY - cy;
+              const dist = Math.sqrt(dx * dx + dy * dy);
+              const clamp = Math.min(dist, maxDist) / (dist || 1);
+              front.style.transform = `translate(${dx * clamp}px, ${dy * clamp}px)`;
+            });
+            document.addEventListener('mouseleave', () => {
+              front.style.transform = 'translate(0px, 0px)';
+            });
+          }
+        }
+      </script>
+
       <h1 class="text-5xl sm:text-6xl md:text-7xl font-extrabold tracking-tight leading-tight">
-        <span class="block bg-gradient-to-r from-accent-indigo to-accent-cyan bg-clip-text text-transparent" style="-webkit-background-clip: text; -webkit-text-fill-color: transparent;">Virtual joysticks</span>
-        <span class="block bg-gradient-to-r from-accent-indigo to-accent-cyan bg-clip-text text-transparent" style="-webkit-background-clip: text; -webkit-text-fill-color: transparent;">for the modern web</span>
+        <span class="hero-title block relative" data-text="Virtual joysticks">
+          <span class="hero-title-text">Virtual joysticks</span>
+        </span>
+        <span class="hero-title block relative mt-2" data-text="for the modern web">
+          <span class="hero-title-text">for the modern web</span>
+        </span>
       </h1>
       <p class="mt-6 font-mono text-sm text-muted">
         // zero deps &middot; typescript &middot; touch &amp; mouse
