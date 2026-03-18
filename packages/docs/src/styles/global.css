@@ -1,0 +1,15 @@
+@import 'tailwindcss';
+
+@theme {
+  --color-base: #08081a;
+  --color-surface: rgba(255, 255, 255, 0.04);
+  --color-heading: #f1f5f9;
+  --color-body: #94a3b8;
+  --color-muted: #64748b;
+  --color-accent-indigo: #818cf8;
+  --color-accent-cyan: #38bdf8;
+  --color-accent-purple: #a78bfa;
+  --color-accent-pink: #e879f9;
+  --color-border: rgba(255, 255, 255, 0.08);
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+}

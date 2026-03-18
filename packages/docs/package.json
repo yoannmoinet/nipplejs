@@ -1,0 +1,16 @@
+{
+  "name": "@nipple/docs",
+  "private": true,
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview"
+  },
+  "dependencies": {
+    "@astrojs/mdx": "^4",
+    "@tailwindcss/vite": "^4",
+    "astro": "^5",
+    "nipplejs": "workspace:*",
+    "tailwindcss": "^4"
+  }
+}
