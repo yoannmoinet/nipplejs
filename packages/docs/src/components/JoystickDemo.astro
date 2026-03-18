@@ -311,6 +311,17 @@ const highlightedCode = highlighter.codeToHtml(code, {
         display: none;
     }
 
+    /* Hide everything except the fullscreen toggle in fullscreen */
+    .joystick-demo-wrapper.is-fullscreen [data-toggle-debug],
+    .joystick-demo-wrapper.is-fullscreen [data-toggle-code],
+    .joystick-demo-wrapper.is-fullscreen .pointer-events-none {
+        display: none;
+    }
+
+    .joystick-demo-wrapper.is-fullscreen .code-open {
+        transform: none;
+    }
+
     .joystick-demo-wrapper.is-fullscreen .joystick-demo {
         flex: 1;
         min-height: 0;

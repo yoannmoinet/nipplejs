@@ -40,7 +40,7 @@ export const createGame: CreateGame = (_container) => {
                 {
                     options: {
                         mode: 'static',
-                        position: { left: '20%', bottom: '20%' },
+                        position: { left: '100px', bottom: '100px' },
                         color: 'rgba(99,102,241,0.5)',
                     },
                     position: { left: '0', top: '0', width: '50%', height: '100%' },
@@ -48,7 +48,7 @@ export const createGame: CreateGame = (_container) => {
                 {
                     options: {
                         mode: 'static',
-                        position: { left: '80%', bottom: '20%' },
+                        position: { right: '100px', bottom: '100px' },
                         color: 'rgba(236,72,153,0.5)',
                     },
                     position: { left: '50%', top: '0', width: '50%', height: '100%' },
