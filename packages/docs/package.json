@@ -7,9 +7,9 @@
     "preview": "astro preview"
   },
   "dependencies": {
-    "@astrojs/mdx": "^4",
+    "@astrojs/mdx": "^5",
     "@tailwindcss/vite": "^4",
-    "astro": "^5",
+    "astro": "^6",
     "nipplejs": "workspace:*",
     "tailwindcss": "^4"
   }
