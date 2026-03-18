@@ -1,0 +1,160 @@
+---
+layout: ../layouts/DocsLayout.astro
+title: API Reference
+---
+
+# API Reference
+
+nipplejs exposes three layers: the **Collection** (Manager) returned by `nipplejs.create()`, individual **Joystick** instances, and the singleton **Factory** for advanced cross-collection coordination.
+
+## Collection (Manager)
+
+A Collection is returned when you call `nipplejs.create(options)`. It manages a group of joysticks within a single zone.
+
+### Methods
+
+#### `on(type, handler)`
+
+Subscribe to events. Supports space-separated event types to bind multiple at once.
+
+```javascript
+const manager = nipplejs.create(options);
+
+manager.on('start', (evt, data) => {
+    console.log('Joystick activated');
+});
+
+// Multiple events at once
+manager.on('start end', (evt, data) => {
+    console.log(evt.type);
+});
+```
+
+#### `off([type, handler])`
+
+Unsubscribe from events. Called with no arguments, it removes all handlers. With only a type, it removes all handlers for that type. With both, it removes the specific handler.
+
+```javascript
+// Remove a specific handler
+manager.off('move', myHandler);
+
+// Remove all 'move' handlers
+manager.off('move');
+
+// Remove all handlers
+manager.off();
+```
+
+#### `destroy()`
+
+Destroy the collection and all its joysticks. Removes DOM elements, unbinds all event listeners, and triggers `collectionDestroyed`.
+
+```javascript
+manager.destroy();
+```
+
+#### `getJoystickByUid(uid?)`
+
+Retrieve a joystick by its unique ID. If no `uid` is provided, returns the first joystick in the collection.
+
+```javascript
+const joystick = manager.getJoystickByUid(0);
+```
+
+### Properties
+
+| Property | Type | Description |
+|---|---|---|
+| `uid` | `number` | Unique identifier for this collection. |
+| `all` | `Map<Uid, Joystick>` | Map of all joysticks in this collection, keyed by their `uid`. |
+| `options` | `Required<CollectionOptions>` | The resolved options object (defaults merged with your overrides). |
+
+## Joystick
+
+Individual joystick instances are accessed through events or via `collection.all`.
+
+```javascript
+manager.on('move', (evt, data) => {
+    const joystick = data.instance;
+    console.log(joystick.uid, joystick.frontPosition);
+});
+
+// Or iterate all joysticks
+manager.all.forEach((joystick) => {
+    console.log(joystick.uid);
+});
+```
+
+### Methods
+
+#### `on(type, handler)`
+
+Subscribe to joystick-level events. Same API as the collection `on`.
+
+```javascript
+joystick.on('start', (evt) => {
+    console.log('This joystick started');
+});
+```
+
+#### `off([type, handler])`
+
+Unsubscribe from joystick-level events. Same API as the collection `off`.
+
+#### `destroy()`
+
+Destroy this joystick. Removes its DOM elements, clears all timeouts, and triggers `joystickDestroyed`.
+
+#### `setPosition(cb, {x, y})`
+
+Set the front (thumb) position of the joystick programmatically. The position is in pixel coordinates relative to the joystick center. An optional callback fires once the transition completes.
+
+```javascript
+joystick.setPosition(() => {
+    console.log('Position set');
+}, { x: 20, y: -10 });
+```
+
+### Properties
+
+| Property | Type | Description |
+|---|---|---|
+| `uid` | `number` | Unique identifier for this joystick. |
+| `identifier` | `number \| undefined` | The touch/pointer identifier currently driving this joystick. `undefined` when idle. |
+| `position` | `{ x, y }` | Pixel coordinates of the joystick base (outer circle center). |
+| `frontPosition` | `{ x, y }` | Pixel offset of the thumb (inner circle) relative to the base center. |
+| `ui` | `{ el, front, back }` | References to the three DOM elements: `el` (wrapper), `front` (thumb), `back` (outer circle). Not available in `dataOnly` mode. |
+| `options` | `Required<JoystickOptions>` | The resolved options for this joystick instance. |
+| `collection` | `Collection` | Back-reference to the parent collection that owns this joystick. |
+| `direction` | `Direction` | The current direction state. Contains `angle` (`'up' \| 'down' \| 'left' \| 'right'`), `x` (`'left' \| 'right'`), and `y` (`'up' \| 'down'`). Empty object `{}` when below threshold. |
+| `pressure` | `number` | Current pressure value from force touch / 3D touch (0 to 1). |
+
+## Factory (Advanced)
+
+The factory is a singleton available at `nipplejs.factory`. It manages all collections and maintains a global index of every joystick across all collections. Most applications will never need to interact with it directly.
+
+```javascript
+import nipplejs from 'nipplejs';
+
+const { factory } = nipplejs;
+```
+
+### Methods
+
+#### `getJoystickByUid(uid)`
+
+Find a joystick by its `uid` across **all** collections. Useful when you have the uid from an event but do not know which collection it belongs to.
+
+```javascript
+const joystick = nipplejs.factory.getJoystickByUid(uid);
+```
+
+#### `getJoystickByIdentifier(identifier)`
+
+Find a joystick by the touch/pointer `identifier` that is currently driving it. This searches across all collections.
+
+```javascript
+const joystick = nipplejs.factory.getJoystickByIdentifier(identifier);
+```
+
+> **Note:** The factory is intended for advanced use cases such as coordinating multiple independent collections (e.g. separate zones for movement and aiming). For most applications, working directly with the collection returned by `nipplejs.create()` is sufficient.
