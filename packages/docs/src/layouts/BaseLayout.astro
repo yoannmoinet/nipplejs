@@ -21,15 +21,59 @@ const { title = 'NippleJS', description = 'A vanilla virtual joystick for touch 
   <link href="https://fonts.bunny.net/css?family=jetbrains-mono:400,700" rel="stylesheet" />
 </head>
 <body class="bg-base text-body min-h-screen font-sans antialiased">
-  <!-- Aurora background -->
+  <!-- Aurora background with grid -->
   <div class="aurora-bg"></div>
+  <!-- Cursor grid highlight -->
+  <div id="grid-highlight"></div>
   <!-- Aurora blobs -->
-  <div class="aurora-blob" style="top:-60px;right:-40px;width:220px;height:220px;background:radial-gradient(circle,rgba(99,102,241,0.3),transparent 70%);animation:aurora-pulse 6s ease-in-out infinite;"></div>
-  <div class="aurora-blob" style="bottom:40px;left:-30px;width:180px;height:180px;background:radial-gradient(circle,rgba(56,189,248,0.2),transparent 70%);animation:aurora-pulse 8s ease-in-out infinite;"></div>
-  <div class="aurora-blob" style="bottom:-40px;right:30%;width:160px;height:160px;background:radial-gradient(circle,rgba(236,72,153,0.15),transparent 70%);animation:aurora-pulse 7s ease-in-out infinite;"></div>
+  <div class="aurora-blob" style="top:-400px;right:-300px;width:1200px;height:1200px;background:radial-gradient(circle,rgba(99,102,241,0.15),transparent 70%);animation:aurora-pulse 6s ease-in-out infinite;"></div>
+  <div class="aurora-blob" style="bottom:-400px;left:-400px;width:1100px;height:1100px;background:radial-gradient(circle,rgba(56,189,248,0.12),transparent 70%);animation:aurora-pulse 8s ease-in-out infinite;"></div>
+  <div class="aurora-blob" style="bottom:-300px;right:10%;width:1000px;height:1000px;background:radial-gradient(circle,rgba(236,72,153,0.1),transparent 70%);animation:aurora-pulse 7s ease-in-out infinite;"></div>
 
   <Header />
   <slot />
   <Footer />
+
+  <script>
+
+
+    // --- Cursor grid highlight ---
+    const highlight = document.getElementById('grid-highlight');
+    if (highlight) {
+      document.addEventListener('mousemove', (e) => {
+        highlight.style.setProperty('--mx', `${e.clientX}px`);
+        highlight.style.setProperty('--my', `${e.clientY}px`);
+        highlight.style.opacity = '1';
+      });
+
+      document.addEventListener('mouseleave', () => {
+        highlight.style.opacity = '0';
+      });
+    }
+
+    // --- Copy button on all <pre> code blocks ---
+    document.querySelectorAll<HTMLPreElement>('.docs-prose pre, .astro-code').forEach((pre) => {
+      // Skip if already has a copy button (e.g. JoystickDemo panels)
+      if (pre.closest('[data-code-panel]')) return;
+
+      const wrapper = document.createElement('div');
+      wrapper.style.position = 'relative';
+      pre.parentNode?.insertBefore(wrapper, pre);
+      wrapper.appendChild(pre);
+
+      const btn = document.createElement('button');
+      btn.textContent = 'Copy';
+      btn.className = 'copy-btn';
+      wrapper.appendChild(btn);
+
+      btn.addEventListener('click', () => {
+        const code = pre.querySelector('code')?.textContent || pre.textContent || '';
+        navigator.clipboard.writeText(code).then(() => {
+          btn.textContent = 'Copied!';
+          setTimeout(() => { btn.textContent = 'Copy'; }, 1500);
+        });
+      });
+    });
+  </script>
 </body>
 </html>

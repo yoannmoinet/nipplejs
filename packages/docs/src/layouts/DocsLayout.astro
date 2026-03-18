@@ -17,20 +17,20 @@ const title = frontmatter.title ? `${frontmatter.title} — NippleJS` : 'NippleJ
 const description = frontmatter.description ?? 'NippleJS documentation';
 ---
 <BaseLayout title={title} description={description}>
-  <div class="max-w-7xl mx-auto px-4">
+  <div class="max-w-7xl mx-auto px-4 xl:pr-[220px] overflow-visible">
     <div class="flex items-center gap-2 md:hidden py-2">
       <MobileNav />
       {frontmatter.title && (
         <span class="text-heading text-sm font-semibold truncate">{frontmatter.title}</span>
       )}
     </div>
-    <div class="flex min-h-[calc(100vh-3.5rem)]">
+    <div class="flex min-h-[calc(100vh-3.5rem)] overflow-visible">
       <Sidebar />
-      <article class="docs-prose flex-1 min-w-0 py-8 md:px-8">
+      <article class="docs-prose flex-1 min-w-0 py-8 md:px-8 overflow-visible">
         <slot />
       </article>
-      <TableOfContents headings={headings} />
     </div>
+    <TableOfContents headings={headings} />
   </div>
 </BaseLayout>
 
