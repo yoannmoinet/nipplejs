@@ -1,0 +1,109 @@
+---
+const base = import.meta.env.BASE_URL;
+const pathname = Astro.url.pathname;
+
+interface SidebarLink {
+  href: string;
+  label: string;
+}
+
+interface SidebarSection {
+  title: string;
+  links: SidebarLink[];
+}
+
+const sections: SidebarSection[] = [
+  {
+    title: 'Getting Started',
+    links: [
+      { href: `${base}getting-started#installation`, label: 'Installation' },
+      { href: `${base}getting-started#quick-start`, label: 'Quick Start' },
+      { href: `${base}getting-started#your-first-joystick`, label: 'Your First Joystick' },
+    ],
+  },
+  {
+    title: 'Options',
+    links: [
+      { href: `${base}options#zone`, label: 'zone' },
+      { href: `${base}options#mode`, label: 'mode' },
+      { href: `${base}options#color--size`, label: 'color / size' },
+      { href: `${base}options#threshold`, label: 'threshold' },
+      { href: `${base}options#fadetime`, label: 'fadeTime' },
+      { href: `${base}options#multitouch--maxnumberofjoysticks`, label: 'multitouch / maxNumberOfJoysticks' },
+      { href: `${base}options#position`, label: 'position' },
+      { href: `${base}options#restjoystick--restopacity`, label: 'restJoystick / restOpacity' },
+      { href: `${base}options#catchdistance`, label: 'catchDistance' },
+      { href: `${base}options#lockx--locky`, label: 'lockX / lockY' },
+      { href: `${base}options#shape`, label: 'shape' },
+      { href: `${base}options#follow`, label: 'follow' },
+      { href: `${base}options#dynamicpage`, label: 'dynamicPage' },
+      { href: `${base}options#dataonly`, label: 'dataOnly' },
+    ],
+  },
+  {
+    title: 'API Reference',
+    links: [
+      { href: `${base}api#collection-manager`, label: 'Collection (Manager)' },
+      { href: `${base}api#joystick`, label: 'Joystick' },
+      { href: `${base}api#factory-advanced`, label: 'Factory (Advanced)' },
+    ],
+  },
+  {
+    title: 'Events',
+    links: [
+      { href: `${base}events#joystick-events`, label: 'Joystick Events' },
+      { href: `${base}events#collection-events`, label: 'Collection Events' },
+      { href: `${base}events#factory-events`, label: 'Factory Events' },
+    ],
+  },
+  {
+    title: 'Examples',
+    links: [
+      { href: `${base}examples#fog-explorer`, label: 'Fog Explorer' },
+      { href: `${base}examples#asteroid-dodge`, label: 'Asteroid Dodge' },
+      { href: `${base}examples#dual-stick-arena`, label: 'Dual-Stick Arena' },
+      { href: `${base}examples#endless-chase`, label: 'Endless Chase' },
+      { href: `${base}examples#space-drift`, label: 'Space Drift' },
+    ],
+  },
+  {
+    title: 'Migration Guide',
+    links: [
+      { href: `${base}migration#v0--v1`, label: 'v0 → v1' },
+    ],
+  },
+];
+
+function isActive(href: string): boolean {
+  const page = href.split('#')[0];
+  return pathname.startsWith(page);
+}
+---
+<aside class="sidebar w-64 shrink-0 overflow-y-auto py-6 pr-4 hidden md:block">
+  <nav aria-label="Documentation navigation">
+    {sections.map((section) => (
+      <div class="mb-5">
+        <h3 class="text-muted text-[11px] font-semibold uppercase tracking-wider mb-2 px-3">
+          {section.title}
+        </h3>
+        <ul class="space-y-0.5">
+          {section.links.map((link) => (
+            <li>
+              <a
+                href={link.href}
+                class:list={[
+                  'block px-3 py-1 text-[13px] rounded-md transition-colors',
+                  isActive(link.href)
+                    ? 'text-accent-indigo bg-accent-indigo/10'
+                    : 'text-muted hover:text-heading hover:bg-surface',
+                ]}
+              >
+                {link.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    ))}
+  </nav>
+</aside>

@@ -1,0 +1,165 @@
+---
+const base = import.meta.env.BASE_URL;
+const pathname = Astro.url.pathname;
+
+interface SidebarLink {
+  href: string;
+  label: string;
+}
+
+interface SidebarSection {
+  title: string;
+  links: SidebarLink[];
+}
+
+const sections: SidebarSection[] = [
+  {
+    title: 'Getting Started',
+    links: [
+      { href: `${base}getting-started#installation`, label: 'Installation' },
+      { href: `${base}getting-started#quick-start`, label: 'Quick Start' },
+      { href: `${base}getting-started#your-first-joystick`, label: 'Your First Joystick' },
+    ],
+  },
+  {
+    title: 'Options',
+    links: [
+      { href: `${base}options#zone`, label: 'zone' },
+      { href: `${base}options#mode`, label: 'mode' },
+      { href: `${base}options#color--size`, label: 'color / size' },
+      { href: `${base}options#threshold`, label: 'threshold' },
+      { href: `${base}options#fadetime`, label: 'fadeTime' },
+      { href: `${base}options#multitouch--maxnumberofjoysticks`, label: 'multitouch / maxNumberOfJoysticks' },
+      { href: `${base}options#position`, label: 'position' },
+      { href: `${base}options#restjoystick--restopacity`, label: 'restJoystick / restOpacity' },
+      { href: `${base}options#catchdistance`, label: 'catchDistance' },
+      { href: `${base}options#lockx--locky`, label: 'lockX / lockY' },
+      { href: `${base}options#shape`, label: 'shape' },
+      { href: `${base}options#follow`, label: 'follow' },
+      { href: `${base}options#dynamicpage`, label: 'dynamicPage' },
+      { href: `${base}options#dataonly`, label: 'dataOnly' },
+    ],
+  },
+  {
+    title: 'API Reference',
+    links: [
+      { href: `${base}api#collection-manager`, label: 'Collection (Manager)' },
+      { href: `${base}api#joystick`, label: 'Joystick' },
+      { href: `${base}api#factory-advanced`, label: 'Factory (Advanced)' },
+    ],
+  },
+  {
+    title: 'Events',
+    links: [
+      { href: `${base}events#joystick-events`, label: 'Joystick Events' },
+      { href: `${base}events#collection-events`, label: 'Collection Events' },
+      { href: `${base}events#factory-events`, label: 'Factory Events' },
+    ],
+  },
+  {
+    title: 'Examples',
+    links: [
+      { href: `${base}examples#fog-explorer`, label: 'Fog Explorer' },
+      { href: `${base}examples#asteroid-dodge`, label: 'Asteroid Dodge' },
+      { href: `${base}examples#dual-stick-arena`, label: 'Dual-Stick Arena' },
+      { href: `${base}examples#endless-chase`, label: 'Endless Chase' },
+      { href: `${base}examples#space-drift`, label: 'Space Drift' },
+    ],
+  },
+  {
+    title: 'Migration Guide',
+    links: [
+      { href: `${base}migration#v0--v1`, label: 'v0 → v1' },
+    ],
+  },
+];
+
+function isActive(href: string): boolean {
+  const page = href.split('#')[0];
+  return pathname.startsWith(page);
+}
+---
+<div class="md:hidden">
+  <button
+    id="mobile-nav-open"
+    class="p-2 text-muted hover:text-heading transition-colors"
+    aria-label="Open navigation menu"
+    type="button"
+  >
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+      <line x1="3" y1="5" x2="17" y2="5" />
+      <line x1="3" y1="10" x2="17" y2="10" />
+      <line x1="3" y1="15" x2="17" y2="15" />
+    </svg>
+  </button>
+
+  <dialog
+    id="mobile-nav-dialog"
+    class="mobile-nav-dialog fixed inset-0 w-full h-full max-w-full max-h-full m-0 p-0 bg-base/95 backdrop-blur-md border-none z-[100]"
+  >
+    <div class="flex flex-col h-full">
+      <div class="flex items-center justify-between px-4 h-14 border-b border-border">
+        <span class="text-heading font-bold text-sm">Navigation</span>
+        <button
+          id="mobile-nav-close"
+          class="p-2 text-muted hover:text-heading transition-colors"
+          aria-label="Close navigation menu"
+          type="button"
+        >
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+            <line x1="5" y1="5" x2="15" y2="15" />
+            <line x1="15" y1="5" x2="5" y2="15" />
+          </svg>
+        </button>
+      </div>
+      <nav class="flex-1 overflow-y-auto px-4 py-6" aria-label="Mobile navigation">
+        {sections.map((section) => (
+          <div class="mb-5">
+            <h3 class="text-muted text-[11px] font-semibold uppercase tracking-wider mb-2 px-3">
+              {section.title}
+            </h3>
+            <ul class="space-y-0.5">
+              {section.links.map((link) => (
+                <li>
+                  <a
+                    href={link.href}
+                    class:list={[
+                      'block px-3 py-1.5 text-sm rounded-md transition-colors',
+                      isActive(link.href)
+                        ? 'text-accent-indigo bg-accent-indigo/10'
+                        : 'text-muted hover:text-heading hover:bg-surface',
+                    ]}
+                  >
+                    {link.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </nav>
+    </div>
+  </dialog>
+</div>
+
+<script>
+  const openBtn = document.getElementById('mobile-nav-open');
+  const closeBtn = document.getElementById('mobile-nav-close');
+  const dialog = document.getElementById('mobile-nav-dialog') as HTMLDialogElement | null;
+
+  if (openBtn && closeBtn && dialog) {
+    openBtn.addEventListener('click', () => {
+      dialog.showModal();
+    });
+
+    closeBtn.addEventListener('click', () => {
+      dialog.close();
+    });
+
+    dialog.addEventListener('click', (e) => {
+      if (e.target === dialog) {
+        dialog.close();
+      }
+    });
+  }
+</script>
