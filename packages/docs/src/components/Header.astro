@@ -1,0 +1,23 @@
+---
+const base = import.meta.env.BASE_URL;
+const links = [
+  { href: `${base}getting-started`, label: 'Docs' },
+  { href: `${base}api`, label: 'API' },
+  { href: `${base}examples`, label: 'Examples' },
+];
+---
+<header class="sticky top-0 z-50 glass border-t-0 border-x-0 rounded-none">
+  <nav class="max-w-7xl mx-auto px-4 h-14 flex items-center gap-6" aria-label="Main navigation">
+    <a href={base} class="flex items-center gap-2.5 shrink-0">
+      <div class="w-6 h-6 rounded-full bg-gradient-to-br from-accent-indigo to-accent-cyan shadow-[0_0_12px_rgba(99,102,241,0.3)]"></div>
+      <span class="text-heading font-bold text-sm tracking-tight">nipplejs</span>
+      <span class="text-muted font-mono text-xs">v1.0</span>
+    </a>
+    <div class="flex-1"></div>
+    {links.map(link => (
+      <a href={link.href} class="text-muted text-sm hover:text-heading transition-colors">{link.label}</a>
+    ))}
+    <div class="w-px h-4 bg-border"></div>
+    <a href="https://github.com/yoannmoinet/nipplejs" class="text-muted text-sm hover:text-heading transition-colors" target="_blank" rel="noopener">GitHub</a>
+  </nav>
+</header>
