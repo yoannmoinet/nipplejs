@@ -692,4 +692,130 @@ describe('Collection', () => {
             expect(offSpy).toHaveBeenCalled();
         });
     });
+
+    describe('reposition()', () => {
+        it('updates box from zone bounding rect', () => {
+            const collection = new Collection(mockFactory, {
+                zone: mockZone,
+                mode: MODES.dynamic,
+            });
+
+            // Simulate zone moving
+            mockZone.style.marginTop = '50px';
+            collection.reposition();
+
+            // box should be recalculated (may or may not differ in jsdom, but should not throw)
+            expect(collection.box).toBeDefined();
+            expect(collection.box).toEqual(expect.objectContaining({ width: expect.any(Number) }));
+        });
+
+        it('updates joystick positions for non-dataOnly joysticks', () => {
+            const collection = new Collection(mockFactory, {
+                zone: mockZone,
+                mode: MODES.static,
+            });
+            collection.init();
+
+            const joystick = collection.all.values().next().value;
+
+            collection.reposition();
+
+            // Position should be recalculated (exact values depend on jsdom layout)
+            expect(joystick.position).toBeDefined();
+            expect(joystick.position.x).toEqual(expect.any(Number));
+            expect(joystick.position.y).toEqual(expect.any(Number));
+        });
+
+        it('refreshes factory scroll value', () => {
+            const collection = new Collection(mockFactory, {
+                zone: mockZone,
+                mode: MODES.dynamic,
+            });
+
+            mockFactory.scroll = { x: 99, y: 99 };
+            collection.reposition();
+
+            // scroll should be refreshed from window (0,0 in jsdom)
+            expect(mockFactory.scroll).toEqual({ x: 0, y: 0 });
+        });
+    });
+
+    describe('Zone position warning', () => {
+        it('warns when zone has position: static', () => {
+            const warnSpy = jest.spyOn(console, 'warn').mockImplementation();
+
+            mockZone.style.position = 'static';
+            // eslint-disable-next-line no-new
+            new Collection(mockFactory, {
+                zone: mockZone,
+                mode: MODES.dynamic,
+            });
+
+            expect(warnSpy).toHaveBeenCalledWith(
+                expect.anything(),
+                expect.stringContaining('no CSS "position" set'),
+                expect.anything(),
+                expect.anything(),
+                expect.anything(),
+            );
+
+            warnSpy.mockRestore();
+        });
+
+        it('does not warn when zone has position: relative', () => {
+            const warnSpy = jest.spyOn(console, 'warn').mockImplementation();
+
+            mockZone.style.position = 'relative';
+            // eslint-disable-next-line no-new
+            new Collection(mockFactory, {
+                zone: mockZone,
+                mode: MODES.dynamic,
+            });
+
+            expect(warnSpy).not.toHaveBeenCalled();
+
+            warnSpy.mockRestore();
+        });
+    });
+
+    describe('ResizeObserver', () => {
+        it('sets up ResizeObserver on zone element', () => {
+            const observeSpy = jest.fn();
+            const disconnectSpy = jest.fn();
+            const MockResizeObserver = jest.fn().mockImplementation(() => ({
+                observe: observeSpy,
+                disconnect: disconnectSpy,
+                unobserve: jest.fn(),
+            }));
+            (globalThis as any).ResizeObserver = MockResizeObserver;
+
+            // eslint-disable-next-line no-new
+            new Collection(mockFactory, {
+                zone: mockZone,
+                mode: MODES.dynamic,
+            });
+
+            expect(MockResizeObserver).toHaveBeenCalledTimes(1);
+            expect(observeSpy).toHaveBeenCalledWith(mockZone);
+        });
+
+        it('disconnects ResizeObserver on destroy', () => {
+            const disconnectSpy = jest.fn();
+            const MockResizeObserver = jest.fn().mockImplementation(() => ({
+                observe: jest.fn(),
+                disconnect: disconnectSpy,
+                unobserve: jest.fn(),
+            }));
+            (globalThis as any).ResizeObserver = MockResizeObserver;
+
+            const collection = new Collection(mockFactory, {
+                zone: mockZone,
+                mode: MODES.dynamic,
+            });
+
+            collection.destroy();
+
+            expect(disconnectSpy).toHaveBeenCalled();
+        });
+    });
 });

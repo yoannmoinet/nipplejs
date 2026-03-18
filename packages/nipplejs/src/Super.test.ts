@@ -273,4 +273,96 @@ describe('Super', () => {
             errorSpy.mockRestore();
         });
     });
+
+    describe('Log Level', () => {
+        afterEach(() => {
+            Super.logLevel = 'warning';
+        });
+
+        it('default logLevel is warning', () => {
+            expect(Super.logLevel).toBe('warning');
+        });
+
+        it('log() is silent at warning level', () => {
+            const instance = new Super('super');
+            const spy = jest.spyOn(console, 'log').mockImplementation();
+
+            instance.log('should not appear');
+
+            expect(spy).not.toHaveBeenCalled();
+            spy.mockRestore();
+        });
+
+        it('warn() fires at warning level', () => {
+            const instance = new Super('super');
+            const spy = jest.spyOn(console, 'warn').mockImplementation();
+
+            instance.warn('should appear');
+
+            expect(spy).toHaveBeenCalled();
+            spy.mockRestore();
+        });
+
+        it('warn() is silent at error level', () => {
+            Super.logLevel = 'error';
+            const instance = new Super('super');
+            const spy = jest.spyOn(console, 'warn').mockImplementation();
+
+            instance.warn('should not appear');
+
+            expect(spy).not.toHaveBeenCalled();
+            spy.mockRestore();
+        });
+
+        it('error() fires at error level', () => {
+            Super.logLevel = 'error';
+            const instance = new Super('super');
+            const spy = jest.spyOn(console, 'error').mockImplementation();
+
+            instance.error('should appear');
+
+            expect(spy).toHaveBeenCalled();
+            spy.mockRestore();
+        });
+
+        it('nothing fires at none level', () => {
+            Super.logLevel = 'none';
+            const instance = new Super('super');
+            const logSpy = jest.spyOn(console, 'log').mockImplementation();
+            const warnSpy = jest.spyOn(console, 'warn').mockImplementation();
+            const errorSpy = jest.spyOn(console, 'error').mockImplementation();
+
+            instance.log('nope');
+            instance.warn('nope');
+            instance.error('nope');
+
+            expect(logSpy).not.toHaveBeenCalled();
+            expect(warnSpy).not.toHaveBeenCalled();
+            expect(errorSpy).not.toHaveBeenCalled();
+
+            logSpy.mockRestore();
+            warnSpy.mockRestore();
+            errorSpy.mockRestore();
+        });
+
+        it('everything fires at debug level', () => {
+            Super.logLevel = 'debug';
+            const instance = new Super('super');
+            const logSpy = jest.spyOn(console, 'log').mockImplementation();
+            const warnSpy = jest.spyOn(console, 'warn').mockImplementation();
+            const errorSpy = jest.spyOn(console, 'error').mockImplementation();
+
+            instance.log('yes');
+            instance.warn('yes');
+            instance.error('yes');
+
+            expect(logSpy).toHaveBeenCalled();
+            expect(warnSpy).toHaveBeenCalled();
+            expect(errorSpy).toHaveBeenCalled();
+
+            logSpy.mockRestore();
+            warnSpy.mockRestore();
+            errorSpy.mockRestore();
+        });
+    });
 });

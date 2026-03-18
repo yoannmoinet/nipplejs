@@ -667,4 +667,66 @@ describe('Joystick', () => {
             jest.useRealTimers();
         });
     });
+
+    describe('Move Event Continuity', () => {
+        it('fires move event even when direction has not changed', () => {
+            const joystick = new Joystick(mockCollection, {
+                position: { x: 100, y: 100 },
+                frontPosition: { x: 0, y: 0 },
+            });
+            const moveSpy = jest.fn();
+            joystick.on('move', moveSpy);
+
+            // Same direction data — angle and force identical
+            const eventData = {
+                position: { x: 100, y: 100 },
+                force: 0.5,
+                pressure: 0.5,
+                distance: 25,
+                angle: { radian: 1.0, degree: 57 },
+                vector: { x: 0.5, y: 0.5 },
+                raw: { distance: 25, position: { x: 100, y: 100 } },
+                instance: joystick,
+                lockX: false,
+                lockY: false,
+            };
+
+            // Call twice with identical data — move should fire both times
+            joystick.computeDirectionAndTriggerEvents({ ...eventData } as any);
+            joystick.computeDirectionAndTriggerEvents({ ...eventData } as any);
+
+            expect(moveSpy).toHaveBeenCalledTimes(2);
+        });
+
+        it('fires directional events only on direction change', () => {
+            const joystick = new Joystick(mockCollection, {
+                position: { x: 100, y: 100 },
+                frontPosition: { x: 0, y: 0 },
+            });
+            const dirSpy = jest.fn();
+            joystick.on('dir', dirSpy);
+
+            const eventData = {
+                position: { x: 100, y: 100 },
+                force: 0.5,
+                pressure: 0.5,
+                distance: 25,
+                angle: { radian: 1.0, degree: 57 },
+                vector: { x: 0.5, y: 0.5 },
+                raw: { distance: 25, position: { x: 100, y: 100 } },
+                instance: joystick,
+                lockX: false,
+                lockY: false,
+            };
+
+            // First call sets direction — fires dir
+            joystick.computeDirectionAndTriggerEvents({ ...eventData } as any);
+            const firstCallCount = dirSpy.mock.calls.length;
+
+            // Second call with same direction — dir should NOT fire again
+            joystick.computeDirectionAndTriggerEvents({ ...eventData } as any);
+
+            expect(dirSpy).toHaveBeenCalledTimes(firstCallCount);
+        });
+    });
 });
