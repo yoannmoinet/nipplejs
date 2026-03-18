@@ -13,3 +13,37 @@
   --color-border: rgba(255, 255, 255, 0.08);
   --font-mono: 'JetBrains Mono', ui-monospace, monospace;
 }
+
+/* Aurora background with grid */
+.aurora-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background-color: var(--color-base);
+  background-image:
+    linear-gradient(rgba(139, 92, 246, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(139, 92, 246, 0.04) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+/* Frosted glass surface */
+.glass {
+  background: var(--color-surface);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--color-border);
+  border-radius: 0.75rem;
+}
+
+/* Aurora glow blobs */
+.aurora-blob {
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(40px);
+  pointer-events: none;
+  z-index: -1;
+}
+
+@keyframes aurora-pulse {
+  0%, 100% { opacity: 0.6; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.1); }
+}

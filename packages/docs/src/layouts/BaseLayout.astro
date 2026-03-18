@@ -1,0 +1,31 @@
+---
+import '../styles/global.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const { title = 'NippleJS', description = 'A vanilla virtual joystick for touch capable interfaces' } = Astro.props;
+---
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content={description} />
+  <title>{title}</title>
+  <link rel="icon" type="image/svg+xml" href={`${import.meta.env.BASE_URL}assets/favicon.svg`} />
+  <link rel="preconnect" href="https://fonts.bunny.net" />
+  <link href="https://fonts.bunny.net/css?family=jetbrains-mono:400,700" rel="stylesheet" />
+</head>
+<body class="bg-base text-body min-h-screen font-sans antialiased">
+  <!-- Aurora background -->
+  <div class="aurora-bg"></div>
+  <!-- Aurora blobs -->
+  <div class="aurora-blob" style="top:-60px;right:-40px;width:220px;height:220px;background:radial-gradient(circle,rgba(99,102,241,0.3),transparent 70%);animation:aurora-pulse 6s ease-in-out infinite;"></div>
+  <div class="aurora-blob" style="bottom:40px;left:-30px;width:180px;height:180px;background:radial-gradient(circle,rgba(56,189,248,0.2),transparent 70%);animation:aurora-pulse 8s ease-in-out infinite;"></div>
+  <div class="aurora-blob" style="bottom:-40px;right:30%;width:160px;height:160px;background:radial-gradient(circle,rgba(236,72,153,0.15),transparent 70%);animation:aurora-pulse 7s ease-in-out infinite;"></div>
+
+  <slot />
+</body>
+</html>
