@@ -1,0 +1,82 @@
+---
+interface Props {
+  game: string;
+  highlight?: string[];
+}
+
+const { game, highlight = [] } = Astro.props;
+---
+<div
+  class="joystick-demo glass relative w-full overflow-hidden"
+  style="min-height: 400px;"
+  data-game={game}
+  data-highlight={JSON.stringify(highlight)}
+>
+  <canvas class="absolute inset-0 w-full h-full"></canvas>
+
+  {highlight.length > 0 && (
+    <div class="absolute top-3 right-3 z-10 flex flex-wrap gap-1.5 pointer-events-none">
+      {highlight.map((opt) => (
+        <span class="glass px-2 py-0.5 text-xs font-mono text-accent-indigo">
+          {opt}
+        </span>
+      ))}
+    </div>
+  )}
+</div>
+
+<script>
+  import nipplejs from 'nipplejs';
+  import type { CreateGame, Collection } from '../games/types';
+
+  const games: Record<string, () => Promise<{ createGame: CreateGame }>> = {
+    'fog-explorer': () => import('../games/fog-explorer'),
+    'asteroid-dodge': () => import('../games/asteroid-dodge'),
+    'dual-stick-arena': () => import('../games/dual-stick-arena'),
+    'endless-chase': () => import('../games/endless-chase'),
+    'space-drift': () => import('../games/space-drift'),
+  };
+
+  document.querySelectorAll<HTMLElement>('[data-game]').forEach(async (container) => {
+    const gameName = container.dataset.game;
+    if (!gameName || !games[gameName]) return;
+
+    const canvas = container.querySelector<HTMLCanvasElement>('canvas');
+    if (!canvas) return;
+
+    const mod = await games[gameName]();
+    const { config, create } = mod.createGame(container);
+    const joysticks: Collection[] = [];
+
+    // Create zone elements and nipplejs instances for each configured zone
+    for (const zone of config.zones) {
+      const zoneEl = document.createElement('div');
+      zoneEl.style.position = 'absolute';
+      zoneEl.style.left = zone.position.left;
+      zoneEl.style.top = zone.position.top;
+      zoneEl.style.width = zone.position.width;
+      zoneEl.style.height = zone.position.height;
+      zoneEl.style.zIndex = '5';
+      container.appendChild(zoneEl);
+
+      const collection = nipplejs.create({
+        ...zone.options,
+        zone: zoneEl,
+      });
+      joysticks.push(collection);
+    }
+
+    const instance = create();
+    instance.start(canvas, joysticks);
+
+    // Cleanup on DOM removal
+    const observer = new MutationObserver(() => {
+      if (!document.body.contains(container)) {
+        instance.destroy();
+        joysticks.forEach((j) => j.destroy());
+        observer.disconnect();
+      }
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+  });
+</script>

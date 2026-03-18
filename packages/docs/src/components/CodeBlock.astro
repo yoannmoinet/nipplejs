@@ -1,0 +1,55 @@
+---
+// CodeBlock.astro — frosted glass wrapper for Shiki-highlighted code with copy button
+---
+<div class="code-block glass relative group">
+  <button
+    class="copy-btn absolute top-3 right-3 z-10 opacity-0 group-hover:opacity-100 transition-opacity
+           glass px-2 py-1 text-xs font-mono text-muted hover:text-heading cursor-pointer"
+    aria-label="Copy code to clipboard"
+  >
+    Copy
+  </button>
+  <div class="overflow-x-auto p-4 text-sm leading-relaxed">
+    <slot />
+  </div>
+</div>
+
+<style>
+  .code-block :global(pre) {
+    background: transparent !important;
+    margin: 0;
+    padding: 0;
+    overflow: visible;
+  }
+
+  .code-block :global(code) {
+    font-family: var(--font-mono);
+    font-size: 0.875rem;
+    line-height: 1.7;
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('.code-block').forEach((block) => {
+    const btn = block.querySelector<HTMLButtonElement>('.copy-btn');
+    if (!btn) return;
+
+    btn.addEventListener('click', async () => {
+      const code = block.querySelector('code');
+      if (!code) return;
+
+      try {
+        await navigator.clipboard.writeText(code.textContent ?? '');
+        btn.textContent = 'Copied!';
+        setTimeout(() => {
+          btn.textContent = 'Copy';
+        }, 2000);
+      } catch {
+        btn.textContent = 'Failed';
+        setTimeout(() => {
+          btn.textContent = 'Copy';
+        }, 2000);
+      }
+    });
+  });
+</script>

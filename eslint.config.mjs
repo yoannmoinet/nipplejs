@@ -383,6 +383,19 @@ export default [
             },
         },
     },
+    // Docs package (browser + relaxed rules for Astro-bundled code).
+    {
+        files: ['packages/docs/src/**/*.ts'],
+        languageOptions: {
+            globals: {
+                ...globals.browser,
+            },
+        },
+        rules: {
+            'import/no-unresolved': 'off',
+            'import/no-extraneous-dependencies': 'off',
+        },
+    },
     // Tests.
     {
         files: ['packages/tests/**/*.*', 'packages/**/*.test.ts'],
