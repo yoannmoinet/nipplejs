@@ -339,7 +339,7 @@ export const createGame: CreateGame = (_container) => {
 
                 // Move player
                 playerX += moveVX * PLAYER_SPEED;
-                playerY += moveVY * PLAYER_SPEED;
+                playerY -= moveVY * PLAYER_SPEED;
 
                 // Clamp to canvas bounds
                 playerX = Math.max(PLAYER_RADIUS, Math.min(canvas.width - PLAYER_RADIUS, playerX));
@@ -447,11 +447,9 @@ export const createGame: CreateGame = (_container) => {
                     // Left stick: movement
                     const moveStick = joysticks[0] ?? null;
                     if (moveStick) {
-                        moveStick.on('move', (_evt, data) => {
-                            if (data.vector) {
-                                moveVX = data.vector.x;
-                                moveVY = -data.vector.y;
-                            }
+                        moveStick.on('move', (evt) => {
+                            moveVX = evt.data.vector.x;
+                            moveVY = evt.data.vector.y;
                         });
 
                         moveStick.on('end', () => {
@@ -467,11 +465,9 @@ export const createGame: CreateGame = (_container) => {
                     // Right stick: aim and shoot
                     const aimStick = joysticks[1] ?? null;
                     if (aimStick) {
-                        aimStick.on('move', (_evt, data) => {
-                            if (data.angle) {
-                                aimAngle = data.angle.radian;
-                                isAiming = true;
-                            }
+                        aimStick.on('move', (evt) => {
+                            aimAngle = evt.data.angle.radian;
+                            isAiming = true;
                         });
 
                         aimStick.on('end', () => {

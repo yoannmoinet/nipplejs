@@ -16,8 +16,8 @@ const SHIP_COLOR = '#38bdf8';
 const ASTEROID_COLORS = ['#e879f9', '#d946ef', '#c084fc', '#a78bfa'];
 const BASE_ASTEROID_SPEED = 2;
 const BASE_SPAWN_INTERVAL = 60;
-const SPEED_INCREASE_INTERVAL = 300; // ~5 seconds at 60fps
-const SPEED_INCREMENT = 0.1;
+const SPEED_INCREASE_INTERVAL = 150; // ~2.5 seconds at 60fps
+const SPEED_INCREMENT = 0.25;
 const PLAYER_SPEED = 4;
 const BG_LINE_COUNT = 30;
 
@@ -103,7 +103,7 @@ export const createGame: CreateGame = (_container) => {
                     radius,
                     rotation: Math.random() * Math.PI * 2,
                     rotationSpeed: (Math.random() - 0.5) * 0.04,
-                    speed: getCurrentSpeed() + (Math.random() - 0.5) * 0.5,
+                    speed: getCurrentSpeed() * (0.5 + Math.random() * 1.0),
                     color: ASTEROID_COLORS[Math.floor(Math.random() * ASTEROID_COLORS.length)],
                 });
             }
@@ -337,10 +337,8 @@ export const createGame: CreateGame = (_container) => {
                     // Listen to joystick events
                     joystickRef = joysticks[0] ?? null;
                     if (joystickRef) {
-                        joystickRef.on('move', (_evt, data) => {
-                            if (data.vector) {
-                                vectorX = data.vector.x;
-                            }
+                        joystickRef.on('move', (evt) => {
+                            vectorX = evt.data.vector.x;
                         });
 
                         joystickRef.on('end', () => {

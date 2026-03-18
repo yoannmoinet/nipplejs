@@ -21,7 +21,8 @@ const BG_COLOR = '#0a0a12';
 const SHIP_SIZE = 12;
 const SHIP_COLOR = '#a78bfa';
 const WAYPOINT_COLORS = ['#22d3ee', '#ec4899', '#818cf8'];
-const SPEED_FACTOR = 2.5;
+const BASE_SPEED = 2.5;
+const SPEED_PER_ORB = 0.15;
 const STAR_COUNT = 60;
 const WAYPOINT_COUNT = 8;
 const WAYPOINT_RADIUS = 10;
@@ -68,6 +69,7 @@ export const createGame: CreateGame = (_container) => {
             // Velocity persists when joystick is released
             let velocityX = 0;
             let velocityY = 0;
+            let currentSpeed = BASE_SPEED;
 
             // Heading angle for the direction indicator (in radians)
             let heading = 0;
@@ -187,6 +189,83 @@ export const createGame: CreateGame = (_container) => {
                 }
             }
 
+            function drawWaypointIndicators() {
+                const cx = canvas.width / 2;
+                const cy = canvas.height / 2;
+                const margin = 30; // distance from screen edge
+
+                for (const wp of waypoints) {
+                    const screenX = cx + (wp.x - shipWorldX);
+                    const screenY = cy + (wp.y - shipWorldY);
+
+                    // Only show indicator for off-screen waypoints
+                    if (
+                        screenX >= -10 &&
+                        screenX <= canvas.width + 10 &&
+                        screenY >= -10 &&
+                        screenY <= canvas.height + 10
+                    ) {
+                        continue;
+                    }
+
+                    // Direction from center of screen to waypoint
+                    const dx = screenX - cx;
+                    const dy = screenY - cy;
+                    const angle = Math.atan2(dy, dx);
+
+                    // Clamp indicator position to screen edge with margin
+                    const edgeX = Math.max(
+                        margin,
+                        Math.min(
+                            canvas.width - margin,
+                            cx + Math.cos(angle) * (canvas.width / 2 - margin),
+                        ),
+                    );
+                    const edgeY = Math.max(
+                        margin,
+                        Math.min(
+                            canvas.height - margin,
+                            cy + Math.sin(angle) * (canvas.height / 2 - margin),
+                        ),
+                    );
+
+                    // Distance in world units
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    const distLabel =
+                        dist < 1000 ? Math.round(dist).toString() : `${(dist / 1000).toFixed(1)}k`;
+
+                    // Draw arrow
+                    ctx.save();
+                    ctx.translate(edgeX, edgeY);
+                    ctx.rotate(angle);
+
+                    ctx.shadowBlur = 6;
+                    ctx.shadowColor = wp.color;
+                    ctx.fillStyle = wp.color;
+                    ctx.globalAlpha = 0.6;
+
+                    // Arrow triangle
+                    ctx.beginPath();
+                    ctx.moveTo(8, 0);
+                    ctx.lineTo(-4, -5);
+                    ctx.lineTo(-4, 5);
+                    ctx.closePath();
+                    ctx.fill();
+
+                    ctx.rotate(-angle); // unrotate for text
+
+                    // Distance text
+                    ctx.shadowBlur = 0;
+                    ctx.globalAlpha = 0.4;
+                    ctx.fillStyle = wp.color;
+                    ctx.font = '9px JetBrains Mono, monospace';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(distLabel, 0, 16);
+
+                    ctx.restore();
+                }
+            }
+
             function drawShip() {
                 const cx = canvas.width / 2;
                 const cy = canvas.height / 2;
@@ -260,6 +339,7 @@ export const createGame: CreateGame = (_container) => {
                     const dist = Math.sqrt(dx * dx + dy * dy);
                     if (dist < COLLECT_DISTANCE) {
                         score++;
+                        currentSpeed = BASE_SPEED + score * SPEED_PER_ORB;
                         waypoints[i] = randomWaypoint(spread, spread);
                         // Offset new waypoint away from ship so it doesn't spawn on top
                         const angle = Math.random() * Math.PI * 2;
@@ -287,6 +367,7 @@ export const createGame: CreateGame = (_container) => {
 
                 drawBackground();
                 drawWaypoints();
+                drawWaypointIndicators();
                 drawDirectionIndicator();
                 drawShip();
                 drawScore();
@@ -323,19 +404,12 @@ export const createGame: CreateGame = (_container) => {
                     // Listen to joystick events
                     const joystick = joysticks[0] ?? null;
                     if (joystick) {
-                        joystick.on('move', (_evt, data) => {
-                            if (data.vector) {
-                                const vx = data.vector.x;
-                                const vy = -data.vector.y; // invert Y: joystick up = negative canvas Y
-                                const force = data.force ?? 1;
+                        joystick.on('move', (evt) => {
+                            velocityX = evt.data.vector.x * currentSpeed;
+                            velocityY = -evt.data.vector.y * currentSpeed;
 
-                                velocityX = vx * force * SPEED_FACTOR;
-                                velocityY = vy * force * SPEED_FACTOR;
-
-                                // Update heading from movement direction
-                                heading = Math.atan2(velocityY, velocityX);
-                                hasHeading = true;
-                            }
+                            heading = Math.atan2(velocityY, velocityX);
+                            hasHeading = true;
                         });
 
                         // Do NOT zero velocity on end — that's the whole point of restJoystick: false

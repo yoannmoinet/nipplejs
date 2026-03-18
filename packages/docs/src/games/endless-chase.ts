@@ -290,7 +290,7 @@ export const createGame: CreateGame = (_container) => {
 
                 // Move player in world space
                 playerWorldX += vectorX * PLAYER_SPEED;
-                playerWorldY += vectorY * PLAYER_SPEED;
+                playerWorldY -= vectorY * PLAYER_SPEED;
 
                 // Pursuer lerps toward player with increasing speed
                 const lerp = getCurrentLerp();
@@ -361,11 +361,9 @@ export const createGame: CreateGame = (_container) => {
                     // Listen to joystick events
                     const joystick = joysticks[0] ?? null;
                     if (joystick) {
-                        joystick.on('move', (_evt, data) => {
-                            if (data.vector) {
-                                vectorX = data.vector.x;
-                                vectorY = -data.vector.y; // invert Y: joystick up = negative canvas Y
-                            }
+                        joystick.on('move', (evt) => {
+                            vectorX = evt.data.vector.x;
+                            vectorY = evt.data.vector.y;
                         });
 
                         joystick.on('end', () => {
