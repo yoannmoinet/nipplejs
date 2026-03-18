@@ -422,12 +422,7 @@ export class Joystick extends Super {
             // NOTE: MUTATION!!!!!
             obj.direction = direction;
 
-            // If all 3 directions are the same, we don't trigger anything.
-            if (same.x && same.y && same.angle) {
-                // Early out.
-                return obj;
-            }
-
+            // If all 3 directions are the same, skip directional events.
             if (!same.x) {
                 this.trigger(`plain plain:${direction.x}`, obj);
             }
