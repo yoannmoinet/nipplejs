@@ -4,7 +4,7 @@ import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
   site: 'https://yoannmoinet.github.io',
-  base: '/nipplejs',
+  base: '/nipplejs/',
   output: 'static',
   integrations: [mdx()],
   vite: {

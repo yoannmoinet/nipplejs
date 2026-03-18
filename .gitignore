@@ -12,3 +12,4 @@ dist/
 packages/nipplejs/e2e/public/
 .claude/
 .superpowers/
+.astro/
