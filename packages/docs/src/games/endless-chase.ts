@@ -62,8 +62,8 @@ export const createGame: CreateGame = (_container) => {
                         position: { left: '50%', bottom: '15%' },
                         follow: true,
                         color: {
-                            front: 'linear-gradient(135deg, #38bdf8, #a78bfa)',
-                            back: 'rgba(56,189,248,0.1)',
+                            front: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 50 50'%3E%3Ccircle cx='25' cy='25' r='23' fill='none' stroke='%2338bdf8' stroke-width='2' opacity='0.8'/%3E%3Ccircle cx='25' cy='25' r='12' fill='none' stroke='%2338bdf8' stroke-width='1' opacity='0.5'/%3E%3Cline x1='25' y1='5' x2='25' y2='18' stroke='%2338bdf8' stroke-width='1' opacity='0.4'/%3E%3Cline x1='25' y1='32' x2='25' y2='45' stroke='%2338bdf8' stroke-width='1' opacity='0.4'/%3E%3Cline x1='5' y1='25' x2='18' y2='25' stroke='%2338bdf8' stroke-width='1' opacity='0.4'/%3E%3Cline x1='32' y1='25' x2='45' y2='25' stroke='%2338bdf8' stroke-width='1' opacity='0.4'/%3E%3Ccircle cx='25' cy='25' r='2' fill='%2338bdf8' opacity='0.6'/%3E%3C/svg%3E") center/cover`,
+                            back: 'radial-gradient(circle, rgba(56,189,248,0.08) 60%, rgba(56,189,248,0.02) 100%)',
                         },
                     },
                     position: { left: '0', top: '0', width: '100%', height: '100%' },
