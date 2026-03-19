@@ -100,7 +100,7 @@ nipplejs.create(options);
 </script>
 ```
 
-**:warning: NB :warning:** Your joystick's container **has** to have its CSS `position` property set, either `absolute`, `relative`, `static`, ....
+**:warning: NB :warning:** Your joystick's container **must** have a CSS `position` value set (`relative`, `absolute`, or `fixed`). Without it, the joystick will not be positioned correctly. The library warns in the console if `position: static` is detected.
 
 ----
 
@@ -496,12 +496,12 @@ But some of them are specific to its instance.
 If you need to listen to each joystick, for example, you can :
 
 ```javascript
-manager.on('added', function (evt, nipple) {
-    nipple.on('start move end dir plain', function (evt) {
+manager.on('added', function (evt) {
+    evt.data.on('start move end dir plain', function (e) {
         // DO EVERYTHING
     });
-}).on('removed', function (evt, nipple) {
-    nipple.off('start move end dir plain');
+}).on('removed', function (evt) {
+    evt.data.off('start move end dir plain');
 });
 ```
 
@@ -645,7 +645,7 @@ Will pass the instance alongside the event.
 
 Won't be trigger in a `dataOnly` configuration.
 
-#### `destroyed`
+#### `joystickDestroyed`
 
 Is triggered at the end of destroy.
 

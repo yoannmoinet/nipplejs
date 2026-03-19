@@ -209,9 +209,9 @@ describe('Super', () => {
 
             (instance as any).unbindEvt(testElement, 'start', handler);
 
-            // Note: unbindEvt unbinds from DOM but doesn't remove from _domHandlers_ map
-            // This is existing behavior, not a bug introduced by tests
-            expect((instance as any)._domHandlers_.has(handler)).toBe(true);
+            // unbindEvt unbinds from DOM and cleans up the _domHandlers_ map
+            expect((instance as any)._domHandlers_.has(handler)).toBe(false);
+            expect((instance as any)._domHandlers_.size).toBe(0);
         });
     });
 

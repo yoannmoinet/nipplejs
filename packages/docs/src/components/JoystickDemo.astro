@@ -159,7 +159,6 @@ const highlightedCode = highlighter.codeToHtml(code, {
             </div>
             <div
                 class="p-4 overflow-auto text-sm leading-relaxed [&_pre]:!bg-transparent [&_pre]:!m-0 [&_pre]:!p-0 [&_code]:!text-sm"
-                style="max-height: 400px;"
                 set:html={highlightedCode}
                 data-raw-code={code}
             />

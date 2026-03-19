@@ -164,7 +164,7 @@ export const processEvent = (evt: SupportedEvent, processedEvt: ProcessedEvent):
                 // as the webkitForce events are triggered as MouseEvent, with no identifier.
                 // So if we have a "start" event with a pointerId of 1, we need a "pressure" event
                 // with an identifier of 1 too, so we can track the correct joystick.
-                1 || 1
+                1
     ) as Identifier;
 
     // This is only what we need, to normalize the interaction event.

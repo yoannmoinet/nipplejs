@@ -288,7 +288,7 @@ export class Collection extends Super {
 
             // This should never be reached.
             // Static mode should always have an idle joystick.
-            this.warn("Coudln't find the expected joystick. Creating a new one.");
+            this.warn("Couldn't find the expected joystick. Creating a new one.");
         }
 
         // Return a new joystick.
@@ -320,7 +320,7 @@ export class Collection extends Super {
             // Compute coordinates from given CssPosition by creating a stub element.
             const stub = document.createElement('DIV');
             u.extend(stub.style, {
-                display: 'hidden',
+                visibility: 'hidden',
                 position: 'absolute',
                 top: position.top,
                 right: position.right,

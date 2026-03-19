@@ -189,6 +189,8 @@ export class Super {
             // Support multiple interfaces type when necessary.
             u.unbindEvt(el, SECONDARY_BIND[type], cb);
         }
+
+        this._domHandlers_.delete(handler);
     }
 
     logPrefix() {
