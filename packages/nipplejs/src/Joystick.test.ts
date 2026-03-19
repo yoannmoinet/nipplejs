@@ -265,6 +265,7 @@ describe('Joystick', () => {
                 force: 0.5,
                 lockX: false,
                 lockY: false,
+                followDelta: { x: 0, y: 0 },
                 distance: 50,
                 position: { x: 100, y: 100 },
                 pressure: 0,
@@ -291,6 +292,7 @@ describe('Joystick', () => {
                 force: 0.5,
                 lockX: false,
                 lockY: false,
+                followDelta: { x: 0, y: 0 },
                 distance: 50,
                 position: { x: 100, y: 100 },
                 pressure: 0,
@@ -316,6 +318,7 @@ describe('Joystick', () => {
                 force: 0.5,
                 lockX: false,
                 lockY: false,
+                followDelta: { x: 0, y: 0 },
                 distance: 50,
                 position: { x: 100, y: 100 },
                 pressure: 0,
@@ -343,6 +346,7 @@ describe('Joystick', () => {
                 force: 0.5,
                 lockX: false,
                 lockY: false,
+                followDelta: { x: 0, y: 0 },
                 distance: 50,
                 position: { x: 100, y: 100 },
                 pressure: 0,
@@ -373,6 +377,7 @@ describe('Joystick', () => {
                 force: 0.5,
                 lockX: false,
                 lockY: false,
+                followDelta: { x: 0, y: 0 },
                 distance: 50,
                 position: { x: 100, y: 100 },
                 pressure: 0,
@@ -403,6 +408,7 @@ describe('Joystick', () => {
                 force: 0.3, // Below threshold
                 lockX: false,
                 lockY: false,
+                followDelta: { x: 0, y: 0 },
                 distance: 30,
                 position: { x: 100, y: 100 },
                 pressure: 0,
@@ -689,6 +695,7 @@ describe('Joystick', () => {
                 instance: joystick,
                 lockX: false,
                 lockY: false,
+                followDelta: { x: 0, y: 0 },
             };
 
             // Call twice with identical data — move should fire both times
@@ -717,6 +724,7 @@ describe('Joystick', () => {
                 instance: joystick,
                 lockX: false,
                 lockY: false,
+                followDelta: { x: 0, y: 0 },
             };
 
             // First call sets direction — fires dir

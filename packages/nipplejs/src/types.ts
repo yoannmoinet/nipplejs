@@ -521,6 +521,14 @@ export interface JoystickEventData {
      * Ranges from 0 to 1.
      */
     pressure: number;
+    /**
+     * The delta movement of the joystick base when `follow: true` is active.
+     *
+     * `{ x: 0, y: 0 }` when the base hasn't moved (thumb within radius).
+     * Non-zero when the base follows the thumb beyond its edge.
+     * Always `{ x: 0, y: 0 }` when `follow` is disabled.
+     */
+    followDelta: Coordinates;
 }
 
 /**
