@@ -332,6 +332,14 @@ const games = [
               dot.classList.add('bg-muted/30');
             }
           });
+
+          // After transition ends (500ms), reposition active game's joysticks
+          setTimeout(() => {
+            const activeGames = (window as any).__nippleGames || [];
+            for (const g of activeGames) {
+              g.collections.forEach((c: any) => c.reposition?.());
+            }
+          }, 550);
         }
 
         // Click neighbors to navigate
