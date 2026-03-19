@@ -310,7 +310,7 @@ Enable if the page has dynamically visible elements such as for Vue, React, Angu
 ### `options.follow`
 > Defaults to false
 
-Makes the joystick follow the thumbstick when it reaches the border.
+Makes the joystick follow the thumbstick when it reaches the border. When the base moves, the move event includes `baseDelta: { x, y }` with the per-frame base displacement — use `vector` for fine aim and `baseDelta` for camera/world panning.
 
 ----
 
@@ -576,7 +576,11 @@ Comes with data :
             y: 95
         }
     },
-    instance: Nipple            // the nipple instance that triggered the event
+    instance: Nipple,           // the nipple instance that triggered the event
+    baseDelta: {                // base movement when follow: true is active
+        x: 0,                  // { x: 0, y: 0 } when follow is off or thumb within radius
+        y: 0
+    }
 }
 ```
 

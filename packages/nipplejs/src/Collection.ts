@@ -504,14 +504,14 @@ export class Collection extends Super {
             clamped_dist = u.distance(clamped_pos, joystick.position);
         }
 
-        let followDelta = { x: 0, y: 0 };
+        let baseDelta = { x: 0, y: 0 };
 
         if (this.options.follow) {
             // If we want the joystick's basis to follow the touch when it reaches outside its bounds.
             if (dist > size) {
                 const delta_x = pos.x - clamped_pos.x;
                 const delta_y = pos.y - clamped_pos.y;
-                followDelta = { x: delta_x, y: -delta_y };
+                baseDelta = { x: delta_x, y: -delta_y };
                 // Move the joystick's basis to the touch's position.
                 joystick.position.x += delta_x;
                 joystick.position.y += delta_y;
@@ -568,7 +568,7 @@ export class Collection extends Super {
             instance: joystick,
             lockX: this.options.lockX,
             lockY: this.options.lockY,
-            followDelta,
+            baseDelta,
         };
 
         joystick.computeDirectionAndTriggerEvents(toSend);

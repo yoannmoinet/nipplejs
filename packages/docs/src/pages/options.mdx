@@ -183,6 +183,8 @@ Sets the shape of the joystick boundary. When set to `'square'`, the thumb can m
 
 When `true`, the joystick base follows the user's thumb when the touch moves beyond the joystick radius. The base shifts to keep the thumb at the edge, allowing unlimited directional travel.
 
+When the base moves, the move event includes `baseDelta: { x, y }` — the per-frame displacement of the base. Use `vector` for fine control within the joystick and `baseDelta` for the broader sweep (e.g. camera panning).
+
 <JoystickDemo game="endless-chase" highlight={['follow']} />
 
 ## dynamicPage

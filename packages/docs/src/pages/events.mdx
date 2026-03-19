@@ -45,15 +45,18 @@ Fired continuously while the joystick is being moved. Passes a `JoystickEventDat
     vector: { x: number, y: number },  // unit vector
     raw: { distance: number, position: { x: number, y: number } },
     instance: Joystick,
-    direction?: { x?: string, y?: string, angle?: string }
+    direction?: { x?: string, y?: string, angle?: string },
+    baseDelta: { x: number, y: number }  // base movement when follow: true
 }
 ```
 
+`baseDelta` contains the per-frame displacement of the joystick base when `follow: true` is active and the thumb exceeds the joystick radius. Always `{ x: 0, y: 0 }` when follow is disabled or the thumb is within bounds. Useful for separating fine aim (`vector`) from camera/world panning (`baseDelta`).
+
 ```javascript
-manager.on('move', (evt, data) => {
-    console.log(data.vector);   // { x: 0.71, y: -0.71 }
-    console.log(data.force);    // 0.85
-    console.log(data.angle);    // { radian: 5.50, degree: 315 }
+manager.on('move', (evt) => {
+    console.log(evt.data.vector);      // { x: 0.71, y: -0.71 }
+    console.log(evt.data.force);       // 0.85
+    console.log(evt.data.baseDelta);   // { x: 3.2, y: -1.5 } when following
 });
 ```
 

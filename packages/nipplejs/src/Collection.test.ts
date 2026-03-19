@@ -646,6 +646,88 @@ describe('Collection', () => {
         });
     });
 
+    describe('baseDelta in move event', () => {
+        it('baseDelta is { x: 0, y: 0 } when follow is disabled', () => {
+            const collection = new Collection(mockFactory, {
+                zone: mockZone,
+                mode: MODES.static,
+            });
+            collection.init();
+
+            const joystick = collection.all.values().next().value;
+            joystick.identifier = 1 as Identifier;
+            collection.actives.set(1 as Identifier, joystick);
+
+            const triggerSpy = jest.spyOn(joystick, 'computeDirectionAndTriggerEvents');
+
+            collection.processOnMove({
+                identifier: 1 as Identifier,
+                position: { x: 120, y: 120 },
+                pressure: 1,
+                raw: {} as any,
+            } as any);
+
+            expect(triggerSpy).toHaveBeenCalled();
+            const eventData = triggerSpy.mock.calls[0][0] as any;
+            expect(eventData.baseDelta).toEqual({ x: 0, y: 0 });
+        });
+
+        it('baseDelta is { x: 0, y: 0 } when thumb is within joystick radius with follow', () => {
+            const collection = new Collection(mockFactory, {
+                zone: mockZone,
+                mode: MODES.static,
+                follow: true,
+            });
+            collection.init();
+
+            const joystick = collection.all.values().next().value;
+            joystick.identifier = 1 as Identifier;
+            collection.actives.set(1 as Identifier, joystick);
+
+            const triggerSpy = jest.spyOn(joystick, 'computeDirectionAndTriggerEvents');
+
+            // Small move within radius (default size is 100, so radius is 50)
+            collection.processOnMove({
+                identifier: 1 as Identifier,
+                position: { x: joystick.position.x + 10, y: joystick.position.y + 10 },
+                pressure: 1,
+                raw: {} as any,
+            } as any);
+
+            expect(triggerSpy).toHaveBeenCalled();
+            const eventData = triggerSpy.mock.calls[0][0] as any;
+            expect(eventData.baseDelta).toEqual({ x: 0, y: 0 });
+        });
+
+        it('baseDelta is non-zero when thumb exceeds joystick radius with follow', () => {
+            const collection = new Collection(mockFactory, {
+                zone: mockZone,
+                mode: MODES.static,
+                follow: true,
+                size: 100,
+            });
+            collection.init();
+
+            const joystick = collection.all.values().next().value;
+            joystick.identifier = 1 as Identifier;
+            collection.actives.set(1 as Identifier, joystick);
+
+            const triggerSpy = jest.spyOn(joystick, 'computeDirectionAndTriggerEvents');
+
+            // Large move way beyond radius
+            collection.processOnMove({
+                identifier: 1 as Identifier,
+                position: { x: joystick.position.x + 200, y: joystick.position.y },
+                pressure: 1,
+                raw: {} as any,
+            } as any);
+
+            expect(triggerSpy).toHaveBeenCalled();
+            const eventData = triggerSpy.mock.calls[0][0] as any;
+            expect(eventData.baseDelta.x).not.toBe(0);
+        });
+    });
+
     describe('Cleanup & Destruction', () => {
         it('destroy() removes all joysticks', () => {
             const collection = new Collection(mockFactory, {

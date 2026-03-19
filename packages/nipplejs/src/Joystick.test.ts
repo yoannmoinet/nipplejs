@@ -34,7 +34,7 @@ const defaultEventData = (joystick: Joystick, overrides: Record<string, any> = {
     force: 0.5,
     lockX: false,
     lockY: false,
-    followDelta: { x: 0, y: 0 },
+    baseDelta: { x: 0, y: 0 },
     distance: 50,
     position: { x: 100, y: 100 },
     pressure: 0,

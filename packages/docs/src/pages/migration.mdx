@@ -196,3 +196,16 @@ Control library console output. Default level is `'warning'`.
 ```javascript
 nipplejs.setLogLevel('debug'); // see all internal logs
 ```
+
+### New: `baseDelta` in move event data
+
+When `follow: true` is active, the move event now includes `baseDelta: { x, y }` — the per-frame displacement of the joystick base as it follows the thumb. This enables separating fine aim (`vector`) from camera/world panning (`baseDelta`) in a single joystick.
+
+```javascript
+manager.on('move', (evt) => {
+    // Fine aim within joystick radius
+    const aim = evt.data.vector;
+    // Camera pan when base follows thumb
+    const pan = evt.data.baseDelta;
+});
+```

@@ -528,7 +528,7 @@ export interface JoystickEventData {
      * Non-zero when the base follows the thumb beyond its edge.
      * Always `{ x: 0, y: 0 }` when `follow` is disabled.
      */
-    followDelta: Coordinates;
+    baseDelta: Coordinates;
 }
 
 /**
