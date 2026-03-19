@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 120">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0f0f23"/>
+      <stop offset="100%" stop-color="#08081a"/>
+    </linearGradient>
+  </defs>
+  <rect width="400" height="120" rx="16" fill="url(#bg)"/>
+  <!-- Back circle -->
+  <circle cx="60" cy="60" r="36" fill="rgba(99,102,241,0.2)"/>
+  <!-- Front circle -->
+  <circle cx="60" cy="60" r="18" fill="rgba(129,140,248,0.7)"/>
+  <!-- Text -->
+  <text x="115" y="70" font-family="system-ui, -apple-system, sans-serif" font-size="40" font-weight="700" fill="#f1f5f9">nipplejs</text>
+</svg>

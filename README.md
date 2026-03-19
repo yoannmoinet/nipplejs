@@ -1,4 +1,4 @@
-![alt tag](./assets/nipplejs.png)
+![nipplejs](./assets/nipplejs.svg)
 > A vanilla virtual joystick for touch capable interfaces
 
 
