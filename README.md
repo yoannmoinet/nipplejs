@@ -3,6 +3,7 @@
   <source media="(prefers-color-scheme: light)" srcset="./assets/nipplejs-light.svg">
   <img alt="nipplejs" src="./assets/nipplejs-light.svg">
 </picture>
+
 > A vanilla virtual joystick for touch capable interfaces
 
 
