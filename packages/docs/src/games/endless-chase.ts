@@ -101,12 +101,13 @@ export const createGame: CreateGame = (_container) => {
                 canvas.height = rect.height;
             }
 
+            // Stars are placed in a 0..1 normalized tile that repeats infinitely
             function initStars() {
                 stars.length = 0;
                 for (let i = 0; i < STAR_COUNT; i++) {
                     stars.push({
-                        x: (Math.random() - 0.5) * SPREAD * 3,
-                        y: (Math.random() - 0.5) * SPREAD * 3,
+                        x: Math.random(), // 0..1 normalized position within tile
+                        y: Math.random(),
                         size: 0.5 + Math.random() * 2,
                         brightness: 0.3 + Math.random() * 0.7,
                         twinkleSpeed: 0.01 + Math.random() * 0.03,
@@ -128,26 +129,26 @@ export const createGame: CreateGame = (_container) => {
             }
 
             function drawStars() {
-                const cx = canvas.width / 2;
-                const cy = canvas.height / 2;
+                const w = canvas.width;
+                const h = canvas.height;
+                // Camera offset in tile space (parallax factor 0.3)
+                const offsetX = (camX * 0.3) % w;
+                const offsetY = (camY * 0.3) % h;
 
                 for (const star of stars) {
                     star.twinklePhase += star.twinkleSpeed;
                     const twinkle = 0.5 + Math.sin(star.twinklePhase) * 0.5;
                     const alpha = star.brightness * (0.4 + twinkle * 0.6);
 
-                    const screenX = cx + (star.x - camX) * 0.3; // parallax
-                    const screenY = cy + (star.y - camY) * 0.3;
-
-                    // Wrap stars
-                    const wrappedX = ((screenX % canvas.width) + canvas.width) % canvas.width;
-                    const wrappedY = ((screenY % canvas.height) + canvas.height) % canvas.height;
+                    // Place star in tile, offset by camera, wrap seamlessly
+                    const sx = (((star.x * w - offsetX) % w) + w) % w;
+                    const sy = (((star.y * h - offsetY) % h) + h) % h;
 
                     ctx.save();
                     ctx.globalAlpha = alpha;
                     ctx.fillStyle = '#e2e8f0';
                     ctx.beginPath();
-                    ctx.arc(wrappedX, wrappedY, star.size, 0, Math.PI * 2);
+                    ctx.arc(sx, sy, star.size, 0, Math.PI * 2);
                     ctx.fill();
                     ctx.restore();
                 }
