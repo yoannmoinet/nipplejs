@@ -29,6 +29,21 @@ const createMockCollection = (): jest.Mocked<Collection> => {
     return mockCollection;
 };
 
+const defaultEventData = (joystick: Joystick, overrides: Record<string, any> = {}) => ({
+    angle: { degree: 90, radian: Math.PI / 2 },
+    force: 0.5,
+    lockX: false,
+    lockY: false,
+    followDelta: { x: 0, y: 0 },
+    distance: 50,
+    position: { x: 100, y: 100 },
+    pressure: 0,
+    vector: { x: 0, y: 0.5 },
+    raw: { distance: 50, position: { x: 100, y: 100 } },
+    instance: joystick,
+    ...overrides,
+});
+
 describe('Joystick', () => {
     let mockCollection: jest.Mocked<Collection>;
 
@@ -260,19 +275,10 @@ describe('Joystick', () => {
                 threshold: 0.1,
             });
 
-            const eventData = {
+            const eventData = defaultEventData(joystick, {
                 angle: { degree: 45, radian: Math.PI / 4 },
-                force: 0.5,
-                lockX: false,
-                lockY: false,
-                followDelta: { x: 0, y: 0 },
-                distance: 50,
-                position: { x: 100, y: 100 },
-                pressure: 0,
                 vector: { x: 0.5, y: 0.5 },
-                raw: { distance: 50, position: { x: 100, y: 100 } },
-                instance: joystick,
-            };
+            });
 
             const result = joystick.computeDirectionAndTriggerEvents(eventData);
 
@@ -287,19 +293,7 @@ describe('Joystick', () => {
                 threshold: 0.1,
             });
 
-            const eventData = {
-                angle: { degree: 90, radian: Math.PI / 2 },
-                force: 0.5,
-                lockX: false,
-                lockY: false,
-                followDelta: { x: 0, y: 0 },
-                distance: 50,
-                position: { x: 100, y: 100 },
-                pressure: 0,
-                vector: { x: 0, y: 0.5 },
-                raw: { distance: 50, position: { x: 100, y: 100 } },
-                instance: joystick,
-            };
+            const eventData = defaultEventData(joystick);
 
             const result = joystick.computeDirectionAndTriggerEvents(eventData);
 
@@ -313,19 +307,10 @@ describe('Joystick', () => {
                 threshold: 0.1,
             });
 
-            const eventData = {
+            const eventData = defaultEventData(joystick, {
                 angle: { degree: 0, radian: 0 },
-                force: 0.5,
-                lockX: false,
-                lockY: false,
-                followDelta: { x: 0, y: 0 },
-                distance: 50,
-                position: { x: 100, y: 100 },
-                pressure: 0,
                 vector: { x: 0.5, y: 0 },
-                raw: { distance: 50, position: { x: 100, y: 100 } },
-                instance: joystick,
-            };
+            });
 
             const result = joystick.computeDirectionAndTriggerEvents(eventData);
 
@@ -341,19 +326,7 @@ describe('Joystick', () => {
 
             const triggerSpy = jest.spyOn(joystick, 'trigger');
 
-            const eventData = {
-                angle: { degree: 90, radian: Math.PI / 2 },
-                force: 0.5,
-                lockX: false,
-                lockY: false,
-                followDelta: { x: 0, y: 0 },
-                distance: 50,
-                position: { x: 100, y: 100 },
-                pressure: 0,
-                vector: { x: 0, y: 0.5 },
-                raw: { distance: 50, position: { x: 100, y: 100 } },
-                instance: joystick,
-            };
+            const eventData = defaultEventData(joystick);
 
             joystick.computeDirectionAndTriggerEvents(eventData);
 
@@ -372,19 +345,7 @@ describe('Joystick', () => {
 
             const triggerSpy = jest.spyOn(joystick, 'trigger');
 
-            const eventData = {
-                angle: { degree: 90, radian: Math.PI / 2 },
-                force: 0.5,
-                lockX: false,
-                lockY: false,
-                followDelta: { x: 0, y: 0 },
-                distance: 50,
-                position: { x: 100, y: 100 },
-                pressure: 0,
-                vector: { x: 0, y: 0.5 },
-                raw: { distance: 50, position: { x: 100, y: 100 } },
-                instance: joystick,
-            };
+            const eventData = defaultEventData(joystick);
 
             joystick.computeDirectionAndTriggerEvents(eventData);
 
@@ -403,19 +364,12 @@ describe('Joystick', () => {
 
             const triggerSpy = jest.spyOn(joystick, 'trigger');
 
-            const eventData = {
-                angle: { degree: 90, radian: Math.PI / 2 },
+            const eventData = defaultEventData(joystick, {
                 force: 0.3, // Below threshold
-                lockX: false,
-                lockY: false,
-                followDelta: { x: 0, y: 0 },
                 distance: 30,
-                position: { x: 100, y: 100 },
-                pressure: 0,
                 vector: { x: 0, y: 0.3 },
                 raw: { distance: 30, position: { x: 100, y: 100 } },
-                instance: joystick,
-            };
+            });
 
             joystick.computeDirectionAndTriggerEvents(eventData);
 
@@ -684,19 +638,13 @@ describe('Joystick', () => {
             joystick.on('move', moveSpy);
 
             // Same direction data — angle and force identical
-            const eventData = {
-                position: { x: 100, y: 100 },
-                force: 0.5,
+            const eventData = defaultEventData(joystick, {
                 pressure: 0.5,
                 distance: 25,
                 angle: { radian: 1.0, degree: 57 },
                 vector: { x: 0.5, y: 0.5 },
                 raw: { distance: 25, position: { x: 100, y: 100 } },
-                instance: joystick,
-                lockX: false,
-                lockY: false,
-                followDelta: { x: 0, y: 0 },
-            };
+            });
 
             // Call twice with identical data — move should fire both times
             joystick.computeDirectionAndTriggerEvents({ ...eventData } as any);
@@ -713,19 +661,13 @@ describe('Joystick', () => {
             const dirSpy = jest.fn();
             joystick.on('dir', dirSpy);
 
-            const eventData = {
-                position: { x: 100, y: 100 },
-                force: 0.5,
+            const eventData = defaultEventData(joystick, {
                 pressure: 0.5,
                 distance: 25,
                 angle: { radian: 1.0, degree: 57 },
                 vector: { x: 0.5, y: 0.5 },
                 raw: { distance: 25, position: { x: 100, y: 100 } },
-                instance: joystick,
-                lockX: false,
-                lockY: false,
-                followDelta: { x: 0, y: 0 },
-            };
+            });
 
             // First call sets direction — fires dir
             joystick.computeDirectionAndTriggerEvents({ ...eventData } as any);
