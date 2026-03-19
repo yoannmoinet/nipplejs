@@ -35,11 +35,11 @@ This demo creates **two separate collections** in split zones, which is the stan
 
 <JoystickDemo game="dual-stick-arena" highlight={['multitouch']} />
 
-## Endless Chase
+## Space Observatory
 
-Outrun a glowing pursuer that accelerates over time. The arena is infinite -- the camera follows the player as they fly through a star field.
+Scan the sky with a crosshair to find and lock onto celestial targets. Hold the crosshair on a target for one second to lock on.
 
-This demo uses **follow** mode, which lets the joystick base follow the user's thumb when they drag beyond the joystick radius. This enables unlimited directional travel without lifting and repositioning.
+This demo uses **follow** mode to split one joystick into two controls: `vector` moves a fine-aim crosshair within the joystick radius, while `baseDelta` pans the camera when you push beyond the edge. This dual-layer control is the key use case for `follow: true`.
 
 <JoystickDemo game="endless-chase" highlight={['follow']} />
 

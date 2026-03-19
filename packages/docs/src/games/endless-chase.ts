@@ -4,20 +4,52 @@ interface Star {
     x: number;
     y: number;
     size: number;
-    opacity: number;
-    depth: number; // parallax layer: higher = further away = slower scroll
+    brightness: number;
+    twinkleSpeed: number;
+    twinklePhase: number;
 }
 
-const BG_COLOR = '#0a0a12';
-const PLAYER_RADIUS = 8;
-const PLAYER_COLOR = '#38bdf8';
-const PURSUER_RADIUS = 12;
-const PURSUER_COLOR = '#e879f9';
-const PLAYER_SPEED = 3;
-const STAR_COUNT = 50;
-const BASE_LERP = 0.02;
-const LERP_INCREASE_INTERVAL = 300; // ~5 seconds at 60fps — pursuer speeds up
-const LERP_INCREMENT = 0.002;
+interface Target {
+    worldX: number;
+    worldY: number;
+    radius: number;
+    color: string;
+    glowColor: string;
+    label: string;
+    lockProgress: number; // 0 to 1
+    locked: boolean;
+    pulse: number;
+}
+
+const BG_COLOR = '#050510';
+const STAR_COUNT = 120;
+const CROSSHAIR_RADIUS = 20;
+const CROSSHAIR_COLOR = '#38bdf8';
+const PAN_SPEED = 1.2;
+const AIM_SPEED = 2;
+const LOCK_TIME = 60; // frames to lock on (~1 second)
+const TARGET_COLORS = [
+    { color: '#818cf8', glow: 'rgba(129,140,248,0.4)', label: 'Nebula' },
+    { color: '#e879f9', glow: 'rgba(232,121,249,0.4)', label: 'Pulsar' },
+    { color: '#38bdf8', glow: 'rgba(56,189,248,0.4)', label: 'Star' },
+    { color: '#a78bfa', glow: 'rgba(167,139,250,0.4)', label: 'Planet' },
+    { color: '#34d399', glow: 'rgba(52,211,153,0.4)', label: 'Quasar' },
+];
+
+function randomTarget(spread: number): Target {
+    const t = TARGET_COLORS[Math.floor(Math.random() * TARGET_COLORS.length)];
+    return {
+        worldX: (Math.random() - 0.5) * spread * 2,
+        worldY: (Math.random() - 0.5) * spread * 2,
+        radius: 8 + Math.random() * 6,
+        color: t.color,
+        glowColor: t.glow,
+        label: t.label,
+        lockProgress: 0,
+        locked: false,
+        pulse: Math.random() * Math.PI * 2,
+    };
+}
 
 export const createGame: CreateGame = (_container) => {
     return {
@@ -28,7 +60,7 @@ export const createGame: CreateGame = (_container) => {
                         mode: 'static',
                         position: { left: '50%', bottom: '15%' },
                         follow: true,
-                        color: 'rgba(56,189,248,0.5)',
+                        color: 'rgba(56,189,248,0.3)',
                     },
                     position: { left: '0', top: '0', width: '100%', height: '100%' },
                 },
@@ -41,28 +73,24 @@ export const createGame: CreateGame = (_container) => {
             let animId: number | null = null;
             let destroyed = false;
 
-            // World-space positions (player is always rendered at center of canvas)
-            let playerWorldX = 0;
-            let playerWorldY = 0;
+            // Camera world position
+            let camX = 0;
+            let camY = 0;
+
+            // Crosshair offset from center (driven by vector)
+            let aimX = 0;
+            let aimY = 0;
+
+            // Current joystick input
             let vectorX = 0;
             let vectorY = 0;
+            let baseDeltaX = 0;
+            let baseDeltaY = 0;
 
-            // Pursuer in world space
-            let pursuerWorldX = 0;
-            let pursuerWorldY = 0;
-            let pursuerPulse = 0;
-
-            // Game state
-            let frameCount = 0;
-            let startTime = 0;
-            let elapsedTime = 0;
-            let gameOver = false;
-            let waitingRestart = false;
-
-            // Background stars (in world space offsets)
-            let stars: Star[] = [];
-
-            let ro: ResizeObserver | null = null;
+            let score = 0;
+            const stars: Star[] = [];
+            let targets: Target[] = [];
+            const SPREAD = 800;
 
             function resizeCanvas() {
                 const parent = canvas.parentElement;
@@ -75,61 +103,49 @@ export const createGame: CreateGame = (_container) => {
             }
 
             function initStars() {
-                stars = [];
+                stars.length = 0;
                 for (let i = 0; i < STAR_COUNT; i++) {
                     stars.push({
-                        x: Math.random() * canvas.width * 3 - canvas.width,
-                        y: Math.random() * canvas.height * 3 - canvas.height,
-                        size: 1 + Math.random() * 2,
-                        opacity: 0.15 + Math.random() * 0.5,
-                        depth: 0.3 + Math.random() * 0.7,
+                        x: (Math.random() - 0.5) * SPREAD * 3,
+                        y: (Math.random() - 0.5) * SPREAD * 3,
+                        size: 0.5 + Math.random() * 2,
+                        brightness: 0.3 + Math.random() * 0.7,
+                        twinkleSpeed: 0.01 + Math.random() * 0.03,
+                        twinklePhase: Math.random() * Math.PI * 2,
                     });
                 }
             }
 
-            function getCurrentLerp(): number {
-                const intervals = Math.floor(frameCount / LERP_INCREASE_INTERVAL);
-                return Math.min(0.06, BASE_LERP + intervals * LERP_INCREMENT);
-            }
-
-            function resetGame() {
-                playerWorldX = 0;
-                playerWorldY = 0;
-                pursuerWorldX = -150;
-                pursuerWorldY = -150;
-                pursuerPulse = 0;
-                vectorX = 0;
-                vectorY = 0;
-                frameCount = 0;
-                startTime = performance.now();
-                elapsedTime = 0;
-                gameOver = false;
-                waitingRestart = false;
-                initStars();
+            function initTargets() {
+                targets = [];
+                for (let i = 0; i < 6; i++) {
+                    targets.push(randomTarget(SPREAD));
+                }
             }
 
             function drawBackground() {
                 ctx.fillStyle = BG_COLOR;
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
+            }
 
-                // Draw stars with parallax scrolling
-                const centerX = canvas.width / 2;
-                const centerY = canvas.height / 2;
+            function drawStars() {
+                const cx = canvas.width / 2;
+                const cy = canvas.height / 2;
 
                 for (const star of stars) {
-                    // Stars offset opposite to player movement, scaled by depth for parallax
-                    const screenX = star.x - playerWorldX * star.depth + centerX;
-                    const screenY = star.y - playerWorldY * star.depth + centerY;
+                    star.twinklePhase += star.twinkleSpeed;
+                    const twinkle = 0.5 + Math.sin(star.twinklePhase) * 0.5;
+                    const alpha = star.brightness * (0.4 + twinkle * 0.6);
 
-                    // Wrap stars around viewport with margin
-                    const margin = 50;
-                    const wrapW = canvas.width + margin * 2;
-                    const wrapH = canvas.height + margin * 2;
-                    const wrappedX = ((((screenX + margin) % wrapW) + wrapW) % wrapW) - margin;
-                    const wrappedY = ((((screenY + margin) % wrapH) + wrapH) % wrapH) - margin;
+                    const screenX = cx + (star.x - camX) * 0.3; // parallax
+                    const screenY = cy + (star.y - camY) * 0.3;
+
+                    // Wrap stars
+                    const wrappedX = ((screenX % canvas.width) + canvas.width) % canvas.width;
+                    const wrappedY = ((screenY % canvas.height) + canvas.height) % canvas.height;
 
                     ctx.save();
-                    ctx.globalAlpha = star.opacity;
+                    ctx.globalAlpha = alpha;
                     ctx.fillStyle = '#e2e8f0';
                     ctx.beginPath();
                     ctx.arc(wrappedX, wrappedY, star.size, 0, Math.PI * 2);
@@ -138,170 +154,285 @@ export const createGame: CreateGame = (_container) => {
                 }
             }
 
-            function drawDistanceLine() {
-                const centerX = canvas.width / 2;
-                const centerY = canvas.height / 2;
-
-                // Pursuer screen position
-                const pursuerScreenX = centerX + (pursuerWorldX - playerWorldX);
-                const pursuerScreenY = centerY + (pursuerWorldY - playerWorldY);
-
-                const dx = pursuerWorldX - playerWorldX;
-                const dy = pursuerWorldY - playerWorldY;
-                const dist = Math.sqrt(dx * dx + dy * dy);
-
-                // Color shifts from green (far) to red (close)
-                // max safe distance ~200, danger at ~30
-                const t = Math.max(0, Math.min(1, 1 - (dist - 30) / 170));
-
-                // Interpolate color components
-                const safeR = 0x34;
-                const safeG = 0xd3;
-                const safeB = 0x99;
-                const dangerR = 0xef;
-                const dangerG = 0x44;
-                const dangerB = 0x44;
-                const r = Math.round(safeR + (dangerR - safeR) * t);
-                const g = Math.round(safeG + (dangerG - safeG) * t);
-                const b = Math.round(safeB + (dangerB - safeB) * t);
-
-                const lineColor = `rgb(${r}, ${g}, ${b})`;
-
-                ctx.save();
-                ctx.strokeStyle = lineColor;
-                ctx.lineWidth = 1;
-                ctx.globalAlpha = 0.4;
-                ctx.setLineDash([4, 4]);
-                ctx.beginPath();
-                ctx.moveTo(centerX, centerY);
-                ctx.lineTo(pursuerScreenX, pursuerScreenY);
-                ctx.stroke();
-                ctx.setLineDash([]);
-                ctx.restore();
-            }
-
-            function drawPlayer() {
+            function drawTargets() {
                 const cx = canvas.width / 2;
                 const cy = canvas.height / 2;
 
-                ctx.save();
-                ctx.shadowBlur = 12;
-                ctx.shadowColor = PLAYER_COLOR;
-                ctx.fillStyle = PLAYER_COLOR;
-                ctx.beginPath();
-                ctx.arc(cx, cy, PLAYER_RADIUS, 0, Math.PI * 2);
-                ctx.fill();
+                for (const target of targets) {
+                    target.pulse += 0.03;
+                    const screenX = cx + (target.worldX - camX);
+                    const screenY = cy + (target.worldY - camY);
 
-                // Inner bright core
-                ctx.shadowBlur = 0;
-                ctx.fillStyle = '#e0f2fe';
-                ctx.beginPath();
-                ctx.arc(cx, cy, PLAYER_RADIUS * 0.4, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.restore();
+                    // Only draw if on screen (with margin)
+                    if (
+                        screenX < -60 ||
+                        screenX > canvas.width + 60 ||
+                        screenY < -60 ||
+                        screenY > canvas.height + 60
+                    ) {
+                        continue;
+                    }
+
+                    const pulseScale = 1 + Math.sin(target.pulse) * 0.15;
+                    const r = target.radius * pulseScale;
+
+                    // Outer glow
+                    ctx.save();
+                    ctx.shadowBlur = 20;
+                    ctx.shadowColor = target.glowColor;
+                    ctx.fillStyle = target.color;
+                    ctx.globalAlpha = target.locked ? 0.3 : 0.7;
+                    ctx.beginPath();
+                    ctx.arc(screenX, screenY, r, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    // Inner bright core
+                    ctx.shadowBlur = 0;
+                    ctx.globalAlpha = target.locked ? 0.2 : 0.5;
+                    ctx.fillStyle = '#ffffff';
+                    ctx.beginPath();
+                    ctx.arc(screenX, screenY, r * 0.35, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.restore();
+
+                    // Lock progress ring
+                    if (target.lockProgress > 0 && !target.locked) {
+                        ctx.save();
+                        ctx.strokeStyle = CROSSHAIR_COLOR;
+                        ctx.lineWidth = 2;
+                        ctx.globalAlpha = 0.8;
+                        ctx.beginPath();
+                        ctx.arc(
+                            screenX,
+                            screenY,
+                            r + 8,
+                            -Math.PI / 2,
+                            -Math.PI / 2 + target.lockProgress * Math.PI * 2,
+                        );
+                        ctx.stroke();
+                        ctx.restore();
+                    }
+
+                    // Locked indicator
+                    if (target.locked) {
+                        ctx.save();
+                        ctx.strokeStyle = '#34d399';
+                        ctx.lineWidth = 2;
+                        ctx.globalAlpha = 0.6;
+                        ctx.beginPath();
+                        ctx.arc(screenX, screenY, r + 8, 0, Math.PI * 2);
+                        ctx.stroke();
+
+                        ctx.font = '9px JetBrains Mono, monospace';
+                        ctx.fillStyle = '#34d399';
+                        ctx.globalAlpha = 0.5;
+                        ctx.textAlign = 'center';
+                        ctx.fillText('LOCKED', screenX, screenY + r + 20);
+                        ctx.restore();
+                    }
+
+                    // Label
+                    if (!target.locked) {
+                        ctx.save();
+                        ctx.font = '9px JetBrains Mono, monospace';
+                        ctx.fillStyle = target.color;
+                        ctx.globalAlpha = 0.4;
+                        ctx.textAlign = 'center';
+                        ctx.fillText(target.label, screenX, screenY + r + 18);
+                        ctx.restore();
+                    }
+                }
             }
 
-            function drawPursuer() {
-                const centerX = canvas.width / 2;
-                const centerY = canvas.height / 2;
+            function drawOffScreenIndicators() {
+                const cx = canvas.width / 2;
+                const cy = canvas.height / 2;
+                const margin = 30;
 
-                const screenX = centerX + (pursuerWorldX - playerWorldX);
-                const screenY = centerY + (pursuerWorldY - playerWorldY);
+                for (const target of targets) {
+                    if (target.locked) {
+                        continue;
+                    }
 
-                pursuerPulse += 0.06;
-                const pulseScale = 1 + Math.sin(pursuerPulse) * 0.15;
-                const r = PURSUER_RADIUS * pulseScale;
-                const alpha = 0.7 + Math.sin(pursuerPulse) * 0.2;
+                    const screenX = cx + (target.worldX - camX);
+                    const screenY = cy + (target.worldY - camY);
+
+                    if (
+                        screenX >= -10 &&
+                        screenX <= canvas.width + 10 &&
+                        screenY >= -10 &&
+                        screenY <= canvas.height + 10
+                    ) {
+                        continue;
+                    }
+
+                    const dx = screenX - cx;
+                    const dy = screenY - cy;
+                    const angle = Math.atan2(dy, dx);
+
+                    const edgeX = Math.max(
+                        margin,
+                        Math.min(
+                            canvas.width - margin,
+                            cx + Math.cos(angle) * (canvas.width / 2 - margin),
+                        ),
+                    );
+                    const edgeY = Math.max(
+                        margin,
+                        Math.min(
+                            canvas.height - margin,
+                            cy + Math.sin(angle) * (canvas.height / 2 - margin),
+                        ),
+                    );
+
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    const distLabel =
+                        dist < 1000 ? Math.round(dist).toString() : `${(dist / 1000).toFixed(1)}k`;
+
+                    ctx.save();
+                    ctx.translate(edgeX, edgeY);
+                    ctx.rotate(angle);
+
+                    ctx.shadowBlur = 6;
+                    ctx.shadowColor = target.color;
+                    ctx.fillStyle = target.color;
+                    ctx.globalAlpha = 0.5;
+
+                    ctx.beginPath();
+                    ctx.moveTo(8, 0);
+                    ctx.lineTo(-4, -5);
+                    ctx.lineTo(-4, 5);
+                    ctx.closePath();
+                    ctx.fill();
+
+                    ctx.rotate(-angle);
+
+                    ctx.shadowBlur = 0;
+                    ctx.globalAlpha = 0.35;
+                    ctx.fillStyle = target.color;
+                    ctx.font = '9px JetBrains Mono, monospace';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(distLabel, 0, 16);
+
+                    ctx.restore();
+                }
+            }
+
+            function drawCrosshair() {
+                const cx = canvas.width / 2 + aimX;
+                const cy = canvas.height / 2 + aimY;
 
                 ctx.save();
-                ctx.globalAlpha = alpha;
-                ctx.shadowBlur = 14;
-                ctx.shadowColor = PURSUER_COLOR;
-                ctx.fillStyle = PURSUER_COLOR;
+                ctx.strokeStyle = CROSSHAIR_COLOR;
+                ctx.lineWidth = 1;
+                ctx.globalAlpha = 0.6;
+                ctx.shadowBlur = 8;
+                ctx.shadowColor = CROSSHAIR_COLOR;
+
+                // Outer ring
                 ctx.beginPath();
-                ctx.arc(screenX, screenY, r, 0, Math.PI * 2);
+                ctx.arc(cx, cy, CROSSHAIR_RADIUS, 0, Math.PI * 2);
+                ctx.stroke();
+
+                // Cross lines
+                const gap = 6;
+                const len = CROSSHAIR_RADIUS - 4;
+
+                ctx.beginPath();
+                ctx.moveTo(cx - len, cy);
+                ctx.lineTo(cx - gap, cy);
+                ctx.moveTo(cx + gap, cy);
+                ctx.lineTo(cx + len, cy);
+                ctx.moveTo(cx, cy - len);
+                ctx.lineTo(cx, cy - gap);
+                ctx.moveTo(cx, cy + gap);
+                ctx.lineTo(cx, cy + len);
+                ctx.stroke();
+
+                // Center dot
+                ctx.globalAlpha = 0.8;
+                ctx.fillStyle = CROSSHAIR_COLOR;
+                ctx.beginPath();
+                ctx.arc(cx, cy, 2, 0, Math.PI * 2);
                 ctx.fill();
 
-                // Inner menacing core
-                ctx.shadowBlur = 0;
-                ctx.globalAlpha = alpha * 0.5;
-                ctx.fillStyle = '#fda4af';
-                ctx.beginPath();
-                ctx.arc(screenX, screenY, r * 0.4, 0, Math.PI * 2);
-                ctx.fill();
                 ctx.restore();
             }
 
             function drawScore() {
-                const display = gameOver ? elapsedTime : (performance.now() - startTime) / 1000;
-                const timeStr = `${display.toFixed(1)}s`;
                 ctx.save();
-                ctx.font = '16px JetBrains Mono, monospace';
-                ctx.fillStyle = '#94a3b8';
-                ctx.fillText(timeStr, 16, 28);
-                ctx.restore();
-            }
-
-            function drawGameOver() {
-                ctx.save();
-                // Semi-transparent overlay
-                ctx.fillStyle = 'rgba(10, 10, 18, 0.8)';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-                const centerX = canvas.width / 2;
-                const centerY = canvas.height / 2;
-
-                // GAME OVER text
-                ctx.shadowBlur = 20;
-                ctx.shadowColor = PURSUER_COLOR;
-                ctx.font = 'bold 28px JetBrains Mono, monospace';
-                ctx.fillStyle = PURSUER_COLOR;
-                ctx.textAlign = 'center';
-                ctx.fillText('GAME OVER', centerX, centerY - 20);
-
-                // Score
-                ctx.shadowBlur = 0;
-                ctx.font = '18px JetBrains Mono, monospace';
-                ctx.fillStyle = PLAYER_COLOR;
-                ctx.fillText(`${elapsedTime.toFixed(1)}s`, centerX, centerY + 15);
-
-                // Restart hint
                 ctx.font = '14px JetBrains Mono, monospace';
-                ctx.fillStyle = '#64748b';
-                ctx.fillText('Tap to restart', centerX, centerY + 50);
-
+                ctx.fillStyle = '#94a3b8';
+                ctx.fillText(`Locked: ${score} / ${targets.length}`, 16, 28);
                 ctx.restore();
+
+                // Hint
+                if (score === 0 && camX === 0 && camY === 0) {
+                    ctx.save();
+                    ctx.font = '11px JetBrains Mono, monospace';
+                    ctx.fillStyle = '#64748b';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(
+                        'Aim within radius \u2022 Pan by pushing beyond',
+                        canvas.width / 2,
+                        canvas.height - 20,
+                    );
+                    ctx.restore();
+                }
             }
 
-            function checkCollision(): boolean {
-                const dx = pursuerWorldX - playerWorldX;
-                const dy = pursuerWorldY - playerWorldY;
-                const dist = Math.sqrt(dx * dx + dy * dy);
-                return dist < PLAYER_RADIUS + PURSUER_RADIUS;
+            function checkLockOn() {
+                const cx = canvas.width / 2 + aimX;
+                const cy = canvas.height / 2 + aimY;
+                const screenCx = canvas.width / 2;
+                const screenCy = canvas.height / 2;
+
+                for (const target of targets) {
+                    if (target.locked) {
+                        continue;
+                    }
+
+                    const screenX = screenCx + (target.worldX - camX);
+                    const screenY = screenCy + (target.worldY - camY);
+
+                    const dx = cx - screenX;
+                    const dy = cy - screenY;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+
+                    if (dist < CROSSHAIR_RADIUS + target.radius) {
+                        target.lockProgress += 1 / LOCK_TIME;
+                        if (target.lockProgress >= 1) {
+                            target.lockProgress = 1;
+                            target.locked = true;
+                            score++;
+
+                            // Spawn a replacement if all aren't locked
+                            if (score < targets.length) {
+                                targets.push(randomTarget(SPREAD));
+                            }
+                        }
+                    } else {
+                        // Decay progress when not aiming at it
+                        target.lockProgress = Math.max(0, target.lockProgress - 0.5 / LOCK_TIME);
+                    }
+                }
             }
 
             function update() {
-                if (gameOver) {
-                    return;
-                }
+                // Pan camera via baseDelta (follow movement)
+                camX += baseDeltaX * PAN_SPEED;
+                camY -= baseDeltaY * PAN_SPEED;
 
-                frameCount++;
-                elapsedTime = (performance.now() - startTime) / 1000;
+                // Move crosshair via vector (within joystick radius)
+                const maxAim = Math.min(canvas.width, canvas.height) * 0.35;
+                aimX = vectorX * maxAim * AIM_SPEED;
+                aimY = -vectorY * maxAim * AIM_SPEED;
 
-                // Move player in world space
-                playerWorldX += vectorX * PLAYER_SPEED;
-                playerWorldY -= vectorY * PLAYER_SPEED;
+                // Clamp aim to screen
+                aimX = Math.max(-canvas.width / 2 + 20, Math.min(canvas.width / 2 - 20, aimX));
+                aimY = Math.max(-canvas.height / 2 + 20, Math.min(canvas.height / 2 - 20, aimY));
 
-                // Pursuer lerps toward player with increasing speed
-                const lerp = getCurrentLerp();
-                pursuerWorldX += (playerWorldX - pursuerWorldX) * lerp;
-                pursuerWorldY += (playerWorldY - pursuerWorldY) * lerp;
-
-                // Check collision
-                if (checkCollision()) {
-                    gameOver = true;
-                    waitingRestart = true;
-                }
+                checkLockOn();
             }
 
             function render() {
@@ -312,22 +443,13 @@ export const createGame: CreateGame = (_container) => {
                 update();
 
                 drawBackground();
-                drawDistanceLine();
-                drawPursuer();
-                drawPlayer();
+                drawStars();
+                drawTargets();
+                drawOffScreenIndicators();
+                drawCrosshair();
                 drawScore();
 
-                if (gameOver) {
-                    drawGameOver();
-                }
-
                 animId = requestAnimationFrame(render);
-            }
-
-            function onStart() {
-                if (waitingRestart) {
-                    resetGame();
-                }
             }
 
             return {
@@ -340,43 +462,30 @@ export const createGame: CreateGame = (_container) => {
                     ctx = context;
 
                     resizeCanvas();
-
-                    // Initialize game state
-                    playerWorldX = 0;
-                    playerWorldY = 0;
-                    pursuerWorldX = -150;
-                    pursuerWorldY = -150;
-                    startTime = performance.now();
-
                     initStars();
+                    initTargets();
 
-                    // Observe container resize
-                    ro = new ResizeObserver(() => {
-                        resizeCanvas();
-                    });
+                    const ro = new ResizeObserver(() => resizeCanvas());
                     if (canvas.parentElement) {
                         ro.observe(canvas.parentElement);
                     }
 
-                    // Listen to joystick events
-                    const joystick = joysticks[0] ?? null;
-                    if (joystick) {
-                        joystick.on('move', (evt) => {
+                    if (joysticks[0]) {
+                        joysticks[0].on('move', (evt) => {
                             vectorX = evt.data.vector.x;
                             vectorY = evt.data.vector.y;
+                            baseDeltaX = evt.data.baseDelta.x;
+                            baseDeltaY = evt.data.baseDelta.y;
                         });
 
-                        joystick.on('end', () => {
+                        joysticks[0].on('end', () => {
                             vectorX = 0;
                             vectorY = 0;
-                        });
-
-                        joystick.on('start', () => {
-                            onStart();
+                            baseDeltaX = 0;
+                            baseDeltaY = 0;
                         });
                     }
 
-                    // Start render loop
                     render();
                 },
 
@@ -385,10 +494,6 @@ export const createGame: CreateGame = (_container) => {
                     if (animId !== null) {
                         cancelAnimationFrame(animId);
                         animId = null;
-                    }
-                    if (ro) {
-                        ro.disconnect();
-                        ro = null;
                     }
                 },
             };

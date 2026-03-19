@@ -91,16 +91,20 @@ const manager = nipplejs.create({
   zone: document.getElementById('zone'),
   mode: 'static',
   position: { left: '50%', bottom: '15%' },
-  follow: true, // Joystick follows your thumb
-  color: 'rgba(56, 189, 248, 0.5)',
+  follow: true, // Base follows your thumb
+  color: 'rgba(56, 189, 248, 0.3)',
 });
 
 manager.on('move', (evt) => {
-  const { vector } = evt.data;
-  // Drag beyond the joystick edge —
-  // it follows your thumb seamlessly
-  player.x += vector.x * speed;
-  player.y -= vector.y * speed;
+  const { vector, baseDelta } = evt.data;
+
+  // vector: fine aim within joystick radius
+  crosshair.x = vector.x * aimRange;
+  crosshair.y = -vector.y * aimRange;
+
+  // baseDelta: camera pan when dragging beyond radius
+  camera.x += baseDelta.x * panSpeed;
+  camera.y -= baseDelta.y * panSpeed;
 });`,
 
     'space-drift': `import nipplejs from 'nipplejs';
