@@ -25,9 +25,9 @@ interface Target {
 
 const BG_COLOR = '#050510';
 const STAR_COUNT = 200;
-const CROSSHAIR_RADIUS = 20;
+const CROSSHAIR_RADIUS = 24;
 const CROSSHAIR_COLOR = '#38bdf8';
-const PAN_SPEED = 1.2;
+const PAN_SPEED = 0.8;
 const LOCK_TIME = 60; // frames to lock on (~1 second)
 const TARGET_COLORS = [
     { color: '#818cf8', glow: 'rgba(129,140,248,0.4)', label: 'Nebula' },
@@ -62,8 +62,8 @@ export const createGame: CreateGame = (_container) => {
                         position: { left: '50%', bottom: '15%' },
                         follow: true,
                         color: {
-                            front: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 50 50'%3E%3Ccircle cx='25' cy='25' r='23' fill='none' stroke='%2338bdf8' stroke-width='2' opacity='0.8'/%3E%3Ccircle cx='25' cy='25' r='12' fill='none' stroke='%2338bdf8' stroke-width='1' opacity='0.5'/%3E%3Cline x1='25' y1='5' x2='25' y2='18' stroke='%2338bdf8' stroke-width='1' opacity='0.4'/%3E%3Cline x1='25' y1='32' x2='25' y2='45' stroke='%2338bdf8' stroke-width='1' opacity='0.4'/%3E%3Cline x1='5' y1='25' x2='18' y2='25' stroke='%2338bdf8' stroke-width='1' opacity='0.4'/%3E%3Cline x1='32' y1='25' x2='45' y2='25' stroke='%2338bdf8' stroke-width='1' opacity='0.4'/%3E%3Ccircle cx='25' cy='25' r='2' fill='%2338bdf8' opacity='0.6'/%3E%3C/svg%3E") center/cover`,
-                            back: 'radial-gradient(circle, rgba(56,189,248,0.08) 60%, rgba(56,189,248,0.02) 100%)',
+                            front: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 50 50'%3E%3Ccircle cx='25' cy='25' r='22' fill='none' stroke='%2338bdf8' stroke-width='3' opacity='0.9'/%3E%3Ccircle cx='25' cy='25' r='10' fill='none' stroke='%2338bdf8' stroke-width='2' opacity='0.6'/%3E%3Cline x1='25' y1='3' x2='25' y2='15' stroke='%2338bdf8' stroke-width='2' opacity='0.7'/%3E%3Cline x1='25' y1='35' x2='25' y2='47' stroke='%2338bdf8' stroke-width='2' opacity='0.7'/%3E%3Cline x1='3' y1='25' x2='15' y2='25' stroke='%2338bdf8' stroke-width='2' opacity='0.7'/%3E%3Cline x1='35' y1='25' x2='47' y2='25' stroke='%2338bdf8' stroke-width='2' opacity='0.7'/%3E%3Ccircle cx='25' cy='25' r='3' fill='%2338bdf8' opacity='0.8'/%3E%3C/svg%3E") center/cover`,
+                            back: 'radial-gradient(circle, rgba(56,189,248,0.12) 40%, rgba(56,189,248,0.03) 100%)',
                         },
                     },
                     position: { left: '0', top: '0', width: '100%', height: '100%' },
@@ -82,14 +82,14 @@ export const createGame: CreateGame = (_container) => {
             let camY = 0;
             let camVelX = 0;
             let camVelY = 0;
-            const CAM_FRICTION = 0.88;
+            const CAM_FRICTION = 0.92;
 
             // Crosshair offset from center (smoothed)
             let aimX = 0;
             let aimY = 0;
             let aimTargetX = 0;
             let aimTargetY = 0;
-            const AIM_LERP = 0.15;
+            const AIM_LERP = 0.08;
 
             // Current joystick input
             let vectorX = 0;
@@ -201,22 +201,14 @@ export const createGame: CreateGame = (_container) => {
                     const pulseScale = 1 + Math.sin(target.pulse) * 0.15;
                     const r = target.radius * pulseScale;
 
-                    // Outer glow
+                    // Simple filled circle with soft glow
                     ctx.save();
-                    ctx.shadowBlur = 20;
+                    ctx.shadowBlur = 15;
                     ctx.shadowColor = target.glowColor;
+                    ctx.globalAlpha = target.locked ? 0.2 : 0.5;
                     ctx.fillStyle = target.color;
-                    ctx.globalAlpha = target.locked ? 0.3 : 0.7;
                     ctx.beginPath();
                     ctx.arc(screenX, screenY, r, 0, Math.PI * 2);
-                    ctx.fill();
-
-                    // Inner bright core
-                    ctx.shadowBlur = 0;
-                    ctx.globalAlpha = target.locked ? 0.2 : 0.5;
-                    ctx.fillStyle = '#ffffff';
-                    ctx.beginPath();
-                    ctx.arc(screenX, screenY, r * 0.35, 0, Math.PI * 2);
                     ctx.fill();
                     ctx.restore();
 
@@ -349,9 +341,9 @@ export const createGame: CreateGame = (_container) => {
 
                 ctx.save();
                 ctx.strokeStyle = CROSSHAIR_COLOR;
-                ctx.lineWidth = 1;
-                ctx.globalAlpha = 0.6;
-                ctx.shadowBlur = 8;
+                ctx.lineWidth = 1.5;
+                ctx.globalAlpha = 0.8;
+                ctx.shadowBlur = 12;
                 ctx.shadowColor = CROSSHAIR_COLOR;
 
                 // Outer ring
