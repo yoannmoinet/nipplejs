@@ -1,8 +1,8 @@
 @import 'tailwindcss';
 
-/* Prevent horizontal scrollbar from code panels sticking out, without clipping overflow on inner elements */
+/* Prevent horizontal scrollbar from code panels and carousel overflow */
 html {
-  overflow-x: clip;
+  overflow-x: hidden;
 }
 
 @theme {

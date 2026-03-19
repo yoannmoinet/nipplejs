@@ -195,46 +195,167 @@ const games = [
       </div>
     </section>
 
-    <!-- Stats -->
-    <section class="flex flex-col sm:flex-row gap-4 justify-center mb-24">
-      <div class="glass flex-1 p-6 text-center">
-        <div class="flex items-center justify-center gap-2">
-          <span class="w-1.5 h-1.5 rounded-full bg-accent-indigo shadow-[0_0_8px_rgba(129,140,248,0.8)]"></span>
-          <span class="font-mono text-4xl font-bold text-heading" style="text-shadow: 0 0 20px rgba(129,140,248,0.6);">3</span>
-        </div>
-        <p class="mt-2 text-xs uppercase tracking-widest text-muted">Modes</p>
-      </div>
-      <div class="glass flex-1 p-6 text-center">
-        <div class="flex items-center justify-center gap-2">
-          <span class="w-1.5 h-1.5 rounded-full bg-accent-cyan shadow-[0_0_8px_rgba(56,189,248,0.8)]"></span>
-          <span class="font-mono text-4xl font-bold text-heading" style="text-shadow: 0 0 20px rgba(56,189,248,0.6);">0</span>
-        </div>
-        <p class="mt-2 text-xs uppercase tracking-widest text-muted">Dependencies</p>
-      </div>
-      <div class="glass flex-1 p-6 text-center">
-        <div class="flex items-center justify-center gap-2">
-          <span class="w-1.5 h-1.5 rounded-full bg-accent-purple shadow-[0_0_8px_rgba(167,139,250,0.8)]"></span>
-          <span class="font-mono text-4xl font-bold text-heading" style="text-shadow: 0 0 20px rgba(167,139,250,0.6);">TS</span>
-        </div>
-        <p class="mt-2 text-xs uppercase tracking-widest text-muted">Native</p>
-      </div>
-    </section>
 
-    <!-- Games Showcase -->
-    <section class="space-y-16 pb-24">
-      {games.map((game) => (
-        <div>
-          <h3 class="text-heading text-2xl font-bold mb-2">{game.name}</h3>
-          <p class="text-body mb-3">{game.description}</p>
-          <div class="flex flex-wrap gap-2 mb-4">
-            {game.badges.map((badge) => (
-              <span class="glass px-3 py-1 text-xs font-mono text-muted">{badge}</span>
+  </main>
+
+    <!-- Games Carousel — full viewport width -->
+    <section class="pb-24" id="games-carousel">
+      <div class="max-w-5xl mx-auto px-6">
+      <!-- Active game info -->
+      <div class="text-center mb-6" id="carousel-info">
+        <h3 class="text-heading text-2xl font-bold mb-2 transition-opacity duration-300" id="carousel-title">{games[0].name}</h3>
+        <p class="text-body mb-3 transition-opacity duration-300" id="carousel-desc">{games[0].description}</p>
+        <div class="flex flex-wrap gap-2 justify-center transition-opacity duration-300" id="carousel-badges">
+          {games[0].badges.map((badge) => (
+            <span class="glass px-3 py-1 text-xs font-mono text-muted">{badge}</span>
+          ))}
+        </div>
+      </div>
+
+      </div><!-- close max-w-5xl -->
+
+      <!-- Arrows + track in a row — full viewport width -->
+      <div class="flex items-center gap-4 px-4">
+        <!-- Prev -->
+        <button id="carousel-prev" class="flex-shrink-0 cursor-pointer text-white/15 hover:text-white/40 transition-colors" aria-label="Previous game">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+        </button>
+
+        <!-- Track wrapper — overflow visible so neighbors show -->
+        <div class="flex-1 min-w-0" style="overflow: visible;">
+          <div class="flex" id="carousel-track" style="transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);">
+            {games.map((game, i) => (
+              <div
+                class="carousel-slide flex-shrink-0 px-3"
+                style="width: 75%; transition: transform 0.5s ease, opacity 0.5s ease, filter 0.5s ease;"
+                data-slide={i}
+                data-name={game.name}
+                data-desc={game.description}
+                data-badges={JSON.stringify(game.badges)}
+              >
+                <JoystickDemo game={game.slug} highlight={game.highlights} />
+              </div>
             ))}
           </div>
-          <JoystickDemo game={game.slug} highlight={game.highlights} />
         </div>
-      ))}
+
+        <!-- Next -->
+        <button id="carousel-next" class="flex-shrink-0 cursor-pointer text-white/15 hover:text-white/40 transition-colors" aria-label="Next game">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+        </button>
+      </div>
+
+      <!-- Dots -->
+      <div class="flex justify-center gap-2 mt-6" id="carousel-dots">
+        {games.map((game, i) => (
+          <button
+            class:list={['w-2 h-2 rounded-full transition-all duration-300 cursor-pointer', i === 0 ? 'bg-accent-indigo w-6' : 'bg-muted/30']}
+            data-dot={i}
+            aria-label={`Go to ${game.name}`}
+          />
+        ))}
+      </div>
+
+      <script>
+        const track = document.getElementById('carousel-track')!;
+        const dots = document.querySelectorAll<HTMLElement>('#carousel-dots [data-dot]');
+        const prevBtn = document.getElementById('carousel-prev')!;
+        const nextBtn = document.getElementById('carousel-next')!;
+        const slides = document.querySelectorAll<HTMLElement>('.carousel-slide');
+        const titleEl = document.getElementById('carousel-title')!;
+        const descEl = document.getElementById('carousel-desc')!;
+        const badgesEl = document.getElementById('carousel-badges')!;
+        const total = slides.length;
+        const SLIDE_PCT = 75; // each slide is 75% of track width
+        let current = 0;
+
+        // Center offset: to center the active slide, shift by (100 - 80) / 2 = 10%
+        const CENTER_OFFSET = (100 - SLIDE_PCT) / 2;
+
+        function goTo(index: number) {
+          current = ((index % total) + total) % total;
+
+          // Translate the track so current slide is centered
+          track.style.transform = `translateX(calc(-${current * SLIDE_PCT}% + ${CENTER_OFFSET}%))`;
+
+          // Style each slide — active is flat, neighbors are tilted and blurred
+          slides.forEach((slide, i) => {
+            const diff = i - current;
+            if (diff === 0) {
+              slide.style.opacity = '1';
+              slide.style.transform = 'scale(1) perspective(1000px) rotateY(0deg)';
+              slide.style.filter = 'none';
+              slide.style.pointerEvents = 'auto';
+              slide.style.zIndex = '2';
+              slide.style.cursor = 'default';
+            } else if (Math.abs(diff) === 1 || Math.abs(diff) === total - 1) {
+              // Immediate neighbor
+              const isRight = diff === 1 || diff === -(total - 1);
+              slide.style.opacity = '0.35';
+              slide.style.transform = `scale(0.88) perspective(1000px) rotateY(${isRight ? '-8' : '8'}deg)`;
+              slide.style.filter = 'blur(2px)';
+              slide.style.pointerEvents = 'auto';
+              slide.style.zIndex = '1';
+              slide.style.cursor = 'pointer';
+            } else {
+              slide.style.opacity = '0.1';
+              slide.style.transform = 'scale(0.8)';
+              slide.style.filter = 'blur(4px)';
+              slide.style.pointerEvents = 'none';
+              slide.style.zIndex = '0';
+              slide.style.cursor = 'default';
+            }
+          });
+
+          // Update text
+          const active = slides[current];
+          if (active) {
+            titleEl.textContent = active.dataset.name || '';
+            descEl.textContent = active.dataset.desc || '';
+            const badges = JSON.parse(active.dataset.badges || '[]') as string[];
+            badgesEl.textContent = '';
+            badges.forEach((b) => {
+              const span = document.createElement('span');
+              span.className = 'glass px-3 py-1 text-xs font-mono text-muted';
+              span.textContent = b;
+              badgesEl.appendChild(span);
+            });
+          }
+
+          // Dots
+          dots.forEach((dot, i) => {
+            if (i === current) {
+              dot.classList.add('bg-accent-indigo', 'w-6');
+              dot.classList.remove('bg-muted/30');
+            } else {
+              dot.classList.remove('bg-accent-indigo', 'w-6');
+              dot.classList.add('bg-muted/30');
+            }
+          });
+        }
+
+        // Click neighbors to navigate
+        slides.forEach((slide, i) => {
+          slide.addEventListener('click', () => {
+            if (i !== current) goTo(i);
+          });
+        });
+
+        // Init — set initial styles without transition, then enable
+        track.style.transition = 'none';
+        goTo(0);
+        // Force reflow then enable transition
+        track.offsetHeight;
+        track.style.transition = 'transform 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
+
+        prevBtn.addEventListener('click', () => goTo(current - 1));
+        nextBtn.addEventListener('click', () => goTo(current + 1));
+        dots.forEach((dot) => {
+          dot.addEventListener('click', () => goTo(Number(dot.dataset.dot)));
+        });
+      </script>
     </section>
 
+  <main class="max-w-5xl mx-auto px-6">
   </main>
 </BaseLayout>
