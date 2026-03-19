@@ -30,7 +30,10 @@ export const createGame: CreateGame = (_container) => {
                         mode: 'static',
                         position: { left: '50%', bottom: '15%' },
                         lockX: true,
-                        color: 'linear-gradient(135deg, rgba(56,189,248,0.5), rgba(99,102,241,0.3))',
+                        color: {
+                            front: 'linear-gradient(135deg, #38bdf8, #0ea5e9)',
+                            back: 'rgba(56,189,248,0.12)',
+                        },
                     },
                     position: { left: '0', top: '0', width: '100%', height: '100%' },
                 },

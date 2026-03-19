@@ -40,13 +40,20 @@ export interface CommonOptions {
     threshold?: number;
 
     /**
-     * ### Defaults to `'white'`
+     * ### Defaults to `’white’`
      *
      * The background color of your joystick’s elements.
      *
-     * Can be any valid CSS color.
+     * Can be a single CSS color/gradient string applied to both circles,
+     * or an object with `front` and `back` to style them separately.
+     *
+     * ```js
+     * color: ‘red’
+     * color: ‘linear-gradient(135deg, #818cf8, #38bdf8)’
+     * color: { front: ‘#818cf8’, back: ‘rgba(99,102,241,0.2)’ }
+     * ```
      */
-    color?: string;
+    color?: string | { front: string; back: string };
 
     /**
      * ### Defaults to `250`

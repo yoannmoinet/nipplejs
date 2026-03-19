@@ -41,7 +41,10 @@ export const createGame: CreateGame = (_container) => {
                     options: {
                         mode: 'static',
                         position: { left: '100px', bottom: '100px' },
-                        color: 'linear-gradient(135deg, rgba(99,102,241,0.5), rgba(56,189,248,0.3))',
+                        color: {
+                            front: 'linear-gradient(135deg, #818cf8, #38bdf8)',
+                            back: 'rgba(99,102,241,0.12)',
+                        },
                     },
                     position: { left: '0', top: '0', width: '50%', height: '100%' },
                 },
@@ -49,7 +52,10 @@ export const createGame: CreateGame = (_container) => {
                     options: {
                         mode: 'static',
                         position: { right: '100px', bottom: '100px' },
-                        color: 'linear-gradient(135deg, rgba(236,72,153,0.5), rgba(167,139,250,0.3))',
+                        color: {
+                            front: 'linear-gradient(135deg, #e879f9, #ec4899)',
+                            back: 'rgba(236,72,153,0.12)',
+                        },
                     },
                     position: { left: '50%', top: '0', width: '50%', height: '100%' },
                 },

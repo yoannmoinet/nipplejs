@@ -107,6 +107,14 @@ export class Joystick extends Super {
         }
     }
 
+    private resolveColors(): { front: string; back: string } {
+        const color = this.options.color;
+        if (typeof color === 'object' && color !== null) {
+            return color;
+        }
+        return { front: color as string, back: color as string };
+    }
+
     private buildEl() {
         // Build the dom element.
         this.ui.el.className = `joystick collection_${this.collection.uid}`;
@@ -122,6 +130,7 @@ export class Joystick extends Super {
         const animTime = `${this.options.fadeTime}ms`;
         const borderStyle = u.configStylePropertyObject('borderRadius', '50%');
         const transitStyle = u.configStylePropertyObject('transition', `opacity ${animTime}`);
+        const colors = this.resolveColors();
 
         u.extend(this.ui.el.style, {
             position: 'absolute',
@@ -139,7 +148,7 @@ export class Joystick extends Super {
             left: '0',
             marginLeft: `${-this.options.size / 2}px`,
             marginTop: `${-this.options.size / 2}px`,
-            background: this.options.color,
+            background: colors.back,
             opacity: '.5',
             ...(this.options.shape === 'circle' ? borderStyle : {}),
         });
@@ -152,7 +161,7 @@ export class Joystick extends Super {
             left: '0',
             marginLeft: `${-this.options.size / 4}px`,
             marginTop: `${-this.options.size / 4}px`,
-            background: this.options.color,
+            background: colors.front,
             opacity: '.5',
             transform: 'translate(0px, 0px)',
             ...borderStyle,
