@@ -18,24 +18,24 @@
 -   [Demo](#demo)
 -   [Usage](#usage)
 -   [Options](#options)
-    -   [`options.zone` defaults to 'body'](#optionszone-defaults-to-body)
-    -   [`options.color` defaults to 'white'](#optionscolor-defaults-to-white)
-    -   [`options.size` defaults to 100](#optionssize-defaults-to-100)
-    -   [`options.threshold` defaults to 0.1](#optionsthreshold-defaults-to-01)
-    -   [`options.fadeTime` defaults to 250](#optionsfadetime-defaults-to-250)
-    -   [`options.multitouch` defaults to false](#optionsmultitouch-defaults-to-false)
-    -   [`options.maxNumberOfJoysticks` defaults to 1](#optionsmaxnumberofjoysticks-defaults-to-1)
-    -   [`options.dataOnly` defaults to false](#optionsdataonly-defaults-to-false)
-    -   [`options.position` defaults to `{top: 0, left: 0}`](#optionsposition-defaults-to-top-0-left-0)
-    -   [`options.mode` defaults to 'dynamic'.](#optionsmode-defaults-to-dynamic)
-    -   [`options.restJoystick` defaults to true](#optionsrestjoystick-defaults-to-true)
-    -   [`options.restOpacity` defaults to 0.5](#optionsrestopacity-defaults-to-05)
-    -   [`options.catchDistance` defaults to 200](#optionscatchdistance-defaults-to-200)
-    -   [`options.lockX` defaults to false](#optionslockx-defaults-to-false)
-    -   [`options.lockY` defaults to false](#optionslocky-defaults-to-false)
-    -   [`options.shape` defaults to 'circle'](#optionsshape-defaults-to-circle)
-    -   [`options.dynamicPage` defaults to false](#optionsdynamicpage-defaults-to-false)
-    -   [`options.follow` defaults to false](#optionsfollow-defaults-to-false)
+    -   [`options.zone`](#optionszone)
+    -   [`options.color`](#optionscolor)
+    -   [`options.size`](#optionssize)
+    -   [`options.threshold`](#optionsthreshold)
+    -   [`options.fadeTime`](#optionsfadetime)
+    -   [`options.multitouch`](#optionsmultitouch)
+    -   [`options.maxNumberOfJoysticks`](#optionsmaxnumberofjoysticks)
+    -   [`options.dataOnly`](#optionsdataonly)
+    -   [`options.position`](#optionsposition)
+    -   [`options.mode`](#optionsmode)
+    -   [`options.restJoystick`](#optionsrestjoystick)
+    -   [`options.restOpacity`](#optionsrestopacity)
+    -   [`options.catchDistance`](#optionscatchdistance)
+    -   [`options.lockX`](#optionslockx)
+    -   [`options.lockY`](#optionslocky)
+    -   [`options.shape`](#optionsshape)
+    -   [`options.dynamicPage`](#optionsdynamicpage)
+    -   [`options.follow`](#optionsfollow)
 -   [API](#api)
     -   [NippleJS instance (manager)](#nipplejs-instance-manager)
     -   [Logging](#logging)
@@ -132,7 +132,9 @@ var options = {
 
 All options are optional :sunglasses:.
 
-### `options.zone` defaults to 'body'
+### `options.zone`
+> Defaults to 'body'
+
 The dom element in which all your joysticks will be injected.
 
 ```html
@@ -151,27 +153,37 @@ This zone also serve as the mouse/touch events handler.
 
 It represents the zone where all your joysticks will be active.
 
-### `options.color` defaults to 'white'
+### `options.color`
+> Defaults to 'white'
+
 The background color of your joystick's elements.
 
 Can be any valid CSS color.
 
-### `options.size` defaults to 100
+### `options.size`
+> Defaults to 100
+
 The size in pixel of the outer circle.
 
 The inner circle is 50% of this size.
 
-### `options.threshold` defaults to 0.1
+### `options.threshold`
+> Defaults to 0.1
+
 This is the strength needed to trigger a directional event.
 
 Basically, the center is 0 and the outer is 1.
 
 You need to at least go to 0.1 to trigger a directional event.
 
-### `options.fadeTime` defaults to 250
+### `options.fadeTime`
+> Defaults to 250
+
 The time it takes for joystick to fade-out and fade-in when activated or de-activated.
 
-### `options.multitouch` defaults to false
+### `options.multitouch`
+> Defaults to false
+
 Enable the multitouch capabilities.
 
 If, for reasons, you need to have multiple nipples in the same zone.
@@ -180,15 +192,21 @@ Otherwise, it will only get one, and all new touches won't do a thing.
 
 Please note that multitouch is off when in `static` or `semi` modes.
 
-### `options.maxNumberOfJoysticks` defaults to 1
+### `options.maxNumberOfJoysticks`
+> Defaults to 1
+
 If you need to, you can also control the maximum number of instances that could be created.
 
 Obviously in a multitouch configuration.
 
-### `options.dataOnly` defaults to false
+### `options.dataOnly`
+> Defaults to false
+
 The library won't draw anything in the DOM and will only trigger events with data.
 
-### `options.position` defaults to `{top: 0, left: 0}`
+### `options.position`
+> Defaults to `{top: 0, left: 0}`
+
 An object that will determine the position of a `static` mode.
 
 You can pass any of the four `top`, `right`, `bottom` and `left`.
@@ -199,7 +217,9 @@ Ex :
 - `{top: '50px', left: '50px'}`
 - `{left: '10%', bottom: '10%'}`
 
-### `options.mode` defaults to 'dynamic'.
+### `options.mode`
+> Defaults to 'dynamic'.
+
 Three modes are possible :
 
 #### `'dynamic'`
@@ -220,7 +240,9 @@ Three modes are possible :
 - each new touch triggers a new direction.
 - **cannot** be multitouch.
 
-### `options.restJoystick` defaults to true
+### `options.restJoystick`
+> Defaults to true
+
 Reset the joystick's position when it enters the rest state.
 
 You can pass a boolean value to reset the joystick's position for both the axis.
@@ -246,22 +268,32 @@ var joystick = nipplejs.create({
 });
 ```
 
-### `options.restOpacity` defaults to 0.5
+### `options.restOpacity`
+> Defaults to 0.5
+
 The opacity to apply when the joystick is in a rest position.
 
-### `options.catchDistance` defaults to 200
+### `options.catchDistance`
+> Defaults to 200
+
 This is only useful in the `semi` mode, and determine at which distance we recycle the previous joystick.
 
 At 200 (px), if you press the zone into a rayon of 200px around the previously displayed joystick,
 it will act as a `static` one.
 
-### `options.lockX` defaults to false
+### `options.lockX`
+> Defaults to false
+
 Locks joystick's movement to the x (horizontal) axis
 
-### `options.lockY` defaults to false
+### `options.lockY`
+> Defaults to false
+
 Locks joystick's movement to the y (vertical) axis
 
-### `options.shape` defaults to 'circle'
+### `options.shape`
+> Defaults to 'circle'
+
 The shape of region within which joystick can move.
 
 #### `'circle'`
@@ -270,10 +302,14 @@ Creates circle region for joystick movement
 #### `'square'`
 Creates square region for joystick movement
 
-### `options.dynamicPage` defaults to false
+### `options.dynamicPage`
+> Defaults to false
+
 Enable if the page has dynamically visible elements such as for Vue, React, Angular or simply some CSS hiding or showing some DOM.
 
-### `options.follow` defaults to false
+### `options.follow`
+> Defaults to false
+
 Makes the joystick follow the thumbstick when it reaches the border.
 
 ----
