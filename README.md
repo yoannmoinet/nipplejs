@@ -33,6 +33,7 @@
     -   [`options.follow` defaults to false](#optionsfollow-defaults-to-false)
 -   [API](#api)
     -   [NippleJS instance (manager)](#nipplejs-instance-manager)
+    -   [Logging](#logging)
     -   [nipple instance (joystick)](#nipple-instance-joystick)
     -   [`joystick.on`, `joystick.off`](#joystickon-joystickoff)
     -   [`joystick.ui`](#joystickui)
