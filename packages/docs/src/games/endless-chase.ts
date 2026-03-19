@@ -7,6 +7,8 @@ interface Star {
     brightness: number;
     twinkleSpeed: number;
     twinklePhase: number;
+    depth: number; // 0 = far background, 1 = near foreground
+    color: string;
 }
 
 interface Target {
@@ -22,7 +24,7 @@ interface Target {
 }
 
 const BG_COLOR = '#050510';
-const STAR_COUNT = 120;
+const STAR_COUNT = 200;
 const CROSSHAIR_RADIUS = 20;
 const CROSSHAIR_COLOR = '#38bdf8';
 const PAN_SPEED = 1.2;
@@ -72,13 +74,19 @@ export const createGame: CreateGame = (_container) => {
             let animId: number | null = null;
             let destroyed = false;
 
-            // Camera world position
+            // Camera world position (smoothed)
             let camX = 0;
             let camY = 0;
+            let camVelX = 0;
+            let camVelY = 0;
+            const CAM_FRICTION = 0.88;
 
-            // Crosshair offset from center (driven by vector)
+            // Crosshair offset from center (smoothed)
             let aimX = 0;
             let aimY = 0;
+            let aimTargetX = 0;
+            let aimTargetY = 0;
+            const AIM_LERP = 0.15;
 
             // Current joystick input
             let vectorX = 0;
@@ -101,19 +109,25 @@ export const createGame: CreateGame = (_container) => {
                 canvas.height = rect.height;
             }
 
-            // Stars are placed in a 0..1 normalized tile that repeats infinitely
+            // Stars at multiple depth layers for parallax 3D effect
+            const STAR_COLORS = ['#e2e8f0', '#c7d2fe', '#bae6fd', '#ddd6fe', '#fbcfe8'];
             function initStars() {
                 stars.length = 0;
                 for (let i = 0; i < STAR_COUNT; i++) {
+                    const depth = Math.random(); // 0 = far, 1 = near
                     stars.push({
-                        x: Math.random(), // 0..1 normalized position within tile
+                        x: Math.random(),
                         y: Math.random(),
-                        size: 0.5 + Math.random() * 2,
-                        brightness: 0.3 + Math.random() * 0.7,
-                        twinkleSpeed: 0.01 + Math.random() * 0.03,
+                        size: 0.3 + depth * 2.2, // far = tiny, near = bigger
+                        brightness: 0.15 + depth * 0.65, // far = dim, near = bright
+                        twinkleSpeed: 0.005 + Math.random() * 0.025,
                         twinklePhase: Math.random() * Math.PI * 2,
+                        depth,
+                        color: STAR_COLORS[Math.floor(Math.random() * STAR_COLORS.length)],
                     });
                 }
+                // Sort by depth so far stars draw first
+                stars.sort((a, b) => a.depth - b.depth);
             }
 
             function initTargets() {
@@ -131,22 +145,30 @@ export const createGame: CreateGame = (_container) => {
             function drawStars() {
                 const w = canvas.width;
                 const h = canvas.height;
-                // Camera offset in tile space (parallax factor 0.3)
-                const offsetX = (camX * 0.3) % w;
-                const offsetY = (camY * 0.3) % h;
 
                 for (const star of stars) {
                     star.twinklePhase += star.twinkleSpeed;
                     const twinkle = 0.5 + Math.sin(star.twinklePhase) * 0.5;
-                    const alpha = star.brightness * (0.4 + twinkle * 0.6);
+                    const alpha = star.brightness * (0.3 + twinkle * 0.7);
 
-                    // Place star in tile, offset by camera, wrap seamlessly
+                    // Parallax: far stars (depth~0) move slowly, near stars (depth~1) move faster
+                    const parallax = 0.05 + star.depth * 0.5;
+                    const offsetX = (camX * parallax) % w;
+                    const offsetY = (camY * parallax) % h;
+
                     const sx = (((star.x * w - offsetX) % w) + w) % w;
                     const sy = (((star.y * h - offsetY) % h) + h) % h;
 
                     ctx.save();
                     ctx.globalAlpha = alpha;
-                    ctx.fillStyle = '#e2e8f0';
+
+                    // Near stars get a subtle glow
+                    if (star.depth > 0.7) {
+                        ctx.shadowBlur = star.size * 3;
+                        ctx.shadowColor = star.color;
+                    }
+
+                    ctx.fillStyle = star.color;
                     ctx.beginPath();
                     ctx.arc(sx, sy, star.size, 0, Math.PI * 2);
                     ctx.fill();
@@ -418,14 +440,35 @@ export const createGame: CreateGame = (_container) => {
                 }
             }
 
-            function update() {
-                // Pan camera via baseDelta (follow movement)
-                camX += baseDeltaX * PAN_SPEED;
-                camY -= baseDeltaY * PAN_SPEED;
+            function drawVignette() {
+                const cx = canvas.width / 2;
+                const cy = canvas.height / 2;
+                const radius = Math.max(cx, cy) * 1.2;
 
-                // Move crosshair via vector — at max vector (1.0), reach the screen edge
-                aimX = vectorX * (canvas.width / 2 - CROSSHAIR_RADIUS);
-                aimY = -vectorY * (canvas.height / 2 - CROSSHAIR_RADIUS);
+                const gradient = ctx.createRadialGradient(cx, cy, radius * 0.4, cx, cy, radius);
+                gradient.addColorStop(0, 'transparent');
+                gradient.addColorStop(1, 'rgba(5, 5, 16, 0.6)');
+
+                ctx.save();
+                ctx.fillStyle = gradient;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.restore();
+            }
+
+            function update() {
+                // Smooth camera: accumulate velocity from baseDelta, apply friction
+                camVelX += baseDeltaX * PAN_SPEED;
+                camVelY -= baseDeltaY * PAN_SPEED;
+                camVelX *= CAM_FRICTION;
+                camVelY *= CAM_FRICTION;
+                camX += camVelX;
+                camY += camVelY;
+
+                // Smooth crosshair: lerp toward target position
+                aimTargetX = vectorX * (canvas.width / 2 - CROSSHAIR_RADIUS);
+                aimTargetY = -vectorY * (canvas.height / 2 - CROSSHAIR_RADIUS);
+                aimX += (aimTargetX - aimX) * AIM_LERP;
+                aimY += (aimTargetY - aimY) * AIM_LERP;
 
                 checkLockOn();
             }
@@ -439,6 +482,7 @@ export const createGame: CreateGame = (_container) => {
 
                 drawBackground();
                 drawStars();
+                drawVignette();
                 drawTargets();
                 drawOffScreenIndicators();
                 drawCrosshair();
