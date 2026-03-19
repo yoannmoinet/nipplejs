@@ -26,7 +26,6 @@ const STAR_COUNT = 120;
 const CROSSHAIR_RADIUS = 20;
 const CROSSHAIR_COLOR = '#38bdf8';
 const PAN_SPEED = 1.2;
-const AIM_SPEED = 2;
 const LOCK_TIME = 60; // frames to lock on (~1 second)
 const TARGET_COLORS = [
     { color: '#818cf8', glow: 'rgba(129,140,248,0.4)', label: 'Nebula' },
@@ -423,14 +422,9 @@ export const createGame: CreateGame = (_container) => {
                 camX += baseDeltaX * PAN_SPEED;
                 camY -= baseDeltaY * PAN_SPEED;
 
-                // Move crosshair via vector (within joystick radius)
-                const maxAim = Math.min(canvas.width, canvas.height) * 0.35;
-                aimX = vectorX * maxAim * AIM_SPEED;
-                aimY = -vectorY * maxAim * AIM_SPEED;
-
-                // Clamp aim to screen
-                aimX = Math.max(-canvas.width / 2 + 20, Math.min(canvas.width / 2 - 20, aimX));
-                aimY = Math.max(-canvas.height / 2 + 20, Math.min(canvas.height / 2 - 20, aimY));
+                // Move crosshair via vector — at max vector (1.0), reach the screen edge
+                aimX = vectorX * (canvas.width / 2 - CROSSHAIR_RADIUS);
+                aimY = -vectorY * (canvas.height / 2 - CROSSHAIR_RADIUS);
 
                 checkLockOn();
             }
