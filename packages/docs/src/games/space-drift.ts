@@ -49,7 +49,7 @@ export const createGame: CreateGame = (_container) => {
                         mode: 'static',
                         position: { left: '50%', bottom: '15%' },
                         restJoystick: false,
-                        color: 'rgba(167,139,250,0.5)',
+                        color: 'linear-gradient(135deg, rgba(167,139,250,0.5), rgba(232,121,249,0.3))',
                     },
                     position: { left: '0', top: '0', width: '100%', height: '100%' },
                 },
