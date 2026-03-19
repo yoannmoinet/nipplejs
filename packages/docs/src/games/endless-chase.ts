@@ -107,9 +107,8 @@ export const createGame: CreateGame = (_container) => {
                 if (!parent) {
                     return;
                 }
-                const rect = parent.getBoundingClientRect();
-                canvas.width = rect.width;
-                canvas.height = rect.height;
+                canvas.width = parent.offsetWidth;
+                canvas.height = parent.offsetHeight;
             }
 
             // Stars at multiple depth layers for parallax 3D effect
