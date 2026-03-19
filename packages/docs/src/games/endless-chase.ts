@@ -340,39 +340,23 @@ export const createGame: CreateGame = (_container) => {
                 const cy = canvas.height / 2 + aimY;
 
                 ctx.save();
-                ctx.strokeStyle = CROSSHAIR_COLOR;
-                ctx.lineWidth = 1.5;
-                ctx.globalAlpha = 0.8;
-                ctx.shadowBlur = 12;
+                // Simple glowing dot
+                ctx.shadowBlur = 18;
                 ctx.shadowColor = CROSSHAIR_COLOR;
+                ctx.fillStyle = CROSSHAIR_COLOR;
+                ctx.globalAlpha = 0.9;
+                ctx.beginPath();
+                ctx.arc(cx, cy, 4, 0, Math.PI * 2);
+                ctx.fill();
 
-                // Outer ring
+                // Faint outer ring
+                ctx.shadowBlur = 0;
+                ctx.strokeStyle = CROSSHAIR_COLOR;
+                ctx.lineWidth = 1;
+                ctx.globalAlpha = 0.3;
                 ctx.beginPath();
                 ctx.arc(cx, cy, CROSSHAIR_RADIUS, 0, Math.PI * 2);
                 ctx.stroke();
-
-                // Cross lines
-                const gap = 6;
-                const len = CROSSHAIR_RADIUS - 4;
-
-                ctx.beginPath();
-                ctx.moveTo(cx - len, cy);
-                ctx.lineTo(cx - gap, cy);
-                ctx.moveTo(cx + gap, cy);
-                ctx.lineTo(cx + len, cy);
-                ctx.moveTo(cx, cy - len);
-                ctx.lineTo(cx, cy - gap);
-                ctx.moveTo(cx, cy + gap);
-                ctx.lineTo(cx, cy + len);
-                ctx.stroke();
-
-                // Center dot
-                ctx.globalAlpha = 0.8;
-                ctx.fillStyle = CROSSHAIR_COLOR;
-                ctx.beginPath();
-                ctx.arc(cx, cy, 2, 0, Math.PI * 2);
-                ctx.fill();
-
                 ctx.restore();
             }
 
