@@ -169,7 +169,7 @@ const highlightedCode = highlighter.codeToHtml(code, {
     <!-- Game container -->
     <div
         class="joystick-demo glass relative overflow-hidden"
-        style="min-height: 400px;"
+        style="aspect-ratio: 16/9;"
         data-game={game}
         data-highlight={JSON.stringify(highlight)}
     >
@@ -330,6 +330,7 @@ const highlightedCode = highlighter.codeToHtml(code, {
         flex: 1;
         min-height: 0;
         border-radius: 0;
+        aspect-ratio: auto;
     }
 
     .demo-code-inner {
