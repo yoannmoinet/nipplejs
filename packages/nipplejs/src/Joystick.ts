@@ -149,7 +149,6 @@ export class Joystick extends Super {
             marginLeft: `${-this.options.size / 2}px`,
             marginTop: `${-this.options.size / 2}px`,
             background: colors.back,
-            opacity: '.5',
             ...(this.options.shape === 'circle' ? borderStyle : {}),
         });
 
