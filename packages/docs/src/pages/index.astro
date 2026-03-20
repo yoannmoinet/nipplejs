@@ -223,7 +223,8 @@ const games = [
         </button>
 
         <!-- Track wrapper — visible on desktop for neighbors, hidden on mobile -->
-        <div class="flex-1 min-w-0 overflow-hidden md:overflow-visible">
+        <!-- filter:blur(0px) on wrapper forces Firefox to create compositing layer for child blur -->
+        <div class="flex-1 min-w-0 overflow-hidden md:overflow-visible" style="filter: blur(0px);">
           <div class="flex" id="carousel-track" style="transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);">
             {games.map((game, i) => (
               <div
