@@ -416,25 +416,49 @@ const highlightedCode = highlighter.codeToHtml(code, {
     import type { CreateGame, Collection } from '../games/types';
 
     // --- Fullscreen toggle ---
+    // Move wrapper to body to escape transform containing blocks (carousel)
+    let fsPlaceholder: Comment | null = null;
+    let fsOriginalParent: HTMLElement | null = null;
+
+    function enterFullscreen(wrapper: HTMLElement) {
+        fsOriginalParent = wrapper.parentElement as HTMLElement;
+        fsPlaceholder = document.createComment('fs-placeholder');
+        fsOriginalParent.insertBefore(fsPlaceholder, wrapper);
+        document.body.appendChild(wrapper);
+        wrapper.classList.add('is-fullscreen');
+        document.body.style.overflow = 'hidden';
+        requestAnimationFrame(() => repositionActiveGames());
+    }
+
+    function exitFullscreen(wrapper: HTMLElement) {
+        wrapper.classList.remove('is-fullscreen');
+        document.body.style.overflow = '';
+        if (fsPlaceholder && fsOriginalParent) {
+            fsOriginalParent.insertBefore(wrapper, fsPlaceholder);
+            fsPlaceholder.remove();
+            fsPlaceholder = null;
+            fsOriginalParent = null;
+        }
+        requestAnimationFrame(() => repositionActiveGames());
+    }
+
     document.querySelectorAll<HTMLElement>('[data-toggle-fullscreen]').forEach((btn) => {
         btn.addEventListener('click', () => {
-            const wrapper = btn.closest('[data-demo-wrapper]')!;
-            const isFs = wrapper.classList.toggle('is-fullscreen');
-            document.body.style.overflow = isFs ? 'hidden' : '';
-            // Reposition after layout settles
-            requestAnimationFrame(() => repositionActiveGames());
+            const wrapper = btn.closest('[data-demo-wrapper]') as HTMLElement;
+            if (!wrapper) return;
+            if (wrapper.classList.contains('is-fullscreen')) {
+                exitFullscreen(wrapper);
+            } else {
+                enterFullscreen(wrapper);
+            }
         });
     });
 
     // Exit fullscreen on Escape
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
-            const fs = document.querySelector('.joystick-demo-wrapper.is-fullscreen');
-            if (fs) {
-                fs.classList.remove('is-fullscreen');
-                document.body.style.overflow = '';
-                requestAnimationFrame(() => repositionActiveGames());
-            }
+            const fs = document.querySelector('.joystick-demo-wrapper.is-fullscreen') as HTMLElement;
+            if (fs) exitFullscreen(fs);
         }
     });
 
