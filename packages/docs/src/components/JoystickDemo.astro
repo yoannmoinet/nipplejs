@@ -15,9 +15,12 @@ async function getHighlighter() {
 interface Props {
     game: string;
     highlight?: string[];
+    title?: string;
+    description?: string;
+    badges?: string[];
 }
 
-const { game, highlight = [] } = Astro.props;
+const { game, highlight = [], title, description, badges = [] } = Astro.props;
 
 const codeSnippets: Record<string, string> = {
     'fog-explorer': `import nipplejs from 'nipplejs';
@@ -196,23 +199,21 @@ const highlightedCode = highlighter.codeToHtml(code, {
 
         <!-- Click to start overlay -->
         <div
-            class="absolute inset-0 z-20 flex items-center justify-center cursor-pointer"
+            class="absolute inset-0 z-20 flex flex-col items-center justify-center cursor-pointer"
+            style="background: rgba(8, 8, 26, 0.6);"
             data-start-overlay
         >
-            <span class="font-mono text-sm text-white/40">Click to start</span>
-        </div>
-
-        {
-            highlight.length > 0 && (
-                <div class="absolute top-3 right-3 z-10 flex flex-wrap gap-1.5 pointer-events-none">
-                    {highlight.map((opt) => (
-                        <span class="glass px-2 py-0.5 text-xs font-mono text-accent-indigo">
-                            {opt}
-                        </span>
+            {title && <h3 class="text-heading text-xl sm:text-2xl font-bold mb-1">{title}</h3>}
+            {description && <p class="text-body text-sm mb-3 max-w-xs text-center">{description}</p>}
+            {badges.length > 0 && (
+                <div class="flex flex-wrap gap-2 justify-center mb-5">
+                    {badges.map((badge) => (
+                        <span class="glass px-2 py-0.5 text-xs font-mono text-muted">{badge}</span>
                     ))}
                 </div>
-            )
-        }
+            )}
+            <span class="glass px-4 py-1.5 text-xs font-mono text-accent-indigo hover:text-heading transition-colors">Start</span>
+        </div>
 
         <!-- Debug overlay -->
         <div class="absolute inset-0 z-[2] pointer-events-none hidden" data-debug-overlay>
