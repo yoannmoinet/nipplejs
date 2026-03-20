@@ -138,12 +138,13 @@ export class Collection extends Super {
         // Bind the start event.
         this.bindEvt(this.options.zone, 'start', this.processOnStart);
 
-        // Disable the default actions of touches. (zooming, panning, etc...)
+        // Disable the default actions of touches (zooming, panning, etc...)
+        // and prevent text selection while interacting with the joystick.
         u.extend(this.options.zone.style, {
             touchAction: 'none',
-            // @ts-expect-error - msTouchAction is not a known type
-            msTouchAction: 'none',
-        });
+            userSelect: 'none',
+            webkitUserSelect: 'none',
+        } as Partial<CSSStyleDeclaration>);
 
         // Automatically reposition when the zone element resizes.
         if (typeof ResizeObserver !== 'undefined') {
