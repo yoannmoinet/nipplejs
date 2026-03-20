@@ -62,7 +62,7 @@ export const createGame: CreateGame = (_container) => {
                         position: { left: '50%', bottom: '15%' },
                         follow: true,
                         color: {
-                            front: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 50 50'%3E%3Ccircle cx='25' cy='25' r='22' fill='none' stroke='%2338bdf8' stroke-width='3' opacity='0.9'/%3E%3Ccircle cx='25' cy='25' r='10' fill='none' stroke='%2338bdf8' stroke-width='2' opacity='0.6'/%3E%3Cline x1='25' y1='3' x2='25' y2='15' stroke='%2338bdf8' stroke-width='2' opacity='0.7'/%3E%3Cline x1='25' y1='35' x2='25' y2='47' stroke='%2338bdf8' stroke-width='2' opacity='0.7'/%3E%3Cline x1='3' y1='25' x2='15' y2='25' stroke='%2338bdf8' stroke-width='2' opacity='0.7'/%3E%3Cline x1='35' y1='25' x2='47' y2='25' stroke='%2338bdf8' stroke-width='2' opacity='0.7'/%3E%3Ccircle cx='25' cy='25' r='3' fill='%2338bdf8' opacity='0.8'/%3E%3C/svg%3E") center/cover`,
+                            front: 'url("/nipplejs/assets/scope.svg") center/cover',
                             back: 'radial-gradient(circle, rgba(56,189,248,0.12) 40%, rgba(56,189,248,0.03) 100%)',
                         },
                     },

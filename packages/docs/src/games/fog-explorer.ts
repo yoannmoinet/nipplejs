@@ -15,9 +15,9 @@ interface Segment {
 }
 
 const ORB_COLORS = ['#38bdf8', '#e879f9', '#a78bfa'];
-const HEAD_RADIUS = 8;
-const SEGMENT_RADIUS = 6;
-const SEGMENT_SPACING = 4;
+const HEAD_RADIUS = 12;
+const SEGMENT_RADIUS = 9;
+const SEGMENT_SPACING = 5;
 const INITIAL_LENGTH = 0;
 const BASE_SNAKE_SPEED = 2;
 const SPEED_PER_ORB = 0.15;
@@ -46,8 +46,8 @@ export const createGame: CreateGame = (_container) => {
                         mode: 'static',
                         position: { left: '50%', top: '50%' },
                         color: {
-                            front: 'linear-gradient(135deg, #818cf8, #6366f1)',
-                            back: 'rgba(99,102,241,0.15)',
+                            front: 'linear-gradient(135deg, #34d399, #10b981)',
+                            back: 'rgba(16,185,129,0.15)',
                         },
                     },
                     position: { left: '0', top: '0', width: '100%', height: '100%' },
@@ -217,127 +217,101 @@ export const createGame: CreateGame = (_container) => {
                 }
             }
 
-            let glowPulse = 0;
-
             function drawSnake() {
-                // Build full path: segments (tail to head) + head position
                 const segs = getSegments();
                 const points = [...segs, { x: headX, y: headY }];
 
-                glowPulse += 0.06;
-
                 if (points.length < 2) {
-                    // Just a head, no body yet
                     drawSnakeHead();
                     return;
                 }
 
-                // Draw pulsing glow trail behind the body
+                // Draw thick body as a connected path with stroke outline
+                // Outer stroke (dark border)
+                ctx.save();
+                ctx.lineCap = 'round';
+                ctx.lineJoin = 'round';
+                ctx.strokeStyle = '#065f46';
+                ctx.lineWidth = SEGMENT_RADIUS * 2 + 4;
+                ctx.beginPath();
+                ctx.moveTo(points[0].x, points[0].y);
+                for (let i = 1; i < points.length; i++) {
+                    ctx.lineTo(points[i].x, points[i].y);
+                }
+                ctx.stroke();
+
+                // Inner fill (bright green)
+                ctx.strokeStyle = '#10b981';
+                ctx.lineWidth = SEGMENT_RADIUS * 2;
+                ctx.beginPath();
+                ctx.moveTo(points[0].x, points[0].y);
+                for (let i = 1; i < points.length; i++) {
+                    ctx.lineTo(points[i].x, points[i].y);
+                }
+                ctx.stroke();
+
+                // Highlight stripe down the center (lighter green)
+                ctx.strokeStyle = 'rgba(52, 211, 153, 0.5)';
+                ctx.lineWidth = SEGMENT_RADIUS * 0.8;
+                ctx.beginPath();
+                ctx.moveTo(points[0].x, points[0].y);
+                for (let i = 1; i < points.length; i++) {
+                    ctx.lineTo(points[i].x, points[i].y);
+                }
+                ctx.stroke();
+                ctx.restore();
+
+                // Glow behind head (desktop only)
                 if (!isMobile) {
                     ctx.save();
-                    const glowIntensity = 0.3 + Math.sin(glowPulse) * 0.15;
-                    for (let i = 0; i < points.length - 1; i++) {
-                        const t = points.length > 1 ? i / (points.length - 1) : 1;
-                        const p = points[i];
-                        const trailAlpha = t * glowIntensity * 0.5;
-                        const trailRadius =
-                            SEGMENT_RADIUS * (0.5 + t * 0.8) +
-                            4 +
-                            Math.sin(glowPulse + i * 0.3) * 2;
-                        ctx.globalAlpha = trailAlpha;
-                        ctx.fillStyle = '#6366f1';
-                        ctx.shadowBlur = 20;
-                        ctx.shadowColor = '#818cf8';
-                        ctx.beginPath();
-                        ctx.arc(p.x, p.y, trailRadius, 0, Math.PI * 2);
-                        ctx.fill();
-                    }
+                    ctx.shadowBlur = 20;
+                    ctx.shadowColor = '#34d399';
+                    ctx.fillStyle = 'rgba(16, 185, 129, 0.15)';
+                    ctx.beginPath();
+                    ctx.arc(headX, headY, HEAD_RADIUS + 8, 0, Math.PI * 2);
+                    ctx.fill();
                     ctx.restore();
                 }
 
-                // Draw connecting gradient lines between segments
-                ctx.save();
-                for (let i = 0; i < points.length - 1; i++) {
-                    const a = points[i];
-                    const b = points[i + 1];
-                    const t = points.length > 2 ? i / (points.length - 2) : 1;
-                    const lineGrad = ctx.createLinearGradient(a.x, a.y, b.x, b.y);
-                    const alphaStart = 0.1 + t * 0.4;
-                    const alphaEnd = 0.1 + (t + 1 / (points.length - 1)) * 0.4;
-                    lineGrad.addColorStop(0, `rgba(129,140,248,${alphaStart})`);
-                    lineGrad.addColorStop(1, `rgba(165,180,252,${alphaEnd})`);
-                    ctx.strokeStyle = lineGrad;
-                    ctx.lineWidth = SEGMENT_RADIUS * (0.4 + t * 0.8);
-                    ctx.lineCap = 'round';
-                    ctx.beginPath();
-                    ctx.moveTo(a.x, a.y);
-                    ctx.lineTo(b.x, b.y);
-                    ctx.stroke();
-                }
-                ctx.restore();
-
-                // Draw body segments (overlapping circles that taper)
-                ctx.save();
-                ctx.shadowBlur = isMobile ? 0 : 10;
-                ctx.shadowColor = '#818cf8';
-                for (let i = 0; i < points.length - 1; i++) {
-                    const t = points.length > 1 ? i / (points.length - 1) : 1;
-                    const p = points[i];
-                    const radius = SEGMENT_RADIUS * (0.3 + t * 0.7);
-                    const alpha = 0.15 + t * 0.65;
-
-                    ctx.globalAlpha = alpha;
-                    ctx.fillStyle = '#818cf8';
-                    ctx.beginPath();
-                    ctx.arc(p.x, p.y, radius, 0, Math.PI * 2);
-                    ctx.fill();
-                }
-                ctx.restore();
-
-                // Draw head on top
                 drawSnakeHead();
             }
 
             function drawSnakeHead() {
-                // Head with radial gradient (brighter, more vivid)
                 ctx.save();
-                const headGrad = ctx.createRadialGradient(
-                    headX,
-                    headY,
-                    0,
-                    headX,
-                    headY,
-                    HEAD_RADIUS,
-                );
-                headGrad.addColorStop(0, '#c7d2fe');
-                headGrad.addColorStop(0.4, '#a78bfa');
-                headGrad.addColorStop(1, '#6366f1');
-                ctx.shadowBlur = isMobile ? 0 : 22;
-                ctx.shadowColor = '#a78bfa';
-                ctx.fillStyle = headGrad;
+
+                // Head circle — dark border + bright fill
+                ctx.shadowBlur = isMobile ? 0 : 15;
+                ctx.shadowColor = '#34d399';
+
+                ctx.fillStyle = '#065f46';
+                ctx.beginPath();
+                ctx.arc(headX, headY, HEAD_RADIUS + 2, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.shadowBlur = 0;
+                ctx.fillStyle = '#10b981';
                 ctx.beginPath();
                 ctx.arc(headX, headY, HEAD_RADIUS, 0, Math.PI * 2);
                 ctx.fill();
 
-                // Inner bright core
-                ctx.shadowBlur = 0;
-                ctx.fillStyle = '#e0e7ff';
+                // Highlight
+                ctx.fillStyle = 'rgba(52, 211, 153, 0.4)';
                 ctx.beginPath();
-                ctx.arc(headX, headY, HEAD_RADIUS * 0.3, 0, Math.PI * 2);
+                ctx.arc(headX - 2, headY - 2, HEAD_RADIUS * 0.5, 0, Math.PI * 2);
                 ctx.fill();
 
-                // Eyes — two small white dots offset in the heading direction
-                const eyeOffset = HEAD_RADIUS * 0.45;
-                const eyeSpread = Math.PI * 0.35;
-                const eyeRadius = 2;
+                // Eyes — large white circles with dark pupils
+                const eyeOffset = HEAD_RADIUS * 0.5;
+                const eyeSpread = Math.PI * 0.3;
+                const eyeRadius = 3.5;
 
                 const leftEyeX = headX + Math.cos(heading - eyeSpread) * eyeOffset;
                 const leftEyeY = headY + Math.sin(heading - eyeSpread) * eyeOffset;
                 const rightEyeX = headX + Math.cos(heading + eyeSpread) * eyeOffset;
                 const rightEyeY = headY + Math.sin(heading + eyeSpread) * eyeOffset;
 
+                // White of the eyes
                 ctx.fillStyle = '#ffffff';
-                ctx.globalAlpha = 0.9;
                 ctx.beginPath();
                 ctx.arc(leftEyeX, leftEyeY, eyeRadius, 0, Math.PI * 2);
                 ctx.fill();
@@ -345,20 +319,27 @@ export const createGame: CreateGame = (_container) => {
                 ctx.arc(rightEyeX, rightEyeY, eyeRadius, 0, Math.PI * 2);
                 ctx.fill();
 
-                // Tiny dark pupils
-                ctx.fillStyle = '#1e1b4b';
-                ctx.globalAlpha = 1;
-                const pupilOffset = HEAD_RADIUS * 0.52;
-                const pupilRadius = 0.9;
-                const leftPupilX = headX + Math.cos(heading - eyeSpread) * pupilOffset;
-                const leftPupilY = headY + Math.sin(heading - eyeSpread) * pupilOffset;
-                const rightPupilX = headX + Math.cos(heading + eyeSpread) * pupilOffset;
-                const rightPupilY = headY + Math.sin(heading + eyeSpread) * pupilOffset;
+                // Dark pupils — offset toward heading
+                const pupilOffset = HEAD_RADIUS * 0.58;
+                const pupilRadius = 2;
+                ctx.fillStyle = '#0a0a12';
                 ctx.beginPath();
-                ctx.arc(leftPupilX, leftPupilY, pupilRadius, 0, Math.PI * 2);
+                ctx.arc(
+                    headX + Math.cos(heading - eyeSpread) * pupilOffset,
+                    headY + Math.sin(heading - eyeSpread) * pupilOffset,
+                    pupilRadius,
+                    0,
+                    Math.PI * 2,
+                );
                 ctx.fill();
                 ctx.beginPath();
-                ctx.arc(rightPupilX, rightPupilY, pupilRadius, 0, Math.PI * 2);
+                ctx.arc(
+                    headX + Math.cos(heading + eyeSpread) * pupilOffset,
+                    headY + Math.sin(heading + eyeSpread) * pupilOffset,
+                    pupilRadius,
+                    0,
+                    Math.PI * 2,
+                );
                 ctx.fill();
 
                 ctx.restore();

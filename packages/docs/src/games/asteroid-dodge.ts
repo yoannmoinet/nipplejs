@@ -184,7 +184,7 @@ export const createGame: CreateGame = (_container) => {
                         line.y = -line.length;
                         line.x = Math.random() * canvas.width;
                     }
-                    ctx.strokeStyle = 'rgba(56, 189, 248, 0.06)';
+                    ctx.strokeStyle = 'rgba(56, 189, 248, 0.15)';
                     ctx.lineWidth = 1;
                     ctx.beginPath();
                     ctx.moveTo(line.x, line.y);
@@ -380,7 +380,7 @@ export const createGame: CreateGame = (_container) => {
                 update();
 
                 // Smooth tilt toward target
-                const tiltTarget = vectorX * 0.03;
+                const tiltTarget = vectorX * -0.03;
                 tilt += (tiltTarget - tilt) * 0.1;
 
                 ctx.save();

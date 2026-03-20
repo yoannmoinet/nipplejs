@@ -32,8 +32,8 @@ const manager = nipplejs.create({
   // color accepts a string or { front, back } object.
   // Values use CSS 'background', so gradients work.
   color: {
-    front: 'linear-gradient(135deg, #818cf8, #6366f1)',
-    back: 'rgba(99, 102, 241, 0.15)',
+    front: 'linear-gradient(135deg, #34d399, #10b981)',
+    back: 'rgba(16, 185, 129, 0.15)',
   },
 });
 
@@ -109,8 +109,9 @@ const manager = nipplejs.create({
   mode: 'static',
   position: { left: '50%', bottom: '15%' },
   follow: true, // Base follows your thumb
+  // color uses CSS 'background' — images, gradients, anything
   color: {
-    front: 'radial-gradient(circle, #67e8f9, #38bdf8)',
+    front: 'url("scope.svg") center/cover',
     back: 'radial-gradient(circle, rgba(56,189,248,0.12) 40%, transparent)',
   },
 });
