@@ -100,12 +100,28 @@ export const createGame: CreateGame = (_container) => {
             let shakeTime = 0;
             let flashAlpha = 0;
 
+            let vibrateOk = false;
+            function vibrate(ms: number) {
+                if (!vibrateOk) {
+                    return;
+                }
+                try {
+                    navigator.vibrate?.(ms);
+                } catch (_) {
+                    /* unsupported */
+                }
+            }
+            function enableVibrate() {
+                vibrateOk = !!navigator.vibrate;
+                if (vibrateOk) {
+                    navigator.vibrate(1);
+                }
+            }
+
             function triggerImpact(intensity: number = 1) {
                 shakeTime = 10 * intensity;
                 flashAlpha = 0.3 * intensity;
-                if (navigator.vibrate) {
-                    navigator.vibrate(50 * intensity);
-                }
+                vibrate(50 * intensity);
             }
 
             function spawnExplosion(x: number, y: number, color: string, count: number) {
@@ -559,6 +575,7 @@ export const createGame: CreateGame = (_container) => {
                         });
 
                         moveStick.on('start', () => {
+                            enableVibrate();
                             onStart();
                         });
                     }

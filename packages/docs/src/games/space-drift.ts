@@ -82,12 +82,28 @@ export const createGame: CreateGame = (_container) => {
             let shakeTime = 0;
             let flashAlpha = 0;
 
+            let vibrateOk = false;
+            function vibrate(ms: number) {
+                if (!vibrateOk) {
+                    return;
+                }
+                try {
+                    navigator.vibrate?.(ms);
+                } catch (_) {
+                    /* unsupported */
+                }
+            }
+            function enableVibrate() {
+                vibrateOk = !!navigator.vibrate;
+                if (vibrateOk) {
+                    navigator.vibrate(1);
+                }
+            }
+
             function triggerImpact() {
                 shakeTime = 8;
                 flashAlpha = 0.15;
-                if (navigator.vibrate) {
-                    navigator.vibrate(50);
-                }
+                vibrate(50);
             }
 
             function spawnConsume(worldX: number, worldY: number, color: string) {
@@ -504,6 +520,9 @@ export const createGame: CreateGame = (_container) => {
                     // Listen to joystick events
                     const joystick = joysticks[0] ?? null;
                     if (joystick) {
+                        joystick.on('start', () => {
+                            enableVibrate();
+                        });
                         joystick.on('move', (evt) => {
                             velocityX = evt.data.vector.x * currentSpeed;
                             velocityY = -evt.data.vector.y * currentSpeed;
