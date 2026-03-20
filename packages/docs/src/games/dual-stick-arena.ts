@@ -83,6 +83,36 @@ export const createGame: CreateGame = (_container) => {
             let enemies: Enemy[] = [];
             let projectiles: Projectile[] = [];
 
+            // Particles
+            interface Particle {
+                x: number;
+                y: number;
+                vx: number;
+                vy: number;
+                life: number;
+                maxLife: number;
+                color: string;
+                radius: number;
+            }
+            const particles: Particle[] = [];
+
+            function spawnExplosion(x: number, y: number, color: string, count: number) {
+                for (let i = 0; i < count; i++) {
+                    const angle = Math.random() * Math.PI * 2;
+                    const speed = 1 + Math.random() * 3;
+                    particles.push({
+                        x,
+                        y,
+                        vx: Math.cos(angle) * speed,
+                        vy: Math.sin(angle) * speed,
+                        life: 1,
+                        maxLife: 20 + Math.random() * 20,
+                        color,
+                        radius: 1.5 + Math.random() * 2,
+                    });
+                }
+            }
+
             // Game state
             let score = 0;
             let frameCount = 0;
@@ -313,11 +343,11 @@ export const createGame: CreateGame = (_container) => {
                         const dy = proj.y - enemy.y;
                         const dist = Math.sqrt(dx * dx + dy * dy);
                         if (dist < PROJECTILE_RADIUS + enemy.radius) {
-                            // Destroy both
+                            spawnExplosion(enemy.x, enemy.y, ENEMY_COLOR, 12);
                             enemies.splice(ei, 1);
                             projectiles.splice(pi, 1);
                             score++;
-                            break; // This projectile is gone, move to next
+                            break;
                         }
                     }
                 }
@@ -398,6 +428,33 @@ export const createGame: CreateGame = (_container) => {
                 }
 
                 checkCollisions();
+
+                // Update particles
+                for (let i = particles.length - 1; i >= 0; i--) {
+                    const p = particles[i];
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.vx *= 0.96;
+                    p.vy *= 0.96;
+                    p.life -= 1 / p.maxLife;
+                    if (p.life <= 0) {
+                        particles.splice(i, 1);
+                    }
+                }
+            }
+
+            function drawParticles() {
+                for (const p of particles) {
+                    ctx.save();
+                    ctx.globalAlpha = p.life;
+                    ctx.shadowBlur = 8;
+                    ctx.shadowColor = p.color;
+                    ctx.fillStyle = p.color;
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.radius * p.life, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.restore();
+                }
             }
 
             function render() {
@@ -410,6 +467,7 @@ export const createGame: CreateGame = (_container) => {
                 drawBackground();
                 drawProjectiles();
                 drawEnemies();
+                drawParticles();
                 drawPlayer();
                 drawAimLine();
                 drawScore();

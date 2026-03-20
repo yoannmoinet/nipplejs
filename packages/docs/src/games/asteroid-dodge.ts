@@ -59,6 +59,36 @@ export const createGame: CreateGame = (_container) => {
             let gameOver = false;
             let waitingRestart = false;
 
+            // Particles
+            interface Particle {
+                x: number;
+                y: number;
+                vx: number;
+                vy: number;
+                life: number;
+                maxLife: number;
+                color: string;
+                radius: number;
+            }
+            const particles: Particle[] = [];
+
+            function spawnExplosion(x: number, y: number, color: string, count: number) {
+                for (let i = 0; i < count; i++) {
+                    const angle = Math.random() * Math.PI * 2;
+                    const speed = 1.5 + Math.random() * 4;
+                    particles.push({
+                        x,
+                        y,
+                        vx: Math.cos(angle) * speed,
+                        vy: Math.sin(angle) * speed,
+                        life: 1,
+                        maxLife: 25 + Math.random() * 25,
+                        color,
+                        radius: 1.5 + Math.random() * 2.5,
+                    });
+                }
+            }
+
             // Background lines (vertical motion lines)
             let bgLines: { x: number; y: number; length: number; speed: number }[] = [];
 
@@ -279,8 +309,23 @@ export const createGame: CreateGame = (_container) => {
                     }
                 }
 
+                // Update particles
+                for (let i = particles.length - 1; i >= 0; i--) {
+                    const p = particles[i];
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.vx *= 0.95;
+                    p.vy *= 0.95;
+                    p.life -= 1 / p.maxLife;
+                    if (p.life <= 0) {
+                        particles.splice(i, 1);
+                    }
+                }
+
                 // Check collisions
                 if (checkCollisions()) {
+                    const sy = canvas.height - shipBottomOffset;
+                    spawnExplosion(shipX, sy, SHIP_COLOR, 20);
                     gameOver = true;
                     waitingRestart = true;
                 }
@@ -296,6 +341,18 @@ export const createGame: CreateGame = (_container) => {
                 drawBackground();
                 drawAsteroids();
                 drawShip();
+                // Draw particles
+                for (const p of particles) {
+                    ctx.save();
+                    ctx.globalAlpha = p.life;
+                    ctx.shadowBlur = 8;
+                    ctx.shadowColor = p.color;
+                    ctx.fillStyle = p.color;
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.radius * p.life, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.restore();
+                }
                 drawScore();
 
                 if (gameOver) {

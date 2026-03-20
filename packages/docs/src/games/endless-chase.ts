@@ -98,6 +98,36 @@ export const createGame: CreateGame = (_container) => {
             let baseDeltaX = 0;
             let baseDeltaY = 0;
 
+            // Particles
+            interface Particle {
+                x: number;
+                y: number;
+                vx: number;
+                vy: number;
+                life: number;
+                maxLife: number;
+                color: string;
+                radius: number;
+            }
+            const particles: Particle[] = [];
+
+            function spawnConsume(x: number, y: number, color: string) {
+                for (let i = 0; i < 10; i++) {
+                    const angle = Math.random() * Math.PI * 2;
+                    const speed = 0.5 + Math.random() * 2.5;
+                    particles.push({
+                        x,
+                        y,
+                        vx: Math.cos(angle) * speed,
+                        vy: Math.sin(angle) * speed,
+                        life: 1,
+                        maxLife: 20 + Math.random() * 20,
+                        color,
+                        radius: 1 + Math.random() * 2.5,
+                    });
+                }
+            }
+
             let score = 0;
             const stars: Star[] = [];
             let targets: Target[] = [];
@@ -405,6 +435,7 @@ export const createGame: CreateGame = (_container) => {
                         if (target.lockProgress >= 1) {
                             target.lockProgress = 1;
                             target.locked = true;
+                            spawnConsume(screenX, screenY, target.color);
                             score++;
 
                             // Spawn a replacement if all aren't locked
@@ -450,6 +481,33 @@ export const createGame: CreateGame = (_container) => {
                 aimY += (aimTargetY - aimY) * AIM_LERP;
 
                 checkLockOn();
+
+                // Update particles
+                for (let i = particles.length - 1; i >= 0; i--) {
+                    const p = particles[i];
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.vx *= 0.95;
+                    p.vy *= 0.95;
+                    p.life -= 1 / p.maxLife;
+                    if (p.life <= 0) {
+                        particles.splice(i, 1);
+                    }
+                }
+            }
+
+            function drawParticles() {
+                for (const p of particles) {
+                    ctx.save();
+                    ctx.globalAlpha = p.life * 0.8;
+                    ctx.shadowBlur = 10;
+                    ctx.shadowColor = p.color;
+                    ctx.fillStyle = p.color;
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.radius * p.life, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.restore();
+                }
             }
 
             function render() {
@@ -463,6 +521,7 @@ export const createGame: CreateGame = (_container) => {
                 drawStars();
                 drawVignette();
                 drawTargets();
+                drawParticles();
                 drawOffScreenIndicators();
                 drawCrosshair();
                 drawScore();

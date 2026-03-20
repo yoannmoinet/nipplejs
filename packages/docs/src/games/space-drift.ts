@@ -65,6 +65,36 @@ export const createGame: CreateGame = (_container) => {
             let animId: number | null = null;
             let destroyed = false;
 
+            // Particles
+            interface Particle {
+                x: number;
+                y: number;
+                vx: number;
+                vy: number;
+                life: number;
+                maxLife: number;
+                color: string;
+                radius: number;
+            }
+            const particles: Particle[] = [];
+
+            function spawnConsume(worldX: number, worldY: number, color: string) {
+                for (let i = 0; i < 8; i++) {
+                    const angle = Math.random() * Math.PI * 2;
+                    const speed = 0.5 + Math.random() * 2;
+                    particles.push({
+                        x: worldX,
+                        y: worldY,
+                        vx: Math.cos(angle) * speed,
+                        vy: Math.sin(angle) * speed,
+                        life: 1,
+                        maxLife: 15 + Math.random() * 15,
+                        color,
+                        radius: 1 + Math.random() * 2,
+                    });
+                }
+            }
+
             // World-space position (ship is always rendered at center of canvas)
             let shipWorldX = 0;
             let shipWorldY = 0;
@@ -340,6 +370,7 @@ export const createGame: CreateGame = (_container) => {
                     const dy = shipWorldY - wp.y;
                     const dist = Math.sqrt(dx * dx + dy * dy);
                     if (dist < COLLECT_DISTANCE) {
+                        spawnConsume(wp.x, wp.y, wp.color);
                         score++;
                         currentSpeed = BASE_SPEED + score * SPEED_PER_ORB;
                         waypoints[i] = randomWaypoint(spread, spread);
@@ -358,6 +389,37 @@ export const createGame: CreateGame = (_container) => {
                 shipWorldY += velocityY;
 
                 checkCollisions();
+
+                // Update particles (world space)
+                for (let i = particles.length - 1; i >= 0; i--) {
+                    const p = particles[i];
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.vx *= 0.94;
+                    p.vy *= 0.94;
+                    p.life -= 1 / p.maxLife;
+                    if (p.life <= 0) {
+                        particles.splice(i, 1);
+                    }
+                }
+            }
+
+            function drawParticles() {
+                const centerX = canvas.width / 2;
+                const centerY = canvas.height / 2;
+                for (const p of particles) {
+                    const sx = centerX + (p.x - shipWorldX);
+                    const sy = centerY + (p.y - shipWorldY);
+                    ctx.save();
+                    ctx.globalAlpha = p.life * 0.8;
+                    ctx.shadowBlur = 10;
+                    ctx.shadowColor = p.color;
+                    ctx.fillStyle = p.color;
+                    ctx.beginPath();
+                    ctx.arc(sx, sy, p.radius * p.life, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.restore();
+                }
             }
 
             function render() {
@@ -369,6 +431,7 @@ export const createGame: CreateGame = (_container) => {
 
                 drawBackground();
                 drawWaypoints();
+                drawParticles();
                 drawWaypointIndicators();
                 drawDirectionIndicator();
                 drawShip();
