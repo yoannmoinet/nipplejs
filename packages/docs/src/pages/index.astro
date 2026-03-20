@@ -314,9 +314,10 @@ const games = [
                 slide.style.pointerEvents = 'auto';
                 slide.style.cursor = 'default';
               } else if (!isMobile && (Math.abs(diff) === 1 || Math.abs(diff) === total - 1)) {
-                // Desktop: neighbors visible, scaled down, blurred
+                // Desktop: neighbors visible, tilted, blurred
+                const isRight = diff === 1 || diff === -(total - 1);
                 slide.style.opacity = '0.5';
-                slide.style.transform = 'scale(0.9)';
+                slide.style.transform = `scale(0.9) perspective(1000px) rotateY(${isRight ? '-8' : '8'}deg)`;
                 slide.style.filter = 'blur(3px)';
                 slide.style.pointerEvents = 'auto';
                 slide.style.zIndex = '1';
