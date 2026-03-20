@@ -156,9 +156,29 @@ It represents the zone where all your joysticks will be active.
 ### `options.color`
 > Defaults to 'white'
 
-The background color of your joystick's elements.
+The background of your joystick's elements. Sets the CSS `background` property, so any valid value works — colors, gradients, images, etc.
 
-Can be any valid CSS color.
+Can be a single string (applied to both parts) or an object with `front` and `back` keys to style the thumb and base independently.
+
+```javascript
+// Simple color
+color: 'rebeccapurple',
+
+// Gradient
+color: 'linear-gradient(135deg, #818cf8, #6366f1)',
+
+// Different front (thumb) and back (base)
+color: {
+    front: 'linear-gradient(135deg, #818cf8, #38bdf8)',
+    back: 'rgba(99, 102, 241, 0.12)',
+},
+
+// Background image
+color: {
+    front: 'url(thumb.png) center/cover',
+    back: 'radial-gradient(circle, rgba(99,102,241,0.15) 40%, transparent)',
+},
+```
 
 ### `options.size`
 > Defaults to 100
@@ -305,7 +325,9 @@ Creates square region for joystick movement
 ### `options.dynamicPage`
 > Defaults to false
 
-Enable if the page has dynamically visible elements such as for Vue, React, Angular or simply some CSS hiding or showing some DOM.
+Nuclear option: forces a recalculation of the joystick position on every single move event. This has a notable performance cost.
+
+In most cases you don't need this — the zone is automatically watched with a `ResizeObserver` that handles size changes. For one-off layout changes (e.g. entering fullscreen, opening a sidebar), call `manager.reposition()` instead. Only enable `dynamicPage` as a last resort when the zone's position changes continuously without resizing (e.g. CSS animations that shift the zone).
 
 ### `options.follow`
 > Defaults to false

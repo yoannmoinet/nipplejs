@@ -119,6 +119,8 @@ jobs:
 
             - run: yarn typecheck
 
+            - run: yarn workspace @nipple/docs astro check
+
             - run: yarn cli integrity
 
             - run: git diff --exit-code && git diff --cached --exit-code || (echo "Please run 'yarn cli integrity' and commit the result." && exit 1)
