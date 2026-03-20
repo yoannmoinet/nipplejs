@@ -63,7 +63,7 @@ export const createGame: CreateGame = (_container) => {
                         follow: true,
                         color: {
                             front: 'url("/nipplejs/assets/scope.svg") center/cover',
-                            back: 'radial-gradient(circle, rgba(56,189,248,0.08) 0%, rgba(56,189,248,0.15) 85%, rgba(56,189,248,0.4) 93%, rgba(56,189,248,0.15) 100%)',
+                            back: 'radial-gradient(circle, rgba(56,189,248,0.15) 0%, rgba(56,189,248,0.25) 80%, rgba(56,189,248,0.8) 92%, rgba(56,189,248,0.3) 100%)',
                         },
                     },
                     position: { left: '0', top: '0', width: '100%', height: '100%' },
