@@ -3,11 +3,11 @@
 /* Prevent horizontal scrollbar */
 html {
   overflow-x: hidden;
+  overscroll-behavior-y: none;
 }
 
-/* Prevent overscroll bounce */
 body {
-  overscroll-behavior: none;
+  overscroll-behavior-y: none;
 }
 
 @theme {
