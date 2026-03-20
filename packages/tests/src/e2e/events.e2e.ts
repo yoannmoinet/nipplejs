@@ -89,6 +89,10 @@ describe('Events', () => {
             // Move the mouse to the direction.
             await page.mouse.move(move.x, move.y, { steps: 10 });
             await page.mouse.up();
+
+            // Wait for the joystick to fully fade and be destroyed
+            // before starting the next direction.
+            await page.waitForTimeout(400);
         }
 
         // Verify all directional events were emitted
