@@ -274,6 +274,13 @@ const games = [
         function goTo(index: number) {
           current = ((index % total) + total) % total;
 
+          // Close any open code panes
+          document.querySelectorAll<HTMLElement>('[data-demo-wrapper].code-open').forEach((w) => {
+            w.classList.remove('code-open');
+            const label = w.querySelector('[data-toggle-label]');
+            if (label) label.textContent = 'Code';
+          });
+
           // Translate the track so current slide is centered
           track.style.transform = `translateX(calc(-${current * SLIDE_PCT}% + ${CENTER_OFFSET}%))`;
 
