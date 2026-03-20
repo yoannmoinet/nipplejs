@@ -342,6 +342,7 @@ export class Collection extends Super {
             };
         } else {
             this.error('Invalid or missing position.', position);
+            return undefined as unknown as Joystick;
         }
 
         const joystick = new Joystick(this, {
@@ -385,7 +386,7 @@ export class Collection extends Super {
         return joystick;
     }
 
-    processOnStart(evt: DomEvent) {
+    processOnStart(evt: DomEvent, _depth: number = 0) {
         // Refresh the box position.
         this.box = this.options.zone.getBoundingClientRect();
         // If we don't have spots available, we stop right here.
@@ -420,10 +421,12 @@ export class Collection extends Super {
             if (distance <= this.options.catchDistance) {
                 // We're in the catch distance, we keep this one.
                 process();
-            } else {
+            } else if (_depth < 3) {
                 // We're too far, delete it and start over.
                 joystick.destroy();
-                this.processOnStart(evt);
+                this.processOnStart(evt, _depth + 1);
+            } else {
+                this.error('Max semi-mode recursion depth reached.');
             }
         } else {
             // In the other modes, we just process it.

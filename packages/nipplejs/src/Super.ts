@@ -143,13 +143,15 @@ export class Super {
             this.log(`- "${type}" [trigger]`);
             const handlers = this._handlers_[type];
             if (handlers && handlers.size) {
-                handlers.forEach((handler) => {
+                // Snapshot to avoid issues if a handler modifies the Set
+                const snapshot = [...handlers];
+                for (const handler of snapshot) {
                     handler.call(this, {
                         type,
                         target: this,
                         data,
                     });
-                });
+                }
             }
         });
     }

@@ -2,7 +2,7 @@ import Collection from './Collection';
 import type Joystick from './Joystick';
 import Super from './Super';
 import { MODES } from './constants';
-import type { CollectionOptions, DomEvent, Identifier, Uid } from './types';
+import type { CollectionOptions, DomEvent, Identifier, ProcessedEvent, Uid } from './types';
 import * as u from './utils';
 
 /**
@@ -29,26 +29,26 @@ export class Factory extends Super {
         this.trigger('factoryCreated', this);
     }
 
+    // Stable references for throttle (avoids creating new closures per event)
+    private repositionAll = () => {
+        this.collections.forEach((collection) => {
+            collection.reposition();
+        });
+    };
+    private refreshScroll = () => {
+        this.scroll = u.getScroll();
+    };
+
     // Listen for resize, to reposition every joystick
     private bindResize() {
-        this.resizeHandler = () => {
-            u.throttle(() => {
-                this.collections.forEach((collection) => {
-                    collection.reposition();
-                });
-            });
-        };
+        this.resizeHandler = () => u.throttle(this.repositionAll);
         u.bindEvt(window, 'resize', this.resizeHandler);
     }
 
     // Listen for scrolls, so we have a global scroll value
     // without having to request it all the time.
     private bindScroll() {
-        this.scrollHandler = () => {
-            u.throttle(() => {
-                this.scroll = u.getScroll();
-            });
-        };
+        this.scrollHandler = () => u.throttle(this.refreshScroll);
         u.bindEvt(window, 'scroll', this.scrollHandler);
     }
 
@@ -192,12 +192,18 @@ export class Factory extends Super {
                     return;
                 }
                 this.log('💣 Cleaning', identifier);
+                // Build a synthetic event reusing the current event's position
+                // but with the inactive identifier. We extract specific properties
+                // because spreading native event objects doesn't copy prototype props.
+                const raw = evt.raw;
                 joystick.collection.processOnEnd(
                     u.processEvent(evt.initial, {
-                        ...evt.raw,
-                        // Re-use the event but spoof it's identifier with the inactive one.
                         identifier,
-                    }),
+                        pageX: raw.pageX,
+                        pageY: raw.pageY,
+                        clientX: raw.clientX,
+                        clientY: raw.clientY,
+                    } as unknown as ProcessedEvent),
                 );
             }
         }

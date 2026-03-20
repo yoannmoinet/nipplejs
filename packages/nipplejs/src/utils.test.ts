@@ -298,14 +298,10 @@ describe('utils', () => {
     });
 
     describe('configStylePropertyObject', () => {
-        it('should return the object with the CSS properties vendorised', () => {
+        it('should return the object with the CSS property', () => {
             const style = u.configStylePropertyObject('borderRadius', '50%');
             expect(style).toEqual({
                 borderRadius: '50%',
-                WebkitBorderRadius: '50%',
-                MozBorderRadius: '50%',
-                OBorderRadius: '50%',
-                msBorderRadius: '50%',
             });
         });
     });

@@ -196,7 +196,6 @@ export class Joystick extends Super {
 
     // Inject the Joystick instance into DOM.
     addToDom(): void {
-        this.trigger(`added`, this);
         // We're not adding it if we're dataOnly or already in dom.
         if (this.options.dataOnly || document.body.contains(this.ui.el)) {
             return;

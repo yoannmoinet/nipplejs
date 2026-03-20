@@ -92,14 +92,8 @@ export const bindEvt = (
     handler: SupportedEventHandler,
 ): void => {
     const types = arg.split(/[ ,]+/g);
-    let type;
     for (let i = 0; i < types.length; i += 1) {
-        type = types[i];
-        if (el.addEventListener) {
-            el.addEventListener(type, handler as EventListenerOrEventListenerObject, false);
-        } else if ((el as any).attachEvent) {
-            (el as any).attachEvent(type, handler);
-        }
+        el.addEventListener(types[i], handler as EventListenerOrEventListenerObject, false);
     }
 };
 
@@ -115,14 +109,8 @@ export const unbindEvt = (
     handler: SupportedEventHandler,
 ): void => {
     const types = arg.split(/[ ,]+/g);
-    let type;
     for (let i = 0; i < types.length; i += 1) {
-        type = types[i];
-        if (el.removeEventListener) {
-            el.removeEventListener(type, handler as EventListenerOrEventListenerObject);
-        } else if ((el as any).detachEvent) {
-            (el as any).detachEvent(type, handler);
-        }
+        el.removeEventListener(types[i], handler as EventListenerOrEventListenerObject);
     }
 };
 
@@ -225,21 +213,10 @@ export const processEvents = (evt: SupportedEvent): DomEvent[] => {
  * Get the current scroll position of the window.
  * @returns {Coordinates} The current scroll position of the window.
  */
-export const getScroll = (): Coordinates => {
-    const x =
-        window.pageXOffset !== undefined
-            ? window.pageXOffset
-            : (document.documentElement || document.body.parentNode || document.body).scrollLeft;
-
-    const y =
-        window.pageYOffset !== undefined
-            ? window.pageYOffset
-            : (document.documentElement || document.body.parentNode || document.body).scrollTop;
-    return {
-        x,
-        y,
-    };
-};
+export const getScroll = (): Coordinates => ({
+    x: window.scrollX,
+    y: window.scrollY,
+});
 
 /**
  * Apply a position to an element.
@@ -250,8 +227,11 @@ export const applyPosition = (el: HTMLElement, pos: AnyPosition): void => {
     const { left, top, right, bottom, x, y } = pos;
     if (top || right || bottom || left) {
         extend(el.style, { top, right, bottom, left });
-    } else if (!isNaN(x || 0) || !isNaN(y || 0)) {
-        extend(el.style, { left: `${x || 0}px`, top: `${y || 0}px` });
+    } else if (isNumber(x) || isNumber(y)) {
+        extend(el.style, {
+            left: isNumber(x) ? `${x}px` : undefined,
+            top: isNumber(y) ? `${y}px` : undefined,
+        } as Partial<CSSStyleDeclaration>);
     }
 };
 
@@ -263,17 +243,9 @@ export const applyPosition = (el: HTMLElement, pos: AnyPosition): void => {
 export const configStylePropertyObject = (
     prop: string,
     value: string = '',
-): Record<string, string> => {
-    const obj: Record<string, string> = {
-        [prop]: value,
-    };
-    const newProp = prop.charAt(0).toUpperCase() + prop.slice(1);
-    // Apply the vendor prefixes.
-    ['Webkit', 'Moz', 'O', 'ms'].forEach((vendor) => {
-        obj[`${vendor}${newProp}`] = value;
-    });
-    return obj;
-};
+): Record<string, string> => ({
+    [prop]: value,
+});
 
 /**
  * Extend an object with the properties of another object.

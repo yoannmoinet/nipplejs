@@ -606,7 +606,7 @@ export type InternalEventHandler<T> = (evt: InternalEvent<T>) => void;
 /**
  * The types of interface we support.
  */
-export type InteractType = 'touch' | 'mouse' | 'pointer' | 'MSPointer';
+export type InteractType = 'touch' | 'mouse' | 'pointer';
 
 /**
  * The types of event we support.

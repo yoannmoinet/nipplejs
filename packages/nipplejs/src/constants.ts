@@ -10,10 +10,8 @@ export const MODES = {
     static: 'static',
 } as const;
 
-const IS_TOUCH = !!('ontouchstart' in window);
-const IS_POINTER = !!window.PointerEvent;
-// @ts-expect-error - TS doesn't know about MSPointerEvent
-const IS_MS_POINTER = !!window.MSPointerEvent;
+const IS_TOUCH = typeof window !== 'undefined' && 'ontouchstart' in window;
+const IS_POINTER = typeof window !== 'undefined' && !!window.PointerEvent;
 
 type Bindings = Record<EventType, string>;
 const EVENTS_TO_BIND: Record<InteractType, Bindings> = {
@@ -35,12 +33,6 @@ const EVENTS_TO_BIND: Record<InteractType, Bindings> = {
         end: 'pointerup, pointercancel, pointerleave',
         pressure: 'webkitmouseforcechanged',
     },
-    MSPointer: {
-        start: 'MSPointerDown',
-        move: 'MSPointerMove',
-        end: 'MSPointerUp, MSPointerCancel, MSPointerLeave',
-        pressure: 'webkitmouseforcechanged',
-    },
 };
 
 let primaryBind: Bindings;
@@ -50,8 +42,6 @@ let secondaryBind: Bindings | undefined;
 // Pointer is the priority because it's the most modern and easy to use.
 if (IS_POINTER) {
     primaryBind = EVENTS_TO_BIND.pointer;
-} else if (IS_MS_POINTER) {
-    primaryBind = EVENTS_TO_BIND.MSPointer;
 } else if (IS_TOUCH) {
     // Some touch interfaces support both mouse and touch,
     // so we need to bind both.
