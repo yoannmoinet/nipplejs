@@ -201,19 +201,6 @@ const games = [
 
     <!-- Games Carousel — full viewport width -->
     <section class="pb-24" id="games-carousel">
-      <div class="max-w-5xl mx-auto px-6">
-      <!-- Active game info -->
-      <div class="text-center mb-6" id="carousel-info">
-        <h3 class="text-heading text-2xl font-bold mb-2 transition-opacity duration-300" id="carousel-title">{games[0].name}</h3>
-        <p class="text-body mb-3 transition-opacity duration-300" id="carousel-desc">{games[0].description}</p>
-        <div class="flex flex-wrap gap-2 justify-center transition-opacity duration-300" id="carousel-badges">
-          {games[0].badges.map((badge) => (
-            <span class="glass px-3 py-1 text-xs font-mono text-muted">{badge}</span>
-          ))}
-        </div>
-      </div>
-
-      </div><!-- close max-w-5xl -->
 
       <!-- Arrows + track -->
       <div class="flex items-center px-4 max-w-6xl mx-auto">
@@ -230,10 +217,16 @@ const games = [
                 class="carousel-slide flex-shrink-0 px-1"
                 style="transition: transform 0.5s ease, opacity 0.5s ease, filter 0.5s ease;"
                 data-slide={i}
-                data-name={game.name}
-                data-desc={game.description}
-                data-badges={JSON.stringify(game.badges)}
               >
+                <div class="text-center mb-4" style="transition: opacity 0.5s ease;">
+                  <h3 class="text-heading text-xl sm:text-2xl font-bold mb-1">{game.name}</h3>
+                  <p class="text-body text-sm mb-2">{game.description}</p>
+                  <div class="flex flex-wrap gap-2 justify-center">
+                    {game.badges.map((badge) => (
+                      <span class="glass px-2 py-0.5 text-xs font-mono text-muted">{badge}</span>
+                    ))}
+                  </div>
+                </div>
                 <JoystickDemo game={game.slug} highlight={game.highlights} />
               </div>
             ))}
@@ -273,9 +266,6 @@ const games = [
         const prevBtnMobile = document.getElementById('carousel-prev-mobile');
         const nextBtnMobile = document.getElementById('carousel-next-mobile');
         const slides = document.querySelectorAll<HTMLElement>('.carousel-slide');
-        const titleEl = document.getElementById('carousel-title')!;
-        const descEl = document.getElementById('carousel-desc')!;
-        const badgesEl = document.getElementById('carousel-badges')!;
         const total = slides.length;
         const isMobile = window.matchMedia('(max-width: 767px)').matches;
         const isFirefox = navigator.userAgent.includes('Firefox');
@@ -332,21 +322,6 @@ const games = [
               }
             });
           });
-
-          // Update text
-          const active = slides[current];
-          if (active) {
-            titleEl.textContent = active.dataset.name || '';
-            descEl.textContent = active.dataset.desc || '';
-            const badges = JSON.parse(active.dataset.badges || '[]') as string[];
-            badgesEl.textContent = '';
-            badges.forEach((b) => {
-              const span = document.createElement('span');
-              span.className = 'glass px-3 py-1 text-xs font-mono text-muted';
-              span.textContent = b;
-              badgesEl.appendChild(span);
-            });
-          }
 
           // Dots
           dots.forEach((dot, i) => {
