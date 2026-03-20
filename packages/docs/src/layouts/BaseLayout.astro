@@ -37,9 +37,10 @@ const { title = 'NippleJS', description = 'A vanilla virtual joystick for touch 
   <script>
 
 
-    // --- Cursor grid highlight ---
+    // --- Cursor grid highlight (desktop only) ---
+    const isMobileDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
     const highlight = document.getElementById('grid-highlight');
-    if (highlight) {
+    if (highlight && !isMobileDevice) {
       document.addEventListener('mousemove', (e) => {
         highlight.style.setProperty('--mx', `${e.clientX}px`);
         highlight.style.setProperty('--my', `${e.clientY}px`);

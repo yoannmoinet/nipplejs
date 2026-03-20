@@ -63,7 +63,8 @@ const games = [
         const logoCanvas = document.getElementById('logo-particles') as HTMLCanvasElement;
         const logoText = document.getElementById('logo-text');
         const logoContainer = document.getElementById('hero-logo');
-        if (logoCanvas && logoText && logoContainer) {
+        const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+        if (logoCanvas && logoText && logoContainer && !isTouchDevice) {
           const lctx = logoCanvas.getContext('2d')!;
           const colors = ['#818cf8', '#38bdf8', '#a78bfa', '#c7d2fe'];
 
@@ -339,10 +340,19 @@ const games = [
           });
 
           // After transition ends (500ms), reposition active game's joysticks
+          // and stop games on non-active slides to save performance
           setTimeout(() => {
-            const activeGames = (window as any).__nippleGames || [];
-            for (const g of activeGames) {
-              g.collections.forEach((c: any) => c.reposition?.());
+            const activeGames: any[] = (window as any).__nippleGames || [];
+            const activeSlide = slides[current];
+            for (let i = activeGames.length - 1; i >= 0; i--) {
+              const g = activeGames[i];
+              if (activeSlide && activeSlide.contains(g.container)) {
+                g.collections.forEach((c: any) => c.reposition?.());
+              } else {
+                g.destroy();
+                g.restore();
+                activeGames.splice(i, 1);
+              }
             }
           }, 550);
         }
