@@ -215,6 +215,18 @@ const games = [
 
       </div><!-- close max-w-5xl -->
 
+      <!-- SVG filter for Firefox-compatible blur -->
+      <svg style="position:absolute;width:0;height:0;" aria-hidden="true">
+        <defs>
+          <filter id="carousel-blur-near">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="3" />
+          </filter>
+          <filter id="carousel-blur-far">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="5" />
+          </filter>
+        </defs>
+      </svg>
+
       <!-- Arrows + track -->
       <div class="flex items-center px-4 max-w-6xl mx-auto">
         <!-- Prev (hidden on mobile) -->
@@ -223,8 +235,7 @@ const games = [
         </button>
 
         <!-- Track wrapper — visible on desktop for neighbors, hidden on mobile -->
-        <!-- filter:blur(0px) on wrapper forces Firefox to create compositing layer for child blur -->
-        <div class="flex-1 min-w-0 overflow-hidden md:overflow-visible" style="filter: blur(0px);">
+        <div class="flex-1 min-w-0 overflow-hidden md:overflow-visible">
           <div class="flex" id="carousel-track" style="transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);">
             {games.map((game, i) => (
               <div
@@ -319,7 +330,7 @@ const games = [
                 const isRight = diff === 1 || diff === -(total - 1);
                 slide.style.opacity = '0.5';
                 slide.style.transform = `scale(0.9) perspective(1000px) rotateY(${isRight ? '-8' : '8'}deg)`;
-                slide.style.filter = 'blur(3px)';
+                slide.style.filter = 'url(#carousel-blur-near)';
                 slide.style.pointerEvents = 'auto';
                 slide.style.zIndex = '1';
                 slide.style.cursor = 'pointer';
@@ -327,7 +338,7 @@ const games = [
                 // Hidden (or mobile neighbors)
                 slide.style.opacity = isMobile ? '0' : '0.15';
                 slide.style.transform = 'scale(0.85)';
-                slide.style.filter = isMobile ? '' : 'blur(5px)';
+                slide.style.filter = isMobile ? '' : 'url(#carousel-blur-far)';
                 slide.style.pointerEvents = 'none';
                 slide.style.zIndex = '0';
                 slide.style.cursor = 'default';
