@@ -228,7 +228,7 @@ const games = [
             {games.map((game, i) => (
               <div
                 class="carousel-slide flex-shrink-0 px-1"
-                style="transition: transform 0.5s ease, opacity 0.5s ease, filter 0.5s ease;"
+                style="transition: transform 0.5s ease, opacity 0.5s ease;"
                 data-slide={i}
                 data-name={game.name}
                 data-desc={game.description}
@@ -310,7 +310,7 @@ const games = [
               if (diff === 0) {
                 slide.style.opacity = '1';
                 slide.style.transform = 'scale(1)';
-                slide.style.filter = 'none';
+                slide.style.filter = '';
                 slide.style.pointerEvents = 'auto';
                 slide.style.cursor = 'default';
               } else if (!isMobile && (Math.abs(diff) === 1 || Math.abs(diff) === total - 1)) {
@@ -325,7 +325,7 @@ const games = [
                 // Hidden (or mobile neighbors)
                 slide.style.opacity = isMobile ? '0' : '0.15';
                 slide.style.transform = 'scale(0.85)';
-                slide.style.filter = isMobile ? 'none' : 'blur(5px)';
+                slide.style.filter = isMobile ? '' : 'blur(5px)';
                 slide.style.pointerEvents = 'none';
                 slide.style.zIndex = '0';
                 slide.style.cursor = 'default';
