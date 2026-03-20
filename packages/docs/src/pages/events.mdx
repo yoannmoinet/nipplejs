@@ -7,33 +7,35 @@ title: Events
 
 nipplejs uses an event system that bubbles upward through three layers: **Joystick** -> **Collection** -> **Factory**. You can subscribe at any level using `.on(type, handler)` and unsubscribe with `.off(type, handler)`.
 
+All handlers receive a **single argument** `(evt)` with `evt.type`, `evt.target`, and `evt.data`.
+
 ## Joystick Events
 
 These events are emitted on individual joystick instances.
 
 ### `start`
 
-Fired when the joystick is activated (user pressed down). The handler receives the joystick instance.
+Fired when the joystick is activated (user pressed down).
 
 ```javascript
-joystick.on('start', (evt, data) => {
-    console.log('Joystick activated', data.instance.uid);
+joystick.on('start', (evt) => {
+    console.log('Joystick activated', evt.data.uid);
 });
 ```
 
 ### `end`
 
-Fired when the joystick is deactivated (user released). The handler receives the joystick instance.
+Fired when the joystick is deactivated (user released).
 
 ```javascript
-joystick.on('end', (evt, data) => {
+joystick.on('end', (evt) => {
     console.log('Joystick released');
 });
 ```
 
 ### `move`
 
-Fired continuously while the joystick is being moved. Passes a `JoystickEventData` object:
+Fired continuously while the joystick is being moved. `evt.data` contains:
 
 ```typescript
 {
@@ -73,11 +75,11 @@ You can listen to all directional changes or subscribe to a specific direction:
 - `dir:right` -- moving right
 
 ```javascript
-manager.on('dir', (evt, data) => {
-    console.log(data.direction); // { angle: 'up' }
+manager.on('dir', (evt) => {
+    console.log(evt.data.direction); // { angle: 'up' }
 });
 
-manager.on('dir:left', (evt, data) => {
+manager.on('dir:left', (evt) => {
     console.log('Moving left');
 });
 ```
@@ -93,7 +95,7 @@ Fired using a 90-degree split, which means **two plain events can fire simultane
 - `plain:right` -- moving right
 
 ```javascript
-manager.on('plain:up plain:left', (evt, data) => {
+manager.on('plain:up plain:left', (evt) => {
     console.log('Upper-left region');
 });
 ```
@@ -139,8 +141,8 @@ Fired when a joystick is detached from its touch or pointer identifier. This hap
 Fired when the pressure value changes (on devices that support force touch or 3D touch). The value ranges from 0 to 1.
 
 ```javascript
-joystick.on('pressure', (evt, data) => {
-    console.log(data.pressure); // 0.0 - 1.0
+joystick.on('pressure', (evt) => {
+    console.log(evt.data); // 0.0 - 1.0
 });
 ```
 
@@ -151,18 +153,18 @@ All joystick events **bubble up** to the collection (manager). You can listen fo
 ```javascript
 const manager = nipplejs.create(options);
 
-manager.on('move', (evt, data) => {
+manager.on('move', (evt) => {
     // Fires for any joystick in this collection
-    console.log(data.instance.uid, data.vector);
+    console.log(evt.data.instance.uid, evt.data.vector);
 });
 ```
 
 To target events from a **specific joystick**, prefix the event name with the joystick's uid:
 
 ```javascript
-manager.on('0:move', (evt, data) => {
+manager.on('0:move', (evt) => {
     // Only fires for joystick with uid 0
-    console.log(data.vector);
+    console.log(evt.data.vector);
 });
 ```
 
@@ -181,9 +183,9 @@ Fired when the collection is destroyed via `manager.destroy()`.
 All collection events **bubble up** to the factory (`nipplejs.factory`). This means you can listen for any joystick or collection event at the factory level, across all collections.
 
 ```javascript
-nipplejs.factory.on('move', (evt, data) => {
+nipplejs.factory.on('move', (evt) => {
     // Fires for any joystick in any collection
-    console.log(data.instance.uid, data.vector);
+    console.log(evt.data.instance.uid, evt.data.vector);
 });
 ```
 

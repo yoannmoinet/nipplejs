@@ -44,7 +44,7 @@ manager.on('destroyed', (evt, data) => {
 **After (v1)**
 
 ```javascript
-manager.on('joystickDestroyed', (evt, data) => {
+manager.on('joystickDestroyed', (evt) => {
     console.log('A joystick was destroyed');
 });
 ```
@@ -64,8 +64,8 @@ manager.on('added', (evt, joystick) => {
 **After (v1)**
 
 ```javascript
-manager.on('added', (evt, joystick) => {
-    joystick.ui.el.style.background = 'red';
+manager.on('added', (evt) => {
+    evt.data.ui.el.style.background = 'red';
 });
 ```
 
