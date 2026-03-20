@@ -227,15 +227,14 @@ const games = [
           <div class="flex" id="carousel-track" style="transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);">
             {games.map((game, i) => (
               <div
-                class="carousel-slide flex-shrink-0 px-1 relative"
-                style="transition: transform 0.5s ease, opacity 0.5s ease;"
+                class="carousel-slide flex-shrink-0 px-1"
+                style="transition: transform 0.5s ease, opacity 0.5s ease, filter 0.5s ease;"
                 data-slide={i}
                 data-name={game.name}
                 data-desc={game.description}
                 data-badges={JSON.stringify(game.badges)}
               >
                 <JoystickDemo game={game.slug} highlight={game.highlights} />
-                <div class="carousel-fade absolute inset-0 rounded-xl pointer-events-none" style="transition: opacity 0.5s ease; background: var(--color-base);"></div>
               </div>
             ))}
           </div>
@@ -279,6 +278,7 @@ const games = [
         const badgesEl = document.getElementById('carousel-badges')!;
         const total = slides.length;
         const isMobile = window.matchMedia('(max-width: 767px)').matches;
+        const isFirefox = navigator.userAgent.includes('Firefox');
         const SLIDE_PCT = isMobile ? 100 : 75;
         let current = 0;
 
@@ -308,30 +308,27 @@ const games = [
           requestAnimationFrame(() => {
             slides.forEach((slide, i) => {
               const diff = i - current;
-              const fade = slide.querySelector('.carousel-fade') as HTMLElement;
               if (diff === 0) {
                 slide.style.opacity = '1';
                 slide.style.transform = 'scale(1)';
+                slide.style.filter = 'none';
                 slide.style.pointerEvents = 'auto';
                 slide.style.cursor = 'default';
-                if (fade) fade.style.opacity = '0';
               } else if (!isMobile && (Math.abs(diff) === 1 || Math.abs(diff) === total - 1)) {
-                // Desktop: neighbors visible, tilted, darkened overlay
                 const isRight = diff === 1 || diff === -(total - 1);
-                slide.style.opacity = '1';
+                slide.style.opacity = '0.5';
                 slide.style.transform = `scale(0.9) perspective(1000px) rotateY(${isRight ? '-8' : '8'}deg)`;
+                slide.style.filter = isFirefox ? 'none' : 'blur(3px)';
                 slide.style.pointerEvents = 'auto';
                 slide.style.zIndex = '1';
                 slide.style.cursor = 'pointer';
-                if (fade) fade.style.opacity = '0.6';
               } else {
-                // Hidden (or mobile neighbors)
-                slide.style.opacity = isMobile ? '0' : '1';
+                slide.style.opacity = isMobile ? '0' : '0.15';
                 slide.style.transform = 'scale(0.85)';
+                slide.style.filter = (isMobile || isFirefox) ? 'none' : 'blur(5px)';
                 slide.style.pointerEvents = 'none';
                 slide.style.zIndex = '0';
                 slide.style.cursor = 'default';
-                if (fade) fade.style.opacity = isMobile ? '0' : '0.85';
               }
             });
           });
