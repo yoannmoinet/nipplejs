@@ -222,8 +222,8 @@ const games = [
           <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
         </button>
 
-        <!-- Track wrapper -->
-        <div class="flex-1 min-w-0" style="overflow: visible;">
+        <!-- Track wrapper — visible on desktop for neighbors, hidden on mobile -->
+        <div class="flex-1 min-w-0 overflow-hidden md:overflow-visible">
           <div class="flex" id="carousel-track" style="transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);">
             {games.map((game, i) => (
               <div

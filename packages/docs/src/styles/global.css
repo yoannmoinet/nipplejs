@@ -1,8 +1,9 @@
 @import 'tailwindcss';
 
-/* Prevent horizontal scrollbar from carousel and code panel overflow */
-html {
+/* Prevent horizontal scrollbar and overscroll from carousel and code panel overflow */
+html, body {
   overflow-x: hidden;
+  overscroll-behavior-x: none;
 }
 
 @theme {
