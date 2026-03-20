@@ -366,10 +366,6 @@ export const createGame: CreateGame = (_container) => {
                         cancelAnimationFrame(animId);
                         animId = null;
                     }
-                    if (ro) {
-                        ro.disconnect();
-                        ro = null;
-                    }
                 },
             };
         },

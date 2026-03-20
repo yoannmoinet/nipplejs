@@ -26,7 +26,12 @@ const manager = nipplejs.create({
   zone: document.getElementById('zone'),
   mode: 'static',
   position: { left: '50%', top: '50%' },
-  color: 'rgba(99, 102, 241, 0.5)',
+  // color accepts a string or { front, back } object.
+  // Values use CSS 'background', so gradients work.
+  color: {
+    front: 'linear-gradient(135deg, #818cf8, #6366f1)',
+    back: 'rgba(99, 102, 241, 0.15)',
+  },
 });
 
 manager.on('move', (evt) => {
@@ -48,7 +53,10 @@ const manager = nipplejs.create({
   mode: 'static',
   position: { left: '50%', bottom: '15%' },
   lockX: true, // Horizontal movement only
-  color: 'rgba(56, 189, 248, 0.5)',
+  color: {
+    front: 'linear-gradient(135deg, #38bdf8, #0ea5e9)',
+    back: 'rgba(56, 189, 248, 0.12)',
+  },
 });
 
 manager.on('move', (evt) => {
@@ -64,7 +72,10 @@ const moveStick = nipplejs.create({
   zone: document.getElementById('left-zone'),
   mode: 'static',
   position: { left: '20%', bottom: '20%' },
-  color: 'rgba(99, 102, 241, 0.5)',
+  color: {
+    front: 'linear-gradient(135deg, #818cf8, #38bdf8)',
+    back: 'rgba(99, 102, 241, 0.12)',
+  },
 });
 
 // Right stick — aim & shoot
@@ -72,7 +83,10 @@ const aimStick = nipplejs.create({
   zone: document.getElementById('right-zone'),
   mode: 'static',
   position: { left: '80%', bottom: '20%' },
-  color: 'rgba(236, 72, 153, 0.5)',
+  color: {
+    front: 'linear-gradient(135deg, #e879f9, #ec4899)',
+    back: 'rgba(236, 72, 153, 0.12)',
+  },
 });
 
 moveStick.on('move', (evt) => {
@@ -92,7 +106,10 @@ const manager = nipplejs.create({
   mode: 'static',
   position: { left: '50%', bottom: '15%' },
   follow: true, // Base follows your thumb
-  color: 'rgba(56, 189, 248, 0.3)',
+  color: {
+    front: 'radial-gradient(circle, #67e8f9, #38bdf8)',
+    back: 'radial-gradient(circle, rgba(56,189,248,0.12) 40%, transparent)',
+  },
 });
 
 manager.on('move', (evt) => {
@@ -114,7 +131,10 @@ const manager = nipplejs.create({
   mode: 'static',
   position: { left: '50%', bottom: '15%' },
   restJoystick: false, // Stays where you leave it
-  color: 'rgba(167, 139, 250, 0.5)',
+  color: {
+    front: 'linear-gradient(135deg, #a78bfa, #e879f9)',
+    back: 'rgba(167, 139, 250, 0.12)',
+  },
 });
 
 let velocity = { x: 0, y: 0 };

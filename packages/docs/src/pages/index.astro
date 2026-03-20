@@ -342,7 +342,7 @@ const games = [
           // After transition ends (500ms), reposition active game's joysticks
           // and stop games on non-active slides to save performance
           setTimeout(() => {
-            const activeGames: any[] = (window as any).__nippleGames || [];
+            const activeGames: any[] = ((window as any).__nippleGames = (window as any).__nippleGames || []);
             const activeSlide = slides[current];
             for (let i = activeGames.length - 1; i >= 0; i--) {
               const g = activeGames[i];
