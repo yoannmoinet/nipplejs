@@ -99,7 +99,7 @@ export const createGame: CreateGame = (_container) => {
             let flashAlpha = 0;
 
             function triggerImpact(intensity: number = 1) {
-                shakeTime = 8 * intensity;
+                shakeTime = 10 * intensity;
                 flashAlpha = 0.3 * intensity;
                 if (navigator.vibrate) {
                     navigator.vibrate(30 * intensity);
@@ -477,7 +477,7 @@ export const createGame: CreateGame = (_container) => {
 
                 ctx.save();
                 if (shakeTime > 0) {
-                    const intensity = shakeTime / 8;
+                    const intensity = shakeTime / 10;
                     ctx.translate(
                         (Math.random() - 0.5) * 6 * intensity,
                         (Math.random() - 0.5) * 6 * intensity,
