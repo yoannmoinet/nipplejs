@@ -183,6 +183,7 @@ const highlightedCode = highlighter.codeToHtml(code, {
             </div>
             <div
                 class="p-4 overflow-auto text-sm leading-relaxed [&_pre]:!bg-transparent [&_pre]:!m-0 [&_pre]:!p-0 [&_code]:!text-sm"
+                style="max-height: 400px; touch-action: pan-y; -webkit-overflow-scrolling: touch;"
                 set:html={highlightedCode}
                 data-raw-code={code}
             />
@@ -361,8 +362,6 @@ const highlightedCode = highlighter.codeToHtml(code, {
 
     .demo-code-inner {
         min-height: 200px;
-        touch-action: pan-y;
-        -webkit-overflow-scrolling: touch;
     }
 
     /* --- Narrow screens: slide up above the game --- */
@@ -508,8 +507,14 @@ const highlightedCode = highlighter.codeToHtml(code, {
             if (g.container !== current) {
                 g.destroy();
                 activeGames.splice(i, 1);
-                // Re-show the start overlay
                 g.restore();
+                // Close code pane
+                const wrapper = g.container.closest('[data-demo-wrapper]');
+                if (wrapper) {
+                    wrapper.classList.remove('code-open');
+                    const label = wrapper.querySelector('[data-toggle-label]');
+                    if (label) label.textContent = 'Code';
+                }
             }
         }
     }

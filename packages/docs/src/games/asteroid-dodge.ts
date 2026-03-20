@@ -42,6 +42,7 @@ export const createGame: CreateGame = (_container) => {
 
         create(): GameInstance {
             const isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+            const isFirefox = navigator.userAgent.includes('Firefox');
 
             let canvas: HTMLCanvasElement;
             let ctx: CanvasRenderingContext2D;
@@ -78,28 +79,9 @@ export const createGame: CreateGame = (_container) => {
             let flashAlpha = 0;
             let tilt = 0;
 
-            let vibrateOk = false;
-            function vibrate(ms: number) {
-                if (!vibrateOk) {
-                    return;
-                }
-                try {
-                    navigator.vibrate?.(ms);
-                } catch (_) {
-                    /* unsupported */
-                }
-            }
-            function enableVibrate() {
-                vibrateOk = !!navigator.vibrate;
-                if (vibrateOk) {
-                    navigator.vibrate(1);
-                }
-            }
-
             function triggerImpact() {
                 shakeTime = 12;
                 flashAlpha = 0.4;
-                vibrate(100);
             }
 
             function spawnExplosion(x: number, y: number, color: string, count: number) {
@@ -135,7 +117,8 @@ export const createGame: CreateGame = (_container) => {
                 }
                 canvas.width = parent.offsetWidth;
                 canvas.height = parent.offsetHeight;
-                speedScale = Math.sqrt(canvas.width ** 2 + canvas.height ** 2) / REF_DIAGONAL;
+                const diag = Math.sqrt(canvas.width ** 2 + canvas.height ** 2);
+                speedScale = (diag / REF_DIAGONAL) * (isFirefox ? 1.3 : 1);
             }
 
             function initBgLines() {
@@ -493,7 +476,6 @@ export const createGame: CreateGame = (_container) => {
                         });
 
                         joystickRef.on('start', () => {
-                            enableVibrate();
                             onStart();
                         });
                     }

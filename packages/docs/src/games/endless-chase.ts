@@ -73,6 +73,7 @@ export const createGame: CreateGame = (_container) => {
 
         create(): GameInstance {
             const isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+            const isFirefox = navigator.userAgent.includes('Firefox');
 
             let canvas: HTMLCanvasElement;
             let ctx: CanvasRenderingContext2D;
@@ -115,28 +116,9 @@ export const createGame: CreateGame = (_container) => {
             let shakeTime = 0;
             let flashAlpha = 0;
 
-            let vibrateOk = false;
-            function vibrate(ms: number) {
-                if (!vibrateOk) {
-                    return;
-                }
-                try {
-                    navigator.vibrate?.(ms);
-                } catch (_) {
-                    /* unsupported */
-                }
-            }
-            function enableVibrate() {
-                vibrateOk = !!navigator.vibrate;
-                if (vibrateOk) {
-                    navigator.vibrate(1);
-                }
-            }
-
             function triggerImpact() {
                 shakeTime = 4;
                 flashAlpha = 0.12;
-                vibrate(50);
             }
 
             function spawnConsume(x: number, y: number, color: string) {
@@ -171,7 +153,8 @@ export const createGame: CreateGame = (_container) => {
                 }
                 canvas.width = parent.offsetWidth;
                 canvas.height = parent.offsetHeight;
-                speedScale = Math.sqrt(canvas.width ** 2 + canvas.height ** 2) / REF_DIAGONAL;
+                const diag = Math.sqrt(canvas.width ** 2 + canvas.height ** 2);
+                speedScale = (diag / REF_DIAGONAL) * (isFirefox ? 1.3 : 1);
             }
 
             // Stars at multiple depth layers for parallax 3D effect
@@ -598,9 +581,6 @@ export const createGame: CreateGame = (_container) => {
                     }
 
                     if (joysticks[0]) {
-                        joysticks[0].on('start', () => {
-                            enableVibrate();
-                        });
                         joysticks[0].on('move', (evt) => {
                             vectorX = evt.data.vector.x;
                             vectorY = evt.data.vector.y;

@@ -64,6 +64,7 @@ export const createGame: CreateGame = (_container) => {
 
         create(): GameInstance {
             const isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+            const isFirefox = navigator.userAgent.includes('Firefox');
 
             let canvas: HTMLCanvasElement;
             let ctx: CanvasRenderingContext2D;
@@ -100,28 +101,9 @@ export const createGame: CreateGame = (_container) => {
             let shakeTime = 0;
             let flashAlpha = 0;
 
-            let vibrateOk = false;
-            function vibrate(ms: number) {
-                if (!vibrateOk) {
-                    return;
-                }
-                try {
-                    navigator.vibrate?.(ms);
-                } catch (_) {
-                    /* unsupported */
-                }
-            }
-            function enableVibrate() {
-                vibrateOk = !!navigator.vibrate;
-                if (vibrateOk) {
-                    navigator.vibrate(1);
-                }
-            }
-
             function triggerImpact(intensity: number = 1) {
                 shakeTime = 10 * intensity;
                 flashAlpha = 0.3 * intensity;
-                vibrate(50 * intensity);
             }
 
             function spawnExplosion(x: number, y: number, color: string, count: number) {
@@ -159,7 +141,8 @@ export const createGame: CreateGame = (_container) => {
                 }
                 canvas.width = parent.offsetWidth;
                 canvas.height = parent.offsetHeight;
-                speedScale = Math.sqrt(canvas.width ** 2 + canvas.height ** 2) / REF_DIAGONAL;
+                const diag = Math.sqrt(canvas.width ** 2 + canvas.height ** 2);
+                speedScale = (diag / REF_DIAGONAL) * (isFirefox ? 1.3 : 1);
             }
 
             function getDifficulty(): number {
@@ -575,7 +558,6 @@ export const createGame: CreateGame = (_container) => {
                         });
 
                         moveStick.on('start', () => {
-                            enableVibrate();
                             onStart();
                         });
                     }
