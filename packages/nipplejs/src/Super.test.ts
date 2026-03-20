@@ -279,6 +279,27 @@ describe('Super', () => {
             Super.logLevel = 'warning';
         });
 
+        it('info() fires at info level', () => {
+            Super.logLevel = 'info';
+            const instance = new Super('super');
+            const spy = jest.spyOn(console, 'info').mockImplementation();
+
+            instance.info('info message');
+
+            expect(spy).toHaveBeenCalled();
+            spy.mockRestore();
+        });
+
+        it('info() is silent at warning level', () => {
+            const instance = new Super('super');
+            const spy = jest.spyOn(console, 'info').mockImplementation();
+
+            instance.info('should not appear');
+
+            expect(spy).not.toHaveBeenCalled();
+            spy.mockRestore();
+        });
+
         it('default logLevel is warning', () => {
             expect(Super.logLevel).toBe('warning');
         });

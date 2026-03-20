@@ -427,6 +427,10 @@ export const createGame: CreateGame = (_container) => {
 
                 destroy() {
                     destroyed = true;
+                    if (ro) {
+                        ro.disconnect();
+                        ro = null;
+                    }
                     if (animId !== null) {
                         cancelAnimationFrame(animId);
                         animId = null;

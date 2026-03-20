@@ -19,6 +19,8 @@ export class Factory extends Super {
     private joysticksByUid: Map<Uid, Joystick> = new Map();
     private joysticksByIdentifier: Map<Identifier, Joystick> = new Map();
     private collections: Set<Collection> = new Set();
+    private resizeHandler: (() => void) | null = null;
+    private scrollHandler: (() => void) | null = null;
 
     constructor() {
         super('factory');
@@ -29,24 +31,25 @@ export class Factory extends Super {
 
     // Listen for resize, to reposition every joystick
     private bindResize() {
-        u.bindEvt(window, 'resize', () => {
+        this.resizeHandler = () => {
             u.throttle(() => {
                 this.collections.forEach((collection) => {
                     collection.reposition();
                 });
             });
-        });
+        };
+        u.bindEvt(window, 'resize', this.resizeHandler);
     }
 
     // Listen for scrolls, so we have a global scroll value
     // without having to request it all the time.
     private bindScroll() {
-        const scrollHandler = () => {
-            this.scroll = u.getScroll();
+        this.scrollHandler = () => {
+            u.throttle(() => {
+                this.scroll = u.getScroll();
+            });
         };
-        u.bindEvt(window, 'scroll', () => {
-            u.throttle(scrollHandler);
-        });
+        u.bindEvt(window, 'scroll', this.scrollHandler);
     }
 
     // Get a joystick from its uid.
@@ -272,6 +275,15 @@ export class Factory extends Super {
         this.collections.forEach((collection) => {
             collection.destroy();
         });
+        // Unbind window listeners.
+        if (this.resizeHandler) {
+            u.unbindEvt(window, 'resize', this.resizeHandler);
+            this.resizeHandler = null;
+        }
+        if (this.scrollHandler) {
+            u.unbindEvt(window, 'scroll', this.scrollHandler);
+            this.scrollHandler = null;
+        }
         this.trigger('factoryDestroyed', this);
         // Clear all the event listeners.
         this.off();

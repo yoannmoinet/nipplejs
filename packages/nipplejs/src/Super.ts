@@ -222,6 +222,12 @@ export class Super {
         }
     }
 
+    info(...args: any[]) {
+        if (LOG_LEVELS[currentLogLevel] <= LOG_LEVELS.info) {
+            console.info(this.logPrefix(), ...args, this.logSuffix());
+        }
+    }
+
     warn(...args: any[]) {
         if (LOG_LEVELS[currentLogLevel] <= LOG_LEVELS.warning) {
             console.warn(this.logPrefix(), ...args, this.logSuffix());

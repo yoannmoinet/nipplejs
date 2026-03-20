@@ -76,6 +76,7 @@ export const createGame: CreateGame = (_container) => {
             let ctx: CanvasRenderingContext2D;
             let animId: number | null = null;
             let destroyed = false;
+            let ro: ResizeObserver | null = null;
 
             // Camera world position (smoothed)
             let camX = 0;
@@ -482,7 +483,7 @@ export const createGame: CreateGame = (_container) => {
                     initStars();
                     initTargets();
 
-                    const ro = new ResizeObserver(() => resizeCanvas());
+                    ro = new ResizeObserver(() => resizeCanvas());
                     if (canvas.parentElement) {
                         ro.observe(canvas.parentElement);
                     }
@@ -508,6 +509,10 @@ export const createGame: CreateGame = (_container) => {
 
                 destroy() {
                     destroyed = true;
+                    if (ro) {
+                        ro.disconnect();
+                        ro = null;
+                    }
                     if (animId !== null) {
                         cancelAnimationFrame(animId);
                         animId = null;

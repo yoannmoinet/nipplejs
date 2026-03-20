@@ -122,6 +122,30 @@ describe('Joystick', () => {
             expect(joystick.options.restOpacity).toBe(0);
         });
 
+        it('applies string color to both front and back', () => {
+            const joystick = new Joystick(mockCollection, {
+                position: { x: 100, y: 100 },
+                frontPosition: { x: 0, y: 0 },
+                color: 'red',
+            });
+            joystick.init();
+
+            expect(joystick.ui.back.style.background).toBe('red');
+            expect(joystick.ui.front.style.background).toBe('red');
+        });
+
+        it('applies { front, back } color object separately', () => {
+            const joystick = new Joystick(mockCollection, {
+                position: { x: 100, y: 100 },
+                frontPosition: { x: 0, y: 0 },
+                color: { front: 'blue', back: 'green' },
+            });
+            joystick.init();
+
+            expect(joystick.ui.back.style.background).toBe('green');
+            expect(joystick.ui.front.style.background).toBe('blue');
+        });
+
         it('emits added and joystickCreated events on init()', () => {
             const joystick = new Joystick(mockCollection, {
                 position: { x: 100, y: 100 },

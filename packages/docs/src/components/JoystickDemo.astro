@@ -714,14 +714,6 @@ const highlightedCode = highlighter.codeToHtml(code, {
                 collections: joysticks,
             });
 
-            const observer = new MutationObserver(() => {
-                if (!document.body.contains(container)) {
-                    instance.destroy();
-                    joysticks.forEach((j) => j.destroy());
-                    observer.disconnect();
-                }
-            });
-            observer.observe(document.body, { childList: true, subtree: true });
         } // end initGame
     });
 </script>
