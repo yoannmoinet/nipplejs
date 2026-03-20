@@ -186,11 +186,20 @@ export const processEvent = (evt: SupportedEvent, processedEvt: ProcessedEvent):
 /**
  * Reconciliation layer for MouseEvent, TouchEvent and PointerEvent.
  * Splits multi-touch events into individual DomEvent items and calls
- * preventDefault() to suppress default browser gestures.
+ * preventDefault() on move events to suppress default browser gestures.
+ *
+ * We skip preventDefault() on start (pointerdown/touchstart/mousedown) events
+ * because the zone element already has `touch-action: none` set, and calling
+ * preventDefault() on pointerdown can interfere with multitouch on mobile.
  */
 export const processEvents = (evt: SupportedEvent): DomEvent[] => {
-    // Prevent the browser default action.
-    evt.preventDefault();
+    // Only preventDefault on move events — start events rely on
+    // touch-action: none (set on the zone) to prevent default gestures,
+    // and calling preventDefault on pointerdown breaks multitouch.
+    const type = evt.type.toLowerCase();
+    if (type.includes('move')) {
+        evt.preventDefault();
+    }
 
     // Prepare arrays of initial events.
     const domEvents: ProcessedEvent[] = [];
