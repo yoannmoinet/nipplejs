@@ -236,8 +236,6 @@ export class Joystick extends Super {
             return;
         }
 
-        // TODO: Not sure about these two, only in dynamic mode do we want to add it to the dom.
-        // Add it to the dom.
         this.addToDom();
 
         this.startPressureInterval(evt);
@@ -410,9 +408,12 @@ export class Joystick extends Super {
             degree: 180 - obj.angle.degree,
         };
 
-        // TODO: Split the events triggering into a separate function for readability.
+        this.triggerDirectionEvents(obj, direction);
 
-        // Trigger the events based on the threshold.
+        return obj;
+    }
+
+    private triggerDirectionEvents(obj: JoystickEventData, direction: Direction): void {
         if (obj.force > this.options.threshold) {
             const oldDirection = {
                 x: this.direction.x,
@@ -420,37 +421,25 @@ export class Joystick extends Super {
                 angle: this.direction.angle,
             };
 
-            const same: Record<keyof Direction, boolean> = {
-                x: oldDirection.x === direction.x,
-                y: oldDirection.y === direction.y,
-                angle: oldDirection.angle === direction.angle,
-            };
-
             this.direction = direction;
-            // NOTE: MUTATION!!!!!
             obj.direction = direction;
 
-            // If all 3 directions are the same, skip directional events.
-            if (!same.x) {
+            if (oldDirection.x !== direction.x) {
                 this.trigger(`plain plain:${direction.x}`, obj);
             }
 
-            if (!same.y) {
+            if (oldDirection.y !== direction.y) {
                 this.trigger(`plain plain:${direction.y}`, obj);
             }
 
-            if (!same.angle) {
+            if (oldDirection.angle !== direction.angle) {
                 this.trigger(`dir dir:${direction.angle}`, obj);
             }
         } else {
-            // If no threshold reached, simply reset the direction.
             this.resetDirection();
         }
 
-        // Trigger the move.
         this.trigger('move', obj);
-
-        return obj;
     }
 
     // Entirely destroy this Joystick

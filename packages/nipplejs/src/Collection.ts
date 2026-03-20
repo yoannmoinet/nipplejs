@@ -170,7 +170,6 @@ export class Collection extends Super {
             return this.all.values().next().value;
         }
 
-        // TODO: Should we fallback to the first Joystick?
         return this.all.get(uid);
     }
 
@@ -209,7 +208,6 @@ export class Collection extends Super {
         });
 
         // Other events that will get bubbled up.
-        // TODO: See if we can factorise with Factory.bindCollection.
         joystick.on('pressure', (evt) => {
             this.trigger(`pressure ${joystick.uid}:pressure`, evt.data);
         });
@@ -297,13 +295,16 @@ export class Collection extends Super {
 
     private createJoystick(position: AnyPosition): Joystick {
         const scroll = this.factory.scroll;
-        // In case of a flex container, the position is relative to the container.
+        // Offset converts page-absolute coordinates to zone-relative.
+        // In flex containers, absolute children are positioned relative to the
+        // flex item's content box, so we only need scroll offset.
         const offset = {
             x: this.parentIsFlex ? scroll.x : scroll.x + this.box.left,
             y: this.parentIsFlex ? scroll.y : scroll.y + this.box.top,
         };
 
-        // FIXME: This process feels wonky, desperate need of a rewrite.
+        // Two paths: numeric {x, y} from pointer events (dynamic/semi mode)
+        // or CSS strings {top, left, ...} from options (static mode).
         let toApply: AnyPosition;
         let newPosition: Coordinates;
 
@@ -335,7 +336,8 @@ export class Collection extends Super {
             this.options.zone.removeChild(stub);
 
             toApply = position;
-            // TODO: Verify if we should use the offset here.
+            // No offset needed — the stub is positioned inside the zone,
+            // so stubBox.left already accounts for the zone's position.
             newPosition = {
                 x: stubBox.left + scroll.x,
                 y: stubBox.top + scroll.y,
@@ -354,7 +356,8 @@ export class Collection extends Super {
             restJoystick: this.options.restJoystick,
             restOpacity: this.options.restOpacity,
             mode: this.options.mode,
-            // TODO: Verify what we use this for.
+            // Page-absolute position of the joystick center.
+            // Used to compute distance/angle in processOnMove and catchDistance in semi mode.
             position: newPosition!,
             zone: this.options.zone,
             frontPosition: {
@@ -443,8 +446,8 @@ export class Collection extends Super {
         const joystick = this.actives.get(evt.identifier);
         const scroll = this.factory.scroll;
 
-        // This should not happen.
-        // FIXME: Maybe  it happens in multitouch when we have more touches than maxNumberOfJoysticks.
+        // Can happen in multitouch when more touches exist than maxNumberOfJoysticks —
+        // processOnStart rejected the touch but Factory still dispatches move events for it.
         if (!joystick) {
             this.error(`Found zombie joystick onMove with identifier ${evt.identifier}`);
             this.deleteIdentifierFromLists(evt.identifier);

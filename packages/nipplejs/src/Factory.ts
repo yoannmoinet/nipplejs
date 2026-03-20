@@ -123,7 +123,6 @@ export class Factory extends Super {
         // });
 
         // Other events that we bubble up.
-        // TODO: See if we can factorise with Collection.bindCollection.
         collection.on('pressure', (evt) => {
             this.trigger(`pressure ${evt.target.uid}:pressure`, evt.data);
         });

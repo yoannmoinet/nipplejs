@@ -557,7 +557,6 @@ export type DomEvent = {
     /** The identifier of the event */
     identifier: Identifier;
     /** Whether the event is a touch event */
-    // FIXME: Might not be used.
     isTouch: boolean;
     /** The normalized position of the event */
     position: Coordinates;
