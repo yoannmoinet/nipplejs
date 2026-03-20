@@ -281,9 +281,8 @@ const games = [
           // Set z-index on active immediately so it's on top during transition
           slides.forEach((slide, i) => {
             const diff = i - current;
-            if (diff === 0) {
-              slide.style.zIndex = '2';
-            }
+            // Active slide above arrows (z-10), neighbors below
+            slide.style.zIndex = diff === 0 ? '20' : '1';
           });
 
           // Use rAF to batch the animated properties so Firefox picks them up
@@ -302,14 +301,12 @@ const games = [
                 slide.style.transform = `scale(0.9) perspective(1000px) rotateY(${isRight ? '-8' : '8'}deg)`;
                 slide.style.filter = isFirefox ? 'none' : 'blur(3px)';
                 slide.style.pointerEvents = 'auto';
-                slide.style.zIndex = '1';
                 slide.style.cursor = 'pointer';
               } else {
                 slide.style.opacity = isMobile ? '0' : '0.15';
                 slide.style.transform = 'scale(0.85)';
                 slide.style.filter = (isMobile || isFirefox) ? 'none' : 'blur(5px)';
                 slide.style.pointerEvents = 'none';
-                slide.style.zIndex = '0';
                 slide.style.cursor = 'default';
               }
             });

@@ -238,8 +238,8 @@ const highlightedCode = highlighter.codeToHtml(code, {
             </div>
         </div>
 
-        <!-- Buttons -->
-        <div class="absolute bottom-3 right-3 z-10 flex items-center gap-2">
+        <!-- Buttons (z-30 to stay above start overlay z-20) -->
+        <div class="absolute bottom-3 right-3 z-30 flex items-center gap-2">
             <button
                 class="glass px-2.5 py-1.5 text-xs font-mono text-muted hover:text-heading transition-colors cursor-pointer flex items-center gap-1"
                 data-toggle-fullscreen
@@ -537,6 +537,8 @@ const highlightedCode = highlighter.codeToHtml(code, {
             if (label) {
                 label.textContent = wrapper.classList.contains('code-open') ? 'Hide' : 'Code';
             }
+            // Reposition joysticks after the code panel transition (400ms)
+            setTimeout(() => repositionActiveGames(), 450);
         });
     });
 
@@ -631,6 +633,7 @@ const highlightedCode = highlighter.codeToHtml(code, {
             const debugOverlay = container.querySelector<HTMLElement>('[data-debug-overlay]');
             const debugData = container.querySelector<HTMLElement>('[data-debug-data]');
             const debugEvents = container.querySelector<HTMLElement>('[data-debug-events]');
+            if (debugEvents) debugEvents.textContent = '';
             const eventLog: { num: number; name: string }[] = [];
             let eventCounter = 0;
 
@@ -705,6 +708,7 @@ const highlightedCode = highlighter.codeToHtml(code, {
 
             let dataVals: Record<string, HTMLElement> | null = null;
             if (debugData) {
+                debugData.textContent = '';
                 dataVals = createDataDOM(debugData);
             }
 
