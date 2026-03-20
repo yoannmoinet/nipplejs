@@ -82,7 +82,7 @@ export const createGame: CreateGame = (_container) => {
                 shakeTime = 12;
                 flashAlpha = 0.4;
                 if (navigator.vibrate) {
-                    navigator.vibrate(50);
+                    navigator.vibrate(100);
                 }
             }
 

@@ -104,7 +104,7 @@ export const createGame: CreateGame = (_container) => {
                 shakeTime = 10 * intensity;
                 flashAlpha = 0.3 * intensity;
                 if (navigator.vibrate) {
-                    navigator.vibrate(30 * intensity);
+                    navigator.vibrate(50 * intensity);
                 }
             }
 
