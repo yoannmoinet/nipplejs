@@ -117,6 +117,7 @@ export const createGame: CreateGame = (_container) => {
             // Heading angle for the direction indicator (in radians)
             let heading = 0;
             let hasHeading = false;
+            let joystickForce = 0;
 
             // Game state
             let score = 0;
@@ -404,6 +405,28 @@ export const createGame: CreateGame = (_container) => {
                 shipWorldX += velocityX * speedScale;
                 shipWorldY += velocityY * speedScale;
 
+                // Exhaust particles from the back of the ship while joystick is active
+                if (joystickForce > 0.1 && hasHeading) {
+                    const count = Math.ceil(joystickForce * 3);
+                    const backX = shipWorldX + Math.cos(heading + Math.PI) * SHIP_SIZE * 0.6;
+                    const backY = shipWorldY + Math.sin(heading + Math.PI) * SHIP_SIZE * 0.6;
+                    for (let i = 0; i < count; i++) {
+                        const spread = (Math.random() - 0.5) * 0.6;
+                        const exhaustAngle = heading + Math.PI + spread;
+                        const spd = (0.5 + joystickForce * 2) * speedScale;
+                        particles.push({
+                            x: backX + (Math.random() - 0.5) * 4,
+                            y: backY + (Math.random() - 0.5) * 4,
+                            vx: Math.cos(exhaustAngle) * spd,
+                            vy: Math.sin(exhaustAngle) * spd,
+                            life: 1,
+                            maxLife: 10 + Math.random() * 10,
+                            color: Math.random() > 0.5 ? '#a78bfa' : '#e879f9',
+                            radius: 1 + Math.random() * 1.5,
+                        });
+                    }
+                }
+
                 checkCollisions();
 
                 // Update particles (world space)
@@ -506,15 +529,14 @@ export const createGame: CreateGame = (_container) => {
                         joystick.on('move', (evt) => {
                             velocityX = evt.data.vector.x * currentSpeed;
                             velocityY = -evt.data.vector.y * currentSpeed;
+                            joystickForce = evt.data.force;
 
                             heading = Math.atan2(velocityY, velocityX);
                             hasHeading = true;
                         });
 
-                        // Do NOT zero velocity on end — that's the whole point of restJoystick: false
-                        // The joystick stays in place, so velocity persists.
                         joystick.on('end', () => {
-                            // Velocity persists — ship keeps drifting
+                            joystickForce = 0;
                         });
                     }
 
