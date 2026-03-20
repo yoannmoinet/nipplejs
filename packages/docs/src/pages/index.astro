@@ -314,19 +314,18 @@ const games = [
                 slide.style.pointerEvents = 'auto';
                 slide.style.cursor = 'default';
               } else if (!isMobile && (Math.abs(diff) === 1 || Math.abs(diff) === total - 1)) {
-                // Desktop: neighbors visible with tilt
-                const isRight = diff === 1 || diff === -(total - 1);
-                slide.style.opacity = '0.35';
-                slide.style.transform = `scale(0.88) perspective(1000px) rotateY(${isRight ? '-8' : '8'}deg)`;
-                slide.style.filter = 'blur(2px)';
+                // Desktop: neighbors visible, scaled down, blurred
+                slide.style.opacity = '0.5';
+                slide.style.transform = 'scale(0.9)';
+                slide.style.filter = 'blur(3px)';
                 slide.style.pointerEvents = 'auto';
                 slide.style.zIndex = '1';
                 slide.style.cursor = 'pointer';
               } else {
                 // Hidden (or mobile neighbors)
-                slide.style.opacity = isMobile ? '0' : '0.1';
-                slide.style.transform = 'scale(0.8)';
-                slide.style.filter = isMobile ? 'none' : 'blur(4px)';
+                slide.style.opacity = isMobile ? '0' : '0.15';
+                slide.style.transform = 'scale(0.85)';
+                slide.style.filter = isMobile ? 'none' : 'blur(5px)';
                 slide.style.pointerEvents = 'none';
                 slide.style.zIndex = '0';
                 slide.style.cursor = 'default';
