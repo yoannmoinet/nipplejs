@@ -112,14 +112,14 @@ const manager = nipplejs.create({
   mode: 'static',
   position: { left: '50%', bottom: '15%' },
   follow: true, // Base follows your thumb
-  restOpacity: 1, // Always visible (scope UI)
+  restOpacity: 0.8, // Keep scope visible at rest
   // color uses CSS 'background' — images, gradients, anything
   color: {
     front: 'url("scope.svg") center/cover',
     back: 'radial-gradient(circle, ' +
-      'rgba(56,189,248,0.06) 0%, rgba(56,189,248,0.08) 86%, ' +
-      'transparent 87%, transparent 91%, ' +
-      '#ffffff 92%, #ffffff 95%, transparent 96%)',
+      'rgba(56,189,248,0.06) 0%, ' +
+      'rgba(56,189,248,0.1) 68%, ' +
+      'rgba(56,189,248,0.3) 68%)',
   },
 });
 
