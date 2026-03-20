@@ -57,6 +57,7 @@ export const createGame: CreateGame = (_container) => {
             let startTime = 0;
             let elapsedTime = 0;
             let gameOver = false;
+            let exploding = false;
             let waitingRestart = false;
 
             // Particles
@@ -70,7 +71,17 @@ export const createGame: CreateGame = (_container) => {
                 color: string;
                 radius: number;
             }
-            const particles: Particle[] = [];
+            let particles: Particle[] = [];
+            let shakeTime = 0;
+            let flashAlpha = 0;
+
+            function triggerImpact() {
+                shakeTime = 12;
+                flashAlpha = 0.4;
+                if (navigator.vibrate) {
+                    navigator.vibrate(50);
+                }
+            }
 
             function spawnExplosion(x: number, y: number, color: string, count: number) {
                 for (let i = 0; i < count; i++) {
@@ -142,10 +153,12 @@ export const createGame: CreateGame = (_container) => {
 
             function resetGame() {
                 asteroids = [];
+                particles = [];
                 frameCount = 0;
                 startTime = performance.now();
                 elapsedTime = 0;
                 gameOver = false;
+                exploding = false;
                 waitingRestart = false;
                 vectorX = 0;
                 shipX = canvas.width / 2;
@@ -287,6 +300,27 @@ export const createGame: CreateGame = (_container) => {
                     return;
                 }
 
+                // During explosion, only update particles — freeze everything else
+                if (exploding) {
+                    for (let i = particles.length - 1; i >= 0; i--) {
+                        const p = particles[i];
+                        p.x += p.vx;
+                        p.y += p.vy;
+                        p.vx *= 0.95;
+                        p.vy *= 0.95;
+                        p.life -= 1 / p.maxLife;
+                        if (p.life <= 0) {
+                            particles.splice(i, 1);
+                        }
+                    }
+                    if (particles.length === 0) {
+                        exploding = false;
+                        gameOver = true;
+                        waitingRestart = true;
+                    }
+                    return;
+                }
+
                 frameCount++;
                 elapsedTime = (performance.now() - startTime) / 1000;
 
@@ -326,8 +360,8 @@ export const createGame: CreateGame = (_container) => {
                 if (checkCollisions()) {
                     const sy = canvas.height - shipBottomOffset;
                     spawnExplosion(shipX, sy, SHIP_COLOR, 20);
-                    gameOver = true;
-                    waitingRestart = true;
+                    triggerImpact();
+                    exploding = true;
                 }
             }
 
@@ -338,10 +372,21 @@ export const createGame: CreateGame = (_container) => {
 
                 update();
 
+                ctx.save();
+                if (shakeTime > 0) {
+                    const intensity = shakeTime / 12;
+                    ctx.translate(
+                        (Math.random() - 0.5) * 8 * intensity,
+                        (Math.random() - 0.5) * 8 * intensity,
+                    );
+                    shakeTime--;
+                }
+
                 drawBackground();
                 drawAsteroids();
-                drawShip();
-                // Draw particles
+                if (!exploding && !gameOver) {
+                    drawShip();
+                }
                 for (const p of particles) {
                     ctx.save();
                     ctx.globalAlpha = p.life;
@@ -354,6 +399,17 @@ export const createGame: CreateGame = (_container) => {
                     ctx.restore();
                 }
                 drawScore();
+
+                if (flashAlpha > 0) {
+                    ctx.fillStyle = `rgba(255,255,255,${flashAlpha})`;
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    flashAlpha *= 0.85;
+                    if (flashAlpha < 0.01) {
+                        flashAlpha = 0;
+                    }
+                }
+
+                ctx.restore();
 
                 if (gameOver) {
                     drawGameOver();

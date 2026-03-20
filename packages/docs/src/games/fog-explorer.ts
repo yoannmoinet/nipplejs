@@ -74,6 +74,16 @@ export const createGame: CreateGame = (_container) => {
                 radius: number;
             }
             const particles: Particle[] = [];
+            let shakeTime = 0;
+            let flashAlpha = 0;
+
+            function triggerImpact() {
+                shakeTime = 4;
+                flashAlpha = 0.12;
+                if (navigator.vibrate) {
+                    navigator.vibrate(15);
+                }
+            }
 
             function spawnConsume(x: number, y: number, color: string) {
                 for (let i = 0; i < 8; i++) {
@@ -286,6 +296,7 @@ export const createGame: CreateGame = (_container) => {
                     const dist = Math.sqrt(dx * dx + dy * dy);
                     if (dist < HEAD_RADIUS + orb.radius) {
                         spawnConsume(orb.x, orb.y, orb.color);
+                        triggerImpact();
                         score++;
                         speed = BASE_SNAKE_SPEED + score * SPEED_PER_ORB;
                         orbs[i] = randomOrb(canvas.width, canvas.height);
@@ -419,6 +430,12 @@ export const createGame: CreateGame = (_container) => {
 
                 update();
 
+                ctx.save();
+                if (shakeTime > 0) {
+                    ctx.translate((Math.random() - 0.5) * 3, (Math.random() - 0.5) * 3);
+                    shakeTime--;
+                }
+
                 drawBackground();
                 drawBorders();
                 drawOrbs();
@@ -427,6 +444,17 @@ export const createGame: CreateGame = (_container) => {
                 drawGameOver();
                 drawHint();
                 drawScore();
+
+                if (flashAlpha > 0) {
+                    ctx.fillStyle = `rgba(255,255,255,${flashAlpha})`;
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    flashAlpha *= 0.8;
+                    if (flashAlpha < 0.01) {
+                        flashAlpha = 0;
+                    }
+                }
+
+                ctx.restore();
 
                 animId = requestAnimationFrame(render);
             }

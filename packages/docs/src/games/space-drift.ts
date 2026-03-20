@@ -77,6 +77,16 @@ export const createGame: CreateGame = (_container) => {
                 radius: number;
             }
             const particles: Particle[] = [];
+            let shakeTime = 0;
+            let flashAlpha = 0;
+
+            function triggerImpact() {
+                shakeTime = 4;
+                flashAlpha = 0.12;
+                if (navigator.vibrate) {
+                    navigator.vibrate(15);
+                }
+            }
 
             function spawnConsume(worldX: number, worldY: number, color: string) {
                 for (let i = 0; i < 8; i++) {
@@ -371,6 +381,7 @@ export const createGame: CreateGame = (_container) => {
                     const dist = Math.sqrt(dx * dx + dy * dy);
                     if (dist < COLLECT_DISTANCE) {
                         spawnConsume(wp.x, wp.y, wp.color);
+                        triggerImpact();
                         score++;
                         currentSpeed = BASE_SPEED + score * SPEED_PER_ORB;
                         waypoints[i] = randomWaypoint(spread, spread);
@@ -429,6 +440,12 @@ export const createGame: CreateGame = (_container) => {
 
                 update();
 
+                ctx.save();
+                if (shakeTime > 0) {
+                    ctx.translate((Math.random() - 0.5) * 3, (Math.random() - 0.5) * 3);
+                    shakeTime--;
+                }
+
                 drawBackground();
                 drawWaypoints();
                 drawParticles();
@@ -436,6 +453,17 @@ export const createGame: CreateGame = (_container) => {
                 drawDirectionIndicator();
                 drawShip();
                 drawScore();
+
+                if (flashAlpha > 0) {
+                    ctx.fillStyle = `rgba(255,255,255,${flashAlpha})`;
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    flashAlpha *= 0.8;
+                    if (flashAlpha < 0.01) {
+                        flashAlpha = 0;
+                    }
+                }
+
+                ctx.restore();
 
                 animId = requestAnimationFrame(render);
             }

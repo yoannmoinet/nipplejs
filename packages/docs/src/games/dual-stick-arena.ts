@@ -95,6 +95,16 @@ export const createGame: CreateGame = (_container) => {
                 radius: number;
             }
             const particles: Particle[] = [];
+            let shakeTime = 0;
+            let flashAlpha = 0;
+
+            function triggerImpact(intensity: number = 1) {
+                shakeTime = 8 * intensity;
+                flashAlpha = 0.3 * intensity;
+                if (navigator.vibrate) {
+                    navigator.vibrate(30 * intensity);
+                }
+            }
 
             function spawnExplosion(x: number, y: number, color: string, count: number) {
                 for (let i = 0; i < count; i++) {
@@ -344,6 +354,7 @@ export const createGame: CreateGame = (_container) => {
                         const dist = Math.sqrt(dx * dx + dy * dy);
                         if (dist < PROJECTILE_RADIUS + enemy.radius) {
                             spawnExplosion(enemy.x, enemy.y, ENEMY_COLOR, 12);
+                            triggerImpact(0.5);
                             enemies.splice(ei, 1);
                             projectiles.splice(pi, 1);
                             score++;
@@ -464,6 +475,16 @@ export const createGame: CreateGame = (_container) => {
 
                 update();
 
+                ctx.save();
+                if (shakeTime > 0) {
+                    const intensity = shakeTime / 8;
+                    ctx.translate(
+                        (Math.random() - 0.5) * 6 * intensity,
+                        (Math.random() - 0.5) * 6 * intensity,
+                    );
+                    shakeTime--;
+                }
+
                 drawBackground();
                 drawProjectiles();
                 drawEnemies();
@@ -471,6 +492,17 @@ export const createGame: CreateGame = (_container) => {
                 drawPlayer();
                 drawAimLine();
                 drawScore();
+
+                if (flashAlpha > 0) {
+                    ctx.fillStyle = `rgba(255,255,255,${flashAlpha})`;
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    flashAlpha *= 0.85;
+                    if (flashAlpha < 0.01) {
+                        flashAlpha = 0;
+                    }
+                }
+
+                ctx.restore();
 
                 if (gameOver) {
                     drawGameOver();

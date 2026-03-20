@@ -110,6 +110,16 @@ export const createGame: CreateGame = (_container) => {
                 radius: number;
             }
             const particles: Particle[] = [];
+            let shakeTime = 0;
+            let flashAlpha = 0;
+
+            function triggerImpact() {
+                shakeTime = 4;
+                flashAlpha = 0.12;
+                if (navigator.vibrate) {
+                    navigator.vibrate(15);
+                }
+            }
 
             function spawnConsume(x: number, y: number, color: string) {
                 for (let i = 0; i < 10; i++) {
@@ -436,6 +446,7 @@ export const createGame: CreateGame = (_container) => {
                             target.lockProgress = 1;
                             target.locked = true;
                             spawnConsume(screenX, screenY, target.color);
+                            triggerImpact();
                             score++;
 
                             // Spawn a replacement if all aren't locked
@@ -517,6 +528,12 @@ export const createGame: CreateGame = (_container) => {
 
                 update();
 
+                ctx.save();
+                if (shakeTime > 0) {
+                    ctx.translate((Math.random() - 0.5) * 3, (Math.random() - 0.5) * 3);
+                    shakeTime--;
+                }
+
                 drawBackground();
                 drawStars();
                 drawVignette();
@@ -525,6 +542,17 @@ export const createGame: CreateGame = (_container) => {
                 drawOffScreenIndicators();
                 drawCrosshair();
                 drawScore();
+
+                if (flashAlpha > 0) {
+                    ctx.fillStyle = `rgba(255,255,255,${flashAlpha})`;
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    flashAlpha *= 0.8;
+                    if (flashAlpha < 0.01) {
+                        flashAlpha = 0;
+                    }
+                }
+
+                ctx.restore();
 
                 animId = requestAnimationFrame(render);
             }
