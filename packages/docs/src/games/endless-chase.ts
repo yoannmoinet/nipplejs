@@ -143,6 +143,9 @@ export const createGame: CreateGame = (_container) => {
             let targets: Target[] = [];
             const SPREAD = 800;
 
+            const REF_DIAGONAL = 800;
+            let speedScale = 1;
+
             function resizeCanvas() {
                 const parent = canvas.parentElement;
                 if (!parent) {
@@ -150,6 +153,7 @@ export const createGame: CreateGame = (_container) => {
                 }
                 canvas.width = parent.offsetWidth;
                 canvas.height = parent.offsetHeight;
+                speedScale = Math.sqrt(canvas.width ** 2 + canvas.height ** 2) / REF_DIAGONAL;
             }
 
             // Stars at multiple depth layers for parallax 3D effect
@@ -478,8 +482,8 @@ export const createGame: CreateGame = (_container) => {
 
             function update() {
                 // Smooth camera: accumulate velocity from baseDelta, apply friction
-                camVelX += baseDeltaX * PAN_SPEED;
-                camVelY -= baseDeltaY * PAN_SPEED;
+                camVelX += baseDeltaX * PAN_SPEED * speedScale;
+                camVelY -= baseDeltaY * PAN_SPEED * speedScale;
                 camVelX *= CAM_FRICTION;
                 camVelY *= CAM_FRICTION;
                 camX += camVelX;

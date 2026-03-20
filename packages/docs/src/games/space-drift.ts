@@ -129,6 +129,9 @@ export const createGame: CreateGame = (_container) => {
 
             let ro: ResizeObserver | null = null;
 
+            const REF_DIAGONAL = 800;
+            let speedScale = 1;
+
             function resizeCanvas() {
                 const parent = canvas.parentElement;
                 if (!parent) {
@@ -136,6 +139,7 @@ export const createGame: CreateGame = (_container) => {
                 }
                 canvas.width = parent.offsetWidth;
                 canvas.height = parent.offsetHeight;
+                speedScale = Math.sqrt(canvas.width ** 2 + canvas.height ** 2) / REF_DIAGONAL;
             }
 
             function initStars() {
@@ -396,8 +400,8 @@ export const createGame: CreateGame = (_container) => {
 
             function update() {
                 // Move ship in world space — velocity persists even after joystick release
-                shipWorldX += velocityX;
-                shipWorldY += velocityY;
+                shipWorldX += velocityX * speedScale;
+                shipWorldY += velocityY * speedScale;
 
                 checkCollisions();
 

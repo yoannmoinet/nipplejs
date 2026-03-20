@@ -131,6 +131,9 @@ export const createGame: CreateGame = (_container) => {
 
             let ro: ResizeObserver | null = null;
 
+            const REF_DIAGONAL = 800;
+            let speedScale = 1;
+
             function resizeCanvas() {
                 const parent = canvas.parentElement;
                 if (!parent) {
@@ -138,6 +141,7 @@ export const createGame: CreateGame = (_container) => {
                 }
                 canvas.width = parent.offsetWidth;
                 canvas.height = parent.offsetHeight;
+                speedScale = Math.sqrt(canvas.width ** 2 + canvas.height ** 2) / REF_DIAGONAL;
             }
 
             function getDifficulty(): number {
@@ -183,7 +187,7 @@ export const createGame: CreateGame = (_container) => {
                     radius: ENEMY_RADIUS,
                     pulse: Math.random() * Math.PI * 2,
                     pulseSpeed: 0.05 + Math.random() * 0.03,
-                    speed: getEnemySpeed() + (Math.random() - 0.5) * 0.4,
+                    speed: (getEnemySpeed() + (Math.random() - 0.5) * 0.4) * speedScale,
                 });
             }
 
@@ -191,8 +195,8 @@ export const createGame: CreateGame = (_container) => {
                 projectiles.push({
                     x: playerX,
                     y: playerY,
-                    vx: Math.cos(aimAngle) * PROJECTILE_SPEED,
-                    vy: -Math.sin(aimAngle) * PROJECTILE_SPEED,
+                    vx: Math.cos(aimAngle) * PROJECTILE_SPEED * speedScale,
+                    vy: -Math.sin(aimAngle) * PROJECTILE_SPEED * speedScale,
                     trail: [],
                 });
             }
@@ -384,8 +388,8 @@ export const createGame: CreateGame = (_container) => {
                 frameCount++;
 
                 // Move player
-                playerX += moveVX * PLAYER_SPEED;
-                playerY -= moveVY * PLAYER_SPEED;
+                playerX += moveVX * PLAYER_SPEED * speedScale;
+                playerY -= moveVY * PLAYER_SPEED * speedScale;
 
                 // Clamp to canvas bounds
                 playerX = Math.max(PLAYER_RADIUS, Math.min(canvas.width - PLAYER_RADIUS, playerX));

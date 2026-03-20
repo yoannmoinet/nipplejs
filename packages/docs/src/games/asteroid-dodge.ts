@@ -106,6 +106,9 @@ export const createGame: CreateGame = (_container) => {
             let ro: ResizeObserver | null = null;
             let joystickRef: Collection | null = null;
 
+            const REF_DIAGONAL = 800;
+            let speedScale = 1;
+
             function resizeCanvas() {
                 const parent = canvas.parentElement;
                 if (!parent) {
@@ -113,6 +116,7 @@ export const createGame: CreateGame = (_container) => {
                 }
                 canvas.width = parent.offsetWidth;
                 canvas.height = parent.offsetHeight;
+                speedScale = Math.sqrt(canvas.width ** 2 + canvas.height ** 2) / REF_DIAGONAL;
             }
 
             function initBgLines() {
@@ -146,7 +150,7 @@ export const createGame: CreateGame = (_container) => {
                     radius,
                     rotation: Math.random() * Math.PI * 2,
                     rotationSpeed: (Math.random() - 0.5) * 0.04,
-                    speed: getCurrentSpeed() * (0.5 + Math.random() * 1.0),
+                    speed: getCurrentSpeed() * (0.5 + Math.random() * 1.0) * speedScale,
                     color: ASTEROID_COLORS[Math.floor(Math.random() * ASTEROID_COLORS.length)],
                 });
             }
@@ -325,7 +329,7 @@ export const createGame: CreateGame = (_container) => {
                 elapsedTime = (performance.now() - startTime) / 1000;
 
                 // Move ship horizontally
-                shipX += vectorX * PLAYER_SPEED;
+                shipX += vectorX * PLAYER_SPEED * speedScale;
                 shipX = Math.max(SHIP_SIZE, Math.min(canvas.width - SHIP_SIZE, shipX));
 
                 // Spawn asteroids

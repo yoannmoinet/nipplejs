@@ -117,6 +117,10 @@ export const createGame: CreateGame = (_container) => {
             // Orbs
             let orbs: Orb[] = [];
 
+            // Scale speeds relative to canvas size so fullscreen feels right
+            const REF_DIAGONAL = 800;
+            let speedScale = 1;
+
             function resizeCanvas() {
                 const parent = canvas.parentElement;
                 if (!parent) {
@@ -124,6 +128,7 @@ export const createGame: CreateGame = (_container) => {
                 }
                 canvas.width = parent.offsetWidth;
                 canvas.height = parent.offsetHeight;
+                speedScale = Math.sqrt(canvas.width ** 2 + canvas.height ** 2) / REF_DIAGONAL;
             }
 
             function initOrbs() {
@@ -371,8 +376,9 @@ export const createGame: CreateGame = (_container) => {
                 }
 
                 // Always move forward in the heading direction
-                headX += Math.cos(heading) * speed;
-                headY += Math.sin(heading) * speed;
+                const s = speed * speedScale;
+                headX += Math.cos(heading) * s;
+                headY += Math.sin(heading) * s;
 
                 // Border collision — game over
                 if (
