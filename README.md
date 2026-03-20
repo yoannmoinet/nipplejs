@@ -10,6 +10,8 @@
 [![npm](https://img.shields.io/npm/v/nipplejs.svg)](https://npmjs.org/package/nipplejs)
 [![npm](https://img.shields.io/npm/dm/nipplejs.svg)](https://npmjs.org/package/nipplejs)
 
+**[Documentation](https://yoannmoinet.github.io/nipplejs/)** · **[Interactive Demos](https://yoannmoinet.github.io/nipplejs/#demos)** · **[Migration Guide](https://yoannmoinet.github.io/nipplejs/migration/)**
+
 ## Table Of Contents <!-- #omit in toc -->
 <details>
 
@@ -65,7 +67,7 @@ npm install nipplejs --save
 ----
 
 ## Demo
-Check out the [demo here](http://yoannmoinet.github.io/nipplejs/#demo).
+Check out the [interactive demos](https://yoannmoinet.github.io/nipplejs/#demos) on the documentation website.
 
 ----
 
