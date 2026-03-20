@@ -56,6 +56,8 @@ export const createGame: CreateGame = (_container) => {
         },
 
         create(): GameInstance {
+            const isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+
             let canvas: HTMLCanvasElement;
             let ctx: CanvasRenderingContext2D;
             let animId: number | null = null;
@@ -174,21 +176,21 @@ export const createGame: CreateGame = (_container) => {
                 ctx.clip();
 
                 // Border line
-                ctx.shadowBlur = 30;
+                ctx.shadowBlur = isMobile ? 0 : 30;
                 ctx.shadowColor = '#ef4444';
                 ctx.strokeStyle = 'rgba(239, 68, 68, 0.4)';
                 ctx.lineWidth = 2;
                 ctx.strokeRect(1, 1, w - 2, h - 2);
 
                 // Wide diffuse inner glow
-                ctx.shadowBlur = 60;
+                ctx.shadowBlur = isMobile ? 0 : 60;
                 ctx.shadowColor = 'rgba(239, 68, 68, 0.4)';
                 ctx.strokeStyle = 'rgba(239, 68, 68, 0.15)';
                 ctx.lineWidth = 6;
                 ctx.strokeRect(-4, -4, w + 8, h + 8);
 
                 // Extra soft layer
-                ctx.shadowBlur = 100;
+                ctx.shadowBlur = isMobile ? 0 : 100;
                 ctx.shadowColor = 'rgba(239, 68, 68, 0.2)';
                 ctx.strokeStyle = 'transparent';
                 ctx.lineWidth = 2;
@@ -204,7 +206,7 @@ export const createGame: CreateGame = (_container) => {
                     const r = orb.radius * scale;
 
                     ctx.save();
-                    ctx.shadowBlur = 15;
+                    ctx.shadowBlur = isMobile ? 0 : 15;
                     ctx.shadowColor = orb.color;
                     ctx.fillStyle = orb.color;
                     ctx.globalAlpha = 0.7 + Math.sin(orb.pulse) * 0.3;
@@ -215,40 +217,73 @@ export const createGame: CreateGame = (_container) => {
                 }
             }
 
+            let glowPulse = 0;
+
             function drawSnake() {
                 // Build full path: segments (tail to head) + head position
                 const segs = getSegments();
                 const points = [...segs, { x: headX, y: headY }];
 
+                glowPulse += 0.06;
+
                 if (points.length < 2) {
                     // Just a head, no body yet
-                    ctx.save();
-                    ctx.shadowBlur = 18;
-                    ctx.shadowColor = '#818cf8';
-                    ctx.fillStyle = '#818cf8';
-                    ctx.beginPath();
-                    ctx.arc(headX, headY, HEAD_RADIUS, 0, Math.PI * 2);
-                    ctx.fill();
-                    ctx.shadowBlur = 0;
-                    ctx.fillStyle = '#c7d2fe';
-                    ctx.beginPath();
-                    ctx.arc(headX, headY, HEAD_RADIUS * 0.4, 0, Math.PI * 2);
-                    ctx.fill();
-                    ctx.restore();
+                    drawSnakeHead();
                     return;
                 }
 
-                // Draw body as connected thick line segments that taper from tail to head
-                // Use overlapping circles along the path for a smooth, continuous body
+                // Draw pulsing glow trail behind the body
+                if (!isMobile) {
+                    ctx.save();
+                    const glowIntensity = 0.3 + Math.sin(glowPulse) * 0.15;
+                    for (let i = 0; i < points.length - 1; i++) {
+                        const t = points.length > 1 ? i / (points.length - 1) : 1;
+                        const p = points[i];
+                        const trailAlpha = t * glowIntensity * 0.5;
+                        const trailRadius =
+                            SEGMENT_RADIUS * (0.5 + t * 0.8) +
+                            4 +
+                            Math.sin(glowPulse + i * 0.3) * 2;
+                        ctx.globalAlpha = trailAlpha;
+                        ctx.fillStyle = '#6366f1';
+                        ctx.shadowBlur = 20;
+                        ctx.shadowColor = '#818cf8';
+                        ctx.beginPath();
+                        ctx.arc(p.x, p.y, trailRadius, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                    ctx.restore();
+                }
+
+                // Draw connecting gradient lines between segments
                 ctx.save();
-                ctx.shadowBlur = 10;
+                for (let i = 0; i < points.length - 1; i++) {
+                    const a = points[i];
+                    const b = points[i + 1];
+                    const t = points.length > 2 ? i / (points.length - 2) : 1;
+                    const lineGrad = ctx.createLinearGradient(a.x, a.y, b.x, b.y);
+                    const alphaStart = 0.1 + t * 0.4;
+                    const alphaEnd = 0.1 + (t + 1 / (points.length - 1)) * 0.4;
+                    lineGrad.addColorStop(0, `rgba(129,140,248,${alphaStart})`);
+                    lineGrad.addColorStop(1, `rgba(165,180,252,${alphaEnd})`);
+                    ctx.strokeStyle = lineGrad;
+                    ctx.lineWidth = SEGMENT_RADIUS * (0.4 + t * 0.8);
+                    ctx.lineCap = 'round';
+                    ctx.beginPath();
+                    ctx.moveTo(a.x, a.y);
+                    ctx.lineTo(b.x, b.y);
+                    ctx.stroke();
+                }
+                ctx.restore();
+
+                // Draw body segments (overlapping circles that taper)
+                ctx.save();
+                ctx.shadowBlur = isMobile ? 0 : 10;
                 ctx.shadowColor = '#818cf8';
-                for (let i = 0; i < points.length; i++) {
+                for (let i = 0; i < points.length - 1; i++) {
                     const t = points.length > 1 ? i / (points.length - 1) : 1;
                     const p = points[i];
-                    // Taper: thin at tail, thick at head
                     const radius = SEGMENT_RADIUS * (0.3 + t * 0.7);
-                    // Fade: dim at tail, bright at head
                     const alpha = 0.15 + t * 0.65;
 
                     ctx.globalAlpha = alpha;
@@ -259,20 +294,73 @@ export const createGame: CreateGame = (_container) => {
                 }
                 ctx.restore();
 
-                // Draw head on top with bright core
+                // Draw head on top
+                drawSnakeHead();
+            }
+
+            function drawSnakeHead() {
+                // Head with radial gradient (brighter, more vivid)
                 ctx.save();
-                ctx.shadowBlur = 18;
-                ctx.shadowColor = '#818cf8';
-                ctx.fillStyle = '#a5b4fc';
+                const headGrad = ctx.createRadialGradient(
+                    headX,
+                    headY,
+                    0,
+                    headX,
+                    headY,
+                    HEAD_RADIUS,
+                );
+                headGrad.addColorStop(0, '#c7d2fe');
+                headGrad.addColorStop(0.4, '#a78bfa');
+                headGrad.addColorStop(1, '#6366f1');
+                ctx.shadowBlur = isMobile ? 0 : 22;
+                ctx.shadowColor = '#a78bfa';
+                ctx.fillStyle = headGrad;
                 ctx.beginPath();
                 ctx.arc(headX, headY, HEAD_RADIUS, 0, Math.PI * 2);
                 ctx.fill();
 
+                // Inner bright core
                 ctx.shadowBlur = 0;
                 ctx.fillStyle = '#e0e7ff';
                 ctx.beginPath();
-                ctx.arc(headX, headY, HEAD_RADIUS * 0.35, 0, Math.PI * 2);
+                ctx.arc(headX, headY, HEAD_RADIUS * 0.3, 0, Math.PI * 2);
                 ctx.fill();
+
+                // Eyes — two small white dots offset in the heading direction
+                const eyeOffset = HEAD_RADIUS * 0.45;
+                const eyeSpread = Math.PI * 0.35;
+                const eyeRadius = 2;
+
+                const leftEyeX = headX + Math.cos(heading - eyeSpread) * eyeOffset;
+                const leftEyeY = headY + Math.sin(heading - eyeSpread) * eyeOffset;
+                const rightEyeX = headX + Math.cos(heading + eyeSpread) * eyeOffset;
+                const rightEyeY = headY + Math.sin(heading + eyeSpread) * eyeOffset;
+
+                ctx.fillStyle = '#ffffff';
+                ctx.globalAlpha = 0.9;
+                ctx.beginPath();
+                ctx.arc(leftEyeX, leftEyeY, eyeRadius, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.beginPath();
+                ctx.arc(rightEyeX, rightEyeY, eyeRadius, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Tiny dark pupils
+                ctx.fillStyle = '#1e1b4b';
+                ctx.globalAlpha = 1;
+                const pupilOffset = HEAD_RADIUS * 0.52;
+                const pupilRadius = 0.9;
+                const leftPupilX = headX + Math.cos(heading - eyeSpread) * pupilOffset;
+                const leftPupilY = headY + Math.sin(heading - eyeSpread) * pupilOffset;
+                const rightPupilX = headX + Math.cos(heading + eyeSpread) * pupilOffset;
+                const rightPupilY = headY + Math.sin(heading + eyeSpread) * pupilOffset;
+                ctx.beginPath();
+                ctx.arc(leftPupilX, leftPupilY, pupilRadius, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.beginPath();
+                ctx.arc(rightPupilX, rightPupilY, pupilRadius, 0, Math.PI * 2);
+                ctx.fill();
+
                 ctx.restore();
             }
 
@@ -338,12 +426,12 @@ export const createGame: CreateGame = (_container) => {
                 ctx.textAlign = 'center';
 
                 ctx.font = 'bold 28px JetBrains Mono, monospace';
-                ctx.shadowBlur = 20;
+                ctx.shadowBlur = isMobile ? 0 : 20;
                 ctx.shadowColor = '#e879f9';
                 ctx.fillStyle = '#e879f9';
                 ctx.fillText('GAME OVER', canvas.width / 2, canvas.height / 2 - 20);
 
-                ctx.shadowBlur = 10;
+                ctx.shadowBlur = isMobile ? 0 : 10;
                 ctx.shadowColor = '#38bdf8';
                 ctx.fillStyle = '#38bdf8';
                 ctx.font = '16px JetBrains Mono, monospace';
@@ -419,7 +507,7 @@ export const createGame: CreateGame = (_container) => {
                 for (const p of particles) {
                     ctx.save();
                     ctx.globalAlpha = p.life * 0.8;
-                    ctx.shadowBlur = 10;
+                    ctx.shadowBlur = isMobile ? 0 : 10;
                     ctx.shadowColor = p.color;
                     ctx.fillStyle = p.color;
                     ctx.beginPath();
@@ -516,6 +604,9 @@ export const createGame: CreateGame = (_container) => {
                         cancelAnimationFrame(animId);
                         animId = null;
                     }
+                    particles.length = 0;
+                    history.length = 0;
+                    orbs.length = 0;
                 },
             };
         },

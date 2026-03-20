@@ -63,6 +63,8 @@ export const createGame: CreateGame = (_container) => {
         },
 
         create(): GameInstance {
+            const isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+
             let canvas: HTMLCanvasElement;
             let ctx: CanvasRenderingContext2D;
             let animId: number | null = null;
@@ -223,7 +225,7 @@ export const createGame: CreateGame = (_container) => {
 
             function drawPlayer() {
                 ctx.save();
-                ctx.shadowBlur = 15;
+                ctx.shadowBlur = isMobile ? 0 : 15;
                 ctx.shadowColor = PLAYER_COLOR;
                 ctx.fillStyle = PLAYER_COLOR;
                 ctx.beginPath();
@@ -267,7 +269,7 @@ export const createGame: CreateGame = (_container) => {
 
                     ctx.save();
                     ctx.globalAlpha = alpha;
-                    ctx.shadowBlur = 10;
+                    ctx.shadowBlur = isMobile ? 0 : 10;
                     ctx.shadowColor = ENEMY_COLOR;
                     ctx.fillStyle = ENEMY_COLOR;
                     ctx.beginPath();
@@ -302,7 +304,7 @@ export const createGame: CreateGame = (_container) => {
 
                     // Draw projectile
                     ctx.save();
-                    ctx.shadowBlur = 8;
+                    ctx.shadowBlur = isMobile ? 0 : 8;
                     ctx.shadowColor = PROJECTILE_COLOR;
                     ctx.fillStyle = PROJECTILE_COLOR;
                     ctx.beginPath();
@@ -328,7 +330,7 @@ export const createGame: CreateGame = (_container) => {
                 const centerX = canvas.width / 2;
                 const centerY = canvas.height / 2;
 
-                ctx.shadowBlur = 20;
+                ctx.shadowBlur = isMobile ? 0 : 20;
                 ctx.shadowColor = ENEMY_COLOR;
                 ctx.font = 'bold 28px JetBrains Mono, monospace';
                 ctx.fillStyle = ENEMY_COLOR;
@@ -462,7 +464,7 @@ export const createGame: CreateGame = (_container) => {
                 for (const p of particles) {
                     ctx.save();
                     ctx.globalAlpha = p.life;
-                    ctx.shadowBlur = 8;
+                    ctx.shadowBlur = isMobile ? 0 : 8;
                     ctx.shadowColor = p.color;
                     ctx.fillStyle = p.color;
                     ctx.beginPath();
@@ -593,6 +595,9 @@ export const createGame: CreateGame = (_container) => {
                         cancelAnimationFrame(animId);
                         animId = null;
                     }
+                    enemies.length = 0;
+                    projectiles.length = 0;
+                    particles.length = 0;
                 },
             };
         },

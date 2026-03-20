@@ -60,6 +60,8 @@ export const createGame: CreateGame = (_container) => {
         },
 
         create(): GameInstance {
+            const isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+
             let canvas: HTMLCanvasElement;
             let ctx: CanvasRenderingContext2D;
             let animId: number | null = null;
@@ -216,7 +218,7 @@ export const createGame: CreateGame = (_container) => {
                     }
 
                     ctx.save();
-                    ctx.shadowBlur = 14;
+                    ctx.shadowBlur = isMobile ? 0 : 14;
                     ctx.shadowColor = wp.color;
                     ctx.fillStyle = wp.color;
                     ctx.globalAlpha = 0.6 + Math.sin(wp.pulse) * 0.3;
@@ -285,7 +287,7 @@ export const createGame: CreateGame = (_container) => {
                     ctx.translate(edgeX, edgeY);
                     ctx.rotate(angle);
 
-                    ctx.shadowBlur = 6;
+                    ctx.shadowBlur = isMobile ? 0 : 6;
                     ctx.shadowColor = wp.color;
                     ctx.fillStyle = wp.color;
                     ctx.globalAlpha = 0.6;
@@ -321,7 +323,7 @@ export const createGame: CreateGame = (_container) => {
                 ctx.rotate(heading);
 
                 // Triangle pointing in heading direction (right = 0 radians)
-                ctx.shadowBlur = 12;
+                ctx.shadowBlur = isMobile ? 0 : 12;
                 ctx.shadowColor = SHIP_COLOR;
                 ctx.fillStyle = SHIP_COLOR;
                 ctx.beginPath();
@@ -427,7 +429,7 @@ export const createGame: CreateGame = (_container) => {
                     const sy = centerY + (p.y - shipWorldY);
                     ctx.save();
                     ctx.globalAlpha = p.life * 0.8;
-                    ctx.shadowBlur = 10;
+                    ctx.shadowBlur = isMobile ? 0 : 10;
                     ctx.shadowColor = p.color;
                     ctx.fillStyle = p.color;
                     ctx.beginPath();
@@ -531,6 +533,9 @@ export const createGame: CreateGame = (_container) => {
                         cancelAnimationFrame(animId);
                         animId = null;
                     }
+                    particles.length = 0;
+                    stars.length = 0;
+                    waypoints.length = 0;
                 },
             };
         },

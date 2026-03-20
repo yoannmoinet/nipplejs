@@ -41,6 +41,8 @@ export const createGame: CreateGame = (_container) => {
         },
 
         create(): GameInstance {
+            const isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+
             let canvas: HTMLCanvasElement;
             let ctx: CanvasRenderingContext2D;
             let animId: number | null = null;
@@ -74,6 +76,7 @@ export const createGame: CreateGame = (_container) => {
             let particles: Particle[] = [];
             let shakeTime = 0;
             let flashAlpha = 0;
+            let tilt = 0;
 
             function triggerImpact() {
                 shakeTime = 12;
@@ -194,7 +197,7 @@ export const createGame: CreateGame = (_container) => {
             function drawShip() {
                 const sy = canvas.height - shipBottomOffset;
                 ctx.save();
-                ctx.shadowBlur = 12;
+                ctx.shadowBlur = isMobile ? 0 : 12;
                 ctx.shadowColor = SHIP_COLOR;
                 ctx.fillStyle = SHIP_COLOR;
                 ctx.beginPath();
@@ -224,7 +227,7 @@ export const createGame: CreateGame = (_container) => {
                     ctx.save();
                     ctx.translate(a.x, a.y);
                     ctx.rotate(a.rotation);
-                    ctx.shadowBlur = 10;
+                    ctx.shadowBlur = isMobile ? 0 : 10;
                     ctx.shadowColor = a.color;
                     ctx.fillStyle = a.color;
                     ctx.globalAlpha = 0.6;
@@ -262,7 +265,7 @@ export const createGame: CreateGame = (_container) => {
                 const centerY = canvas.height / 2;
 
                 // GAME OVER text
-                ctx.shadowBlur = 20;
+                ctx.shadowBlur = isMobile ? 0 : 20;
                 ctx.shadowColor = '#e879f9';
                 ctx.font = 'bold 28px JetBrains Mono, monospace';
                 ctx.fillStyle = '#e879f9';
@@ -376,6 +379,10 @@ export const createGame: CreateGame = (_container) => {
 
                 update();
 
+                // Smooth tilt toward target
+                const tiltTarget = vectorX * 0.03;
+                tilt += (tiltTarget - tilt) * 0.1;
+
                 ctx.save();
                 if (shakeTime > 0) {
                     const intensity = shakeTime / 12;
@@ -386,6 +393,11 @@ export const createGame: CreateGame = (_container) => {
                     shakeTime--;
                 }
 
+                // Apply subtle canvas tilt based on horizontal movement
+                ctx.translate(canvas.width / 2, canvas.height / 2);
+                ctx.rotate(tilt);
+                ctx.translate(-canvas.width / 2, -canvas.height / 2);
+
                 drawBackground();
                 drawAsteroids();
                 if (!exploding && !gameOver) {
@@ -394,7 +406,7 @@ export const createGame: CreateGame = (_container) => {
                 for (const p of particles) {
                     ctx.save();
                     ctx.globalAlpha = p.life;
-                    ctx.shadowBlur = 8;
+                    ctx.shadowBlur = isMobile ? 0 : 8;
                     ctx.shadowColor = p.color;
                     ctx.fillStyle = p.color;
                     ctx.beginPath();
@@ -483,6 +495,9 @@ export const createGame: CreateGame = (_container) => {
                         cancelAnimationFrame(animId);
                         animId = null;
                     }
+                    asteroids.length = 0;
+                    particles.length = 0;
+                    bgLines.length = 0;
                 },
             };
         },

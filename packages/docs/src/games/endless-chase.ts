@@ -72,6 +72,8 @@ export const createGame: CreateGame = (_container) => {
         },
 
         create(): GameInstance {
+            const isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+
             let canvas: HTMLCanvasElement;
             let ctx: CanvasRenderingContext2D;
             let animId: number | null = null;
@@ -211,7 +213,7 @@ export const createGame: CreateGame = (_container) => {
 
                     // Near stars get a subtle glow
                     if (star.depth > 0.7) {
-                        ctx.shadowBlur = star.size * 3;
+                        ctx.shadowBlur = isMobile ? 0 : star.size * 3;
                         ctx.shadowColor = star.color;
                     }
 
@@ -247,7 +249,7 @@ export const createGame: CreateGame = (_container) => {
 
                     // Simple filled circle with soft glow
                     ctx.save();
-                    ctx.shadowBlur = 15;
+                    ctx.shadowBlur = isMobile ? 0 : 15;
                     ctx.shadowColor = target.glowColor;
                     ctx.globalAlpha = target.locked ? 0.2 : 0.5;
                     ctx.fillStyle = target.color;
@@ -354,7 +356,7 @@ export const createGame: CreateGame = (_container) => {
                     ctx.translate(edgeX, edgeY);
                     ctx.rotate(angle);
 
-                    ctx.shadowBlur = 6;
+                    ctx.shadowBlur = isMobile ? 0 : 6;
                     ctx.shadowColor = target.color;
                     ctx.fillStyle = target.color;
                     ctx.globalAlpha = 0.5;
@@ -385,7 +387,7 @@ export const createGame: CreateGame = (_container) => {
 
                 ctx.save();
                 // Simple glowing dot
-                ctx.shadowBlur = 18;
+                ctx.shadowBlur = isMobile ? 0 : 18;
                 ctx.shadowColor = CROSSHAIR_COLOR;
                 ctx.fillStyle = CROSSHAIR_COLOR;
                 ctx.globalAlpha = 0.9;
@@ -515,7 +517,7 @@ export const createGame: CreateGame = (_container) => {
                 for (const p of particles) {
                     ctx.save();
                     ctx.globalAlpha = p.life * 0.8;
-                    ctx.shadowBlur = 10;
+                    ctx.shadowBlur = isMobile ? 0 : 10;
                     ctx.shadowColor = p.color;
                     ctx.fillStyle = p.color;
                     ctx.beginPath();
@@ -608,6 +610,9 @@ export const createGame: CreateGame = (_container) => {
                         cancelAnimationFrame(animId);
                         animId = null;
                     }
+                    particles.length = 0;
+                    stars.length = 0;
+                    targets.length = 0;
                 },
             };
         },
