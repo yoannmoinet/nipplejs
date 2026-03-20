@@ -1,8 +1,12 @@
 @import 'tailwindcss';
 
-/* Prevent horizontal scrollbar and overscroll bounce */
-html, body {
+/* Prevent horizontal scrollbar */
+html {
   overflow-x: hidden;
+}
+
+/* Prevent overscroll bounce */
+body {
   overscroll-behavior: none;
 }
 
