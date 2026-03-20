@@ -206,12 +206,12 @@ const games = [
       <!-- Arrows + track -->
       <div class="flex items-center px-4 max-w-6xl mx-auto">
         <!-- Prev (hidden on mobile) -->
-        <button id="carousel-prev" class="hidden md:flex flex-shrink-0 cursor-pointer text-white/20 hover:text-white/50 transition-colors -mr-6 z-10" aria-label="Previous game">
+        <button id="carousel-prev" class="hidden md:flex flex-shrink-0 cursor-pointer text-white/20 hover:text-white/50 transition-colors -mr-6" aria-label="Previous game">
           <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
         </button>
 
         <!-- Track wrapper — visible on desktop for neighbors, hidden on mobile -->
-        <div class="flex-1 min-w-0 overflow-hidden md:overflow-visible">
+        <div class="flex-1 min-w-0 overflow-hidden md:overflow-visible relative z-10">
           <div class="flex" id="carousel-track" style="transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);">
             {games.map((game, i) => (
               <div
@@ -226,7 +226,7 @@ const games = [
         </div>
 
         <!-- Next (hidden on mobile) -->
-        <button id="carousel-next" class="hidden md:flex flex-shrink-0 cursor-pointer text-white/20 hover:text-white/50 transition-colors -ml-6 z-10" aria-label="Next game">
+        <button id="carousel-next" class="hidden md:flex flex-shrink-0 cursor-pointer text-white/20 hover:text-white/50 transition-colors -ml-6" aria-label="Next game">
           <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
         </button>
       </div>
