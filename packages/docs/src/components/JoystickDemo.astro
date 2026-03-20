@@ -303,7 +303,11 @@ const highlightedCode = highlighter.codeToHtml(code, {
     /* Viewport fullscreen mode */
     .joystick-demo-wrapper.is-fullscreen {
         position: fixed;
-        inset: 0;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        height: 100dvh; /* dynamic viewport height for mobile browsers */
         z-index: 9999;
         margin: 0;
         display: flex;

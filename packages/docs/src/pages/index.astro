@@ -149,10 +149,11 @@ const games = [
           logoObserver.observe(logoContainer);
           loop();
 
-          // --- Joystick front follows cursor ---
+          // --- Joystick front follows cursor (desktop only) ---
+          const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
           const back = document.getElementById('hero-joystick-back');
           const front = document.getElementById('hero-joystick-front');
-          if (back && front) {
+          if (back && front && !isTouch) {
             const maxDist = back.offsetWidth / 2; // front center can reach the back's edge
             document.addEventListener('mousemove', (e) => {
               const rect = back.getBoundingClientRect();
@@ -214,20 +215,20 @@ const games = [
 
       </div><!-- close max-w-5xl -->
 
-      <!-- Arrows + track in a row — full viewport width -->
+      <!-- Arrows + track -->
       <div class="flex items-center gap-4 px-4">
-        <!-- Prev -->
-        <button id="carousel-prev" class="flex-shrink-0 cursor-pointer text-white/15 hover:text-white/40 transition-colors" aria-label="Previous game">
+        <!-- Prev (hidden on mobile) -->
+        <button id="carousel-prev" class="hidden md:flex flex-shrink-0 cursor-pointer text-white/15 hover:text-white/40 transition-colors" aria-label="Previous game">
           <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
         </button>
 
-        <!-- Track wrapper — overflow visible so neighbors show -->
+        <!-- Track wrapper -->
         <div class="flex-1 min-w-0" style="overflow: visible;">
           <div class="flex" id="carousel-track" style="transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);">
             {games.map((game, i) => (
               <div
                 class="carousel-slide flex-shrink-0 px-1"
-                style="width: 75%; transition: transform 0.5s ease, opacity 0.5s ease, filter 0.5s ease;"
+                style="transition: transform 0.5s ease, opacity 0.5s ease, filter 0.5s ease;"
                 data-slide={i}
                 data-name={game.name}
                 data-desc={game.description}
@@ -239,14 +240,18 @@ const games = [
           </div>
         </div>
 
-        <!-- Next -->
-        <button id="carousel-next" class="flex-shrink-0 cursor-pointer text-white/15 hover:text-white/40 transition-colors" aria-label="Next game">
+        <!-- Next (hidden on mobile) -->
+        <button id="carousel-next" class="hidden md:flex flex-shrink-0 cursor-pointer text-white/15 hover:text-white/40 transition-colors" aria-label="Next game">
           <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
         </button>
       </div>
 
-      <!-- Dots -->
-      <div class="flex justify-center gap-2 mt-6" id="carousel-dots">
+      <!-- Dots + mobile arrows on same line -->
+      <div class="flex justify-center items-center gap-4 mt-4" id="carousel-dots-row">
+        <button id="carousel-prev-mobile" class="md:hidden cursor-pointer text-white/25 hover:text-white/50 transition-colors" aria-label="Previous game">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+        </button>
+        <div class="flex gap-2" id="carousel-dots">
         {games.map((game, i) => (
           <button
             class:list={['w-2 h-2 rounded-full transition-all duration-300 cursor-pointer', i === 0 ? 'bg-accent-indigo w-6' : 'bg-muted/30']}
@@ -254,22 +259,33 @@ const games = [
             aria-label={`Go to ${game.name}`}
           />
         ))}
+        </div>
+        <button id="carousel-next-mobile" class="md:hidden cursor-pointer text-white/25 hover:text-white/50 transition-colors" aria-label="Next game">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+        </button>
       </div>
 
       <script>
         const track = document.getElementById('carousel-track')!;
         const dots = document.querySelectorAll<HTMLElement>('#carousel-dots [data-dot]');
-        const prevBtn = document.getElementById('carousel-prev')!;
-        const nextBtn = document.getElementById('carousel-next')!;
+        const prevBtn = document.getElementById('carousel-prev');
+        const nextBtn = document.getElementById('carousel-next');
+        const prevBtnMobile = document.getElementById('carousel-prev-mobile');
+        const nextBtnMobile = document.getElementById('carousel-next-mobile');
         const slides = document.querySelectorAll<HTMLElement>('.carousel-slide');
         const titleEl = document.getElementById('carousel-title')!;
         const descEl = document.getElementById('carousel-desc')!;
         const badgesEl = document.getElementById('carousel-badges')!;
         const total = slides.length;
-        const SLIDE_PCT = 75; // each slide is 75% of track width
+        const isMobile = window.matchMedia('(max-width: 767px)').matches;
+        const SLIDE_PCT = isMobile ? 100 : 75;
         let current = 0;
 
-        // Center offset: to center the active slide, shift by (100 - 80) / 2 = 10%
+        // Set slide widths
+        slides.forEach((slide) => {
+          slide.style.width = `${SLIDE_PCT}%`;
+        });
+
         const CENTER_OFFSET = (100 - SLIDE_PCT) / 2;
 
         function goTo(index: number) {
@@ -293,11 +309,12 @@ const games = [
               const diff = i - current;
               if (diff === 0) {
                 slide.style.opacity = '1';
-                slide.style.transform = 'scale(1) perspective(1000px) rotateY(0deg)';
+                slide.style.transform = 'scale(1)';
                 slide.style.filter = 'none';
                 slide.style.pointerEvents = 'auto';
                 slide.style.cursor = 'default';
-              } else if (Math.abs(diff) === 1 || Math.abs(diff) === total - 1) {
+              } else if (!isMobile && (Math.abs(diff) === 1 || Math.abs(diff) === total - 1)) {
+                // Desktop: neighbors visible with tilt
                 const isRight = diff === 1 || diff === -(total - 1);
                 slide.style.opacity = '0.35';
                 slide.style.transform = `scale(0.88) perspective(1000px) rotateY(${isRight ? '-8' : '8'}deg)`;
@@ -306,9 +323,10 @@ const games = [
                 slide.style.zIndex = '1';
                 slide.style.cursor = 'pointer';
               } else {
-                slide.style.opacity = '0.1';
+                // Hidden (or mobile neighbors)
+                slide.style.opacity = isMobile ? '0' : '0.1';
                 slide.style.transform = 'scale(0.8)';
-                slide.style.filter = 'blur(4px)';
+                slide.style.filter = isMobile ? 'none' : 'blur(4px)';
                 slide.style.pointerEvents = 'none';
                 slide.style.zIndex = '0';
                 slide.style.cursor = 'default';
@@ -365,8 +383,10 @@ const games = [
         track.offsetHeight;
         track.style.transition = 'transform 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
 
-        prevBtn.addEventListener('click', () => goTo(current - 1));
-        nextBtn.addEventListener('click', () => goTo(current + 1));
+        prevBtn?.addEventListener('click', () => goTo(current - 1));
+        nextBtn?.addEventListener('click', () => goTo(current + 1));
+        prevBtnMobile?.addEventListener('click', () => goTo(current - 1));
+        nextBtnMobile?.addEventListener('click', () => goTo(current + 1));
         dots.forEach((dot) => {
           dot.addEventListener('click', () => goTo(Number(dot.dataset.dot)));
         });
