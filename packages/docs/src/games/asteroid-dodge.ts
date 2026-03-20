@@ -127,8 +127,8 @@ export const createGame: CreateGame = (_container) => {
                     bgLines.push({
                         x: Math.random() * canvas.width,
                         y: Math.random() * canvas.height,
-                        length: 10 + Math.random() * 30,
-                        speed: 0.5 + Math.random() * 1.5,
+                        length: 15 + Math.random() * 40,
+                        speed: 2 + Math.random() * 4,
                     });
                 }
             }
