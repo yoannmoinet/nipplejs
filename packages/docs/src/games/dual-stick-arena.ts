@@ -42,7 +42,7 @@ export const createGame: CreateGame = (_container) => {
                         mode: 'static',
                         position: { left: '100px', bottom: '100px' },
                         color: {
-                            front: 'linear-gradient(135deg, #818cf8, #38bdf8)',
+                            front: 'url("/nipplejs/assets/move.svg") center/60% no-repeat, linear-gradient(135deg, #818cf8, #38bdf8)',
                             back: 'rgba(99,102,241,0.12)',
                         },
                     },
@@ -53,7 +53,7 @@ export const createGame: CreateGame = (_container) => {
                         mode: 'static',
                         position: { right: '100px', bottom: '100px' },
                         color: {
-                            front: 'linear-gradient(135deg, #e879f9, #ec4899)',
+                            front: 'url("/nipplejs/assets/shoot.svg") center/60% no-repeat, linear-gradient(135deg, #e879f9, #ec4899)',
                             back: 'rgba(236,72,153,0.12)',
                         },
                     },

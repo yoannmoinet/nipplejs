@@ -1,0 +1,8 @@
+<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 50 50'>
+  <circle cx='25' cy='25' r='16' fill='none' stroke='#fda4af' stroke-width='2' opacity='0.7'/>
+  <circle cx='25' cy='25' r='3' fill='#fda4af' opacity='0.9'/>
+  <line x1='25' y1='5' x2='25' y2='15' stroke='#fda4af' stroke-width='2' opacity='0.6'/>
+  <line x1='25' y1='35' x2='25' y2='45' stroke='#fda4af' stroke-width='2' opacity='0.6'/>
+  <line x1='5' y1='25' x2='15' y2='25' stroke='#fda4af' stroke-width='2' opacity='0.6'/>
+  <line x1='35' y1='25' x2='45' y2='25' stroke='#fda4af' stroke-width='2' opacity='0.6'/>
+</svg>

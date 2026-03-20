@@ -172,10 +172,12 @@ export const createGame: CreateGame = (_container) => {
             }
 
             function drawBackground() {
+                // Overdraw background to cover corners exposed by canvas tilt
+                const pad = 40;
                 ctx.fillStyle = BG_COLOR;
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.fillRect(-pad, -pad, canvas.width + pad * 2, canvas.height + pad * 2);
 
-                // Draw subtle vertical motion lines
+                // Draw vertical motion lines
                 ctx.save();
                 for (const line of bgLines) {
                     line.y += line.speed;
@@ -183,8 +185,8 @@ export const createGame: CreateGame = (_container) => {
                         line.y = -line.length;
                         line.x = Math.random() * canvas.width;
                     }
-                    ctx.strokeStyle = 'rgba(56, 189, 248, 0.15)';
-                    ctx.lineWidth = 1;
+                    ctx.strokeStyle = 'rgba(56, 189, 248, 0.25)';
+                    ctx.lineWidth = 1.5;
                     ctx.beginPath();
                     ctx.moveTo(line.x, line.y);
                     ctx.lineTo(line.x, line.y + line.length);
@@ -381,6 +383,10 @@ export const createGame: CreateGame = (_container) => {
                 // Smooth tilt toward target
                 const tiltTarget = vectorX * -0.03;
                 tilt += (tiltTarget - tilt) * 0.1;
+
+                // Clear canvas before tilt so edges are clean
+                ctx.fillStyle = BG_COLOR;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
 
                 ctx.save();
                 if (shakeTime > 0) {
