@@ -535,9 +535,9 @@ export const createGame: CreateGame = (_container) => {
                             hasHeading = true;
                         });
 
-                        joystick.on('end', () => {
-                            joystickForce = 0;
-                        });
+                        // Don't zero joystickForce on end — restJoystick: false
+                        // keeps the last input, so exhaust persists until
+                        // the user manually centers the joystick (force → 0).
                     }
 
                     // Start render loop
