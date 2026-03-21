@@ -35,6 +35,9 @@ jobs:
 
             - run: yarn install
 
+            - name: Install Playwright
+              run: yarn workspace @nipple/tests playwright install --with-deps
+
             - name: Update version
               if: inputs.version != ''
               working-directory: packages/nipplejs
