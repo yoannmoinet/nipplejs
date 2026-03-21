@@ -118,6 +118,9 @@ jobs:
 
             - run: yarn test:e2e
 
+            - name: Copy README into package
+              run: cp README.md packages/nipplejs/README.md
+
             - name: Publish
               env:
                   CHANNEL: ${{ steps.channel.outputs.channel }}
