@@ -2,11 +2,19 @@ name: Release
 
 on:
     release:
-        types: [published]
+        types: [released]
     workflow_dispatch:
         inputs:
+            channel:
+                description: 'Publish channel'
+                required: true
+                default: 'dev'
+                type: choice
+                options:
+                    - latest
+                    - dev
             version:
-                description: 'Version to publish (e.g. 1.0.0). Leave empty to use the version from package.json.'
+                description: 'Version to publish (leave empty to use package.json version)'
                 required: false
                 type: string
 
@@ -15,17 +23,14 @@ jobs:
         name: Publish to NPM
         runs-on: ubuntu-latest
 
-        # Only run on master — for releases, check the target branch; for manual dispatch, check the ref
-        if: >-
-            (github.event_name == 'release' && github.event.release.target_commitish == 'master') ||
-            (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/master')
-
         permissions:
             contents: write
             id-token: write
 
         steps:
             - uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
 
             - name: Install Node
               uses: actions/setup-node@v4
@@ -33,22 +38,73 @@ jobs:
                   node-version-file: 'package.json'
                   registry-url: 'https://registry.npmjs.org'
 
+            - name: Validate and set channel
+              id: channel
+              run: |
+                  CHANNEL="${{ github.event.inputs.channel || 'latest' }}"
+
+                  if [ "${{ github.event_name }}" = "release" ]; then
+                    BRANCH="${{ github.event.release.target_commitish }}"
+                  else
+                    BRANCH="${{ github.ref_name }}"
+                  fi
+
+                  if [ "$CHANNEL" = "latest" ] && [ "$BRANCH" != "master" ]; then
+                    echo "Error: 'latest' channel can only be published from 'master'."
+                    echo "Current branch: $BRANCH"
+                    exit 1
+                  fi
+
+                  echo "channel=$CHANNEL" >> $GITHUB_OUTPUT
+                  echo "branch=$BRANCH" >> $GITHUB_OUTPUT
+                  echo "Publishing to channel: $CHANNEL from branch: $BRANCH"
+
+            - name: Validate and set version
+              id: version
+              env:
+                  INPUT_VERSION: ${{ github.event.inputs.version }}
+                  CHANNEL: ${{ steps.channel.outputs.channel }}
+                  BRANCH: ${{ steps.channel.outputs.branch }}
+              run: |
+                  if [ -n "$INPUT_VERSION" ]; then
+                    echo "Using provided version: $INPUT_VERSION"
+
+                    if [ "$BRANCH" = "master" ] && [ "$CHANNEL" = "latest" ]; then
+                      echo "Error: Cannot override version for 'latest' on master. Use package.json version."
+                      exit 1
+                    fi
+
+                    if [ "$CHANNEL" = "dev" ]; then
+                      if ! echo "$INPUT_VERSION" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+-dev\.[0-9]+$'; then
+                        echo "Error: Dev versions must match x.y.z-dev.N (e.g. 1.0.1-dev.0)"
+                        exit 1
+                      fi
+                    fi
+
+                    echo "version=$INPUT_VERSION" >> $GITHUB_OUTPUT
+                    echo "has_version=true" >> $GITHUB_OUTPUT
+                  else
+                    echo "No version provided, using package.json"
+                    echo "has_version=false" >> $GITHUB_OUTPUT
+                  fi
+
             - run: yarn install
 
             - name: Install Playwright
               run: yarn workspace @nipple/tests playwright install --with-deps
 
-            - name: Update version
-              if: inputs.version != ''
-              working-directory: packages/nipplejs
+            - name: Set version
+              if: steps.version.outputs.has_version == 'true'
               env:
-                  RELEASE_VERSION: ${{ inputs.version }}
-              run: npm version "$RELEASE_VERSION" --no-git-tag-version
+                  RELEASE_VERSION: ${{ steps.version.outputs.version }}
+              run: |
+                  cd packages/nipplejs
+                  npm version "$RELEASE_VERSION" --no-git-tag-version
 
             - name: Commit version bump
-              if: inputs.version != ''
+              if: steps.version.outputs.has_version == 'true'
               env:
-                  RELEASE_VERSION: ${{ inputs.version }}
+                  RELEASE_VERSION: ${{ steps.version.outputs.version }}
               run: |
                   git config user.name "github-actions[bot]"
                   git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -63,7 +119,11 @@ jobs:
             - run: yarn test:e2e
 
             - name: Publish
-              working-directory: packages/nipplejs
-              run: npm publish --provenance --access public
               env:
-                  NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+                  CHANNEL: ${{ steps.channel.outputs.channel }}
+              run: |
+                  if [ "$CHANNEL" = "dev" ]; then
+                    yarn workspace nipplejs npm publish --provenance --access public --tag dev
+                  else
+                    yarn workspace nipplejs npm publish --provenance --access public
+                  fi
