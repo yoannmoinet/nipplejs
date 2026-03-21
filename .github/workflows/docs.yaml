@@ -25,10 +25,7 @@ jobs:
       - name: Install Node
         uses: actions/setup-node@v4
         with:
-          node-version-file: 'package.json'
-
-      - name: Enable Corepack
-        run: corepack enable
+          node-version: '24'
 
       - run: yarn install
 

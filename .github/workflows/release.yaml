@@ -33,9 +33,6 @@ jobs:
                   node-version: '24'
                   registry-url: 'https://registry.npmjs.org'
 
-            - name: Enable Corepack and use Yarn 4.10
-              run: corepack enable && corepack prepare yarn@4.10.0 --activate
-
             - run: yarn install
 
             - name: Install Playwright

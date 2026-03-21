@@ -17,7 +17,7 @@
         "packages/*"
     ],
     "volta": {
-        "node": "22.14.0",
+        "node": "24.0.0",
         "yarn": "1.22.19"
     },
     "scripts": {
@@ -57,5 +57,5 @@
         "prettier": "3.2.5",
         "typescript": "5.4.3"
     },
-    "packageManager": "yarn@4.6.0"
+    "packageManager": "yarn@4.10.0"
 }

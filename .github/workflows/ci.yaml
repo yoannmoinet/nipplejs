@@ -13,14 +13,14 @@ jobs:
             - name: Install Node
               uses: actions/setup-node@v4
               with:
-                  node-version-file: 'package.json'
+                  node-version: '24'
 
             - name: Cache build
               id: cache-build
               uses: actions/cache@v4
               with:
                   path: packages/nipplejs/**/dist
-                  key: node22-cache-build-${{ hashFiles('packages/tests/**', 'packages/nipplejs/**', 'yarn.lock') }}
+                  key: node24-cache-build-${{ hashFiles('packages/tests/**', 'packages/nipplejs/**', 'yarn.lock') }}
 
             - run: yarn install
 
@@ -42,14 +42,14 @@ jobs:
             - name: Install Node
               uses: actions/setup-node@v4
               with:
-                  node-version-file: 'package.json'
+                  node-version: '24'
 
             - name: Cache build
               id: cache-build
               uses: actions/cache@v4
               with:
                   path: packages/nipplejs/**/dist
-                  key: node22-cache-build-${{ hashFiles('packages/tests/**', 'packages/nipplejs/**', 'yarn.lock') }}
+                  key: node24-cache-build-${{ hashFiles('packages/tests/**', 'packages/nipplejs/**', 'yarn.lock') }}
 
             - name: Cache playwright binaries
               id: cache-playwright-binaries
@@ -102,14 +102,14 @@ jobs:
             - name: Install Node
               uses: actions/setup-node@v4
               with:
-                  node-version-file: 'package.json'
+                  node-version: '24'
 
             - name: Cache build
               id: cache-build
               uses: actions/cache@v4
               with:
                   path: packages/nipplejs/**/dist
-                  key: node22-cache-build-${{ hashFiles('packages/nipplejs/**', 'eslint.config.mjs', '.prettierrc', 'yarn.lock') }}
+                  key: node24-cache-build-${{ hashFiles('packages/nipplejs/**', 'eslint.config.mjs', '.prettierrc', 'yarn.lock') }}
 
             - run: yarn install
 
