@@ -119,7 +119,7 @@ jobs:
 
             - run: yarn typecheck
 
-            - run: yarn workspace @nipple/docs astro check
+            - run: yarn workspace @nipple/docs astro-check
 
             - run: yarn cli integrity
 
