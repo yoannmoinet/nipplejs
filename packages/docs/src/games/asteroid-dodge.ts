@@ -15,9 +15,9 @@ const SHIP_SIZE = 12;
 const SHIP_COLOR = '#38bdf8';
 const ASTEROID_COLORS = ['#e879f9', '#d946ef', '#c084fc', '#a78bfa'];
 const BASE_ASTEROID_SPEED = 2;
-const BASE_SPAWN_INTERVAL = 60;
-const SPEED_INCREASE_INTERVAL = 150; // ~2.5 seconds at 60fps
-const SPEED_INCREMENT = 0.25;
+const BASE_SPAWN_INTERVAL = 50;
+const SPEED_INCREASE_INTERVAL = 120; // ~2 seconds at 60fps
+const SPEED_INCREMENT = 0.4;
 const PLAYER_SPEED = 4;
 const BG_LINE_COUNT = 30;
 
@@ -140,7 +140,7 @@ export const createGame: CreateGame = (_container) => {
 
             function getSpawnInterval(): number {
                 const intervals = Math.floor(frameCount / SPEED_INCREASE_INTERVAL);
-                return Math.max(15, BASE_SPAWN_INTERVAL - intervals * 3);
+                return Math.max(10, BASE_SPAWN_INTERVAL - intervals * 4);
             }
 
             function spawnAsteroid() {

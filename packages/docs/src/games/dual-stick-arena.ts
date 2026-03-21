@@ -28,10 +28,10 @@ const PROJECTILE_SPEED = 5;
 const PROJECTILE_TRAIL_LENGTH = 6;
 const PLAYER_SPEED = 3;
 const AIM_LINE_LENGTH = 60;
-const BASE_SPAWN_INTERVAL = 90;
+const BASE_SPAWN_INTERVAL = 75;
 const BASE_ENEMY_SPEED = 1;
 const FIRE_INTERVAL = 15;
-const DIFFICULTY_INTERVAL = 600; // Ramp up every ~10 seconds
+const DIFFICULTY_INTERVAL = 400; // Ramp up every ~6.5 seconds
 
 export const createGame: CreateGame = (_container) => {
     return {
@@ -150,11 +150,11 @@ export const createGame: CreateGame = (_container) => {
             }
 
             function getSpawnInterval(): number {
-                return Math.max(20, BASE_SPAWN_INTERVAL - getDifficulty() * 8);
+                return Math.max(12, BASE_SPAWN_INTERVAL - getDifficulty() * 10);
             }
 
             function getEnemySpeed(): number {
-                return BASE_ENEMY_SPEED + getDifficulty() * 0.15;
+                return BASE_ENEMY_SPEED + getDifficulty() * 0.25;
             }
 
             function spawnEnemy() {
