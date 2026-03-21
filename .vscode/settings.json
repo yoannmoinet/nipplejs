@@ -1,0 +1,31 @@
+{
+    "eslint.enable": true,
+    "eslint.validate": ["javascript", "typescript"],
+    "[yaml]": {
+        "editor.formatOnSave": false
+    },
+    "[javascript]": {
+        "editor.formatOnSave": false
+    },
+    "[typescript]": {
+        "editor.formatOnSave": false
+    },
+    "[markdown]": {
+        "editor.formatOnSave": false
+    },
+    "editor.formatOnSave": true,
+    "editor.rulers": [100],
+    "typescript.preferences.importModuleSpecifier": "relative",
+    "editor.codeActionsOnSave": {
+        "source.fixAll.eslint": "explicit"
+    },
+    "prettier.configPath": "prettier.config.js",
+    "search.exclude": {
+        "**/.pnp.js": true,
+        "**/.yarn/": true,
+        "**/.yarnrc.yml": true,
+        "**/yarn.lock": true
+    },
+    "typescript.tsdk": "node_modules/typescript/lib",
+    "git-blame.gitWebUrl": "https://github.com/yoannmoinet/nipplejs/commit/$ID"
+}

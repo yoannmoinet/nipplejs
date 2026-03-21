@@ -1,0 +1,242 @@
+---
+layout: ../layouts/DocsLayout.astro
+title: Options
+---
+
+import JoystickDemo from '../components/JoystickDemo.astro';
+
+# Options
+
+All options are passed to `nipplejs.create(options)`. Every option is optional and has a sensible default.
+
+## zone
+
+| | |
+|---|---|
+| **Type** | `HTMLElement` |
+| **Default** | `document.body` |
+
+The DOM element in which joysticks will be created and that listens for touch/mouse events. It represents the active area where joysticks can appear.
+
+```javascript
+nipplejs.create({
+    zone: document.getElementById('my-zone'),
+});
+```
+
+## mode
+
+| | |
+|---|---|
+| **Type** | `'dynamic' \| 'semi' \| 'static'` |
+| **Default** | `'dynamic'` |
+
+Controls how joysticks are created and managed:
+
+- **dynamic** -- A new joystick is created at each touch point and destroyed on release. Supports multitouch.
+- **semi** -- A joystick is created on first touch. On subsequent touches within `catchDistance`, the existing joystick is reused. Outside that distance, the old one is destroyed and a new one is created. Cannot be multitouch.
+- **static** -- A single joystick is placed immediately at the configured `position`. Each new touch triggers a new direction. Cannot be multitouch.
+
+## color / size
+
+| | |
+|---|---|
+| **`color` Type** | `string \| { front: string, back: string }` |
+| **`color` Default** | `'white'` |
+| **`size` Type** | `number` |
+| **`size` Default** | `100` |
+
+`color` sets the CSS `background` of the joystick elements — so any valid CSS background value works: colors, gradients, images, etc.
+
+Pass a single string to style both parts, or an object with `front` (thumb) and `back` (base) keys to style them independently.
+
+`size` is the diameter of the outer circle in pixels. The inner circle (thumb) is always 50% of this value.
+
+```javascript
+// Simple color
+nipplejs.create({ color: 'rebeccapurple', size: 150 });
+
+// Gradient thumb, translucent base
+nipplejs.create({
+    color: {
+        front: 'linear-gradient(135deg, #818cf8, #38bdf8)',
+        back: 'rgba(99, 102, 241, 0.12)',
+    },
+});
+
+// Background image on the thumb
+nipplejs.create({
+    color: {
+        front: 'url(thumb.png) center/cover',
+        back: 'radial-gradient(circle, rgba(0,0,0,0.2), transparent)',
+    },
+});
+```
+
+## threshold
+
+| | |
+|---|---|
+| **Type** | `number` |
+| **Default** | `0.1` |
+
+The minimum force (normalized distance from center) required to trigger directional events like `dir` and `plain`. A value of `0` is the center and `1` is the outer edge. The default `0.1` means the user must move the thumb at least 10% of the radius before direction events fire.
+
+## fadeTime
+
+| | |
+|---|---|
+| **Type** | `number` |
+| **Default** | `250` |
+
+Duration in milliseconds for the fade-in and fade-out transitions when a joystick is activated or deactivated.
+
+## multitouch / maxNumberOfJoysticks
+
+| | |
+|---|---|
+| **`multitouch` Type** | `boolean` |
+| **`multitouch` Default** | `false` |
+| **`maxNumberOfJoysticks` Type** | `number` |
+| **`maxNumberOfJoysticks` Default** | `10` |
+
+When `multitouch` is `true`, multiple joysticks can exist simultaneously in the same zone. `maxNumberOfJoysticks` caps how many can be created.
+
+When `multitouch` is `false` (the default), `maxNumberOfJoysticks` is automatically overridden to `1`.
+
+Multitouch is forced to `false` in `static` and `semi` modes -- only `dynamic` mode supports it.
+
+```javascript
+nipplejs.create({
+    multitouch: true,
+    maxNumberOfJoysticks: 4,
+    mode: 'dynamic',
+});
+```
+
+<JoystickDemo game="dual-stick-arena" highlight={['multitouch']} />
+
+## position
+
+| | |
+|---|---|
+| **Type** | `Partial<CssPosition>` |
+| **Default** | `{ top: '0px', left: '0px' }` |
+
+The CSS position for a `static` mode joystick. Accepts `top`, `right`, `bottom`, and `left` as CSS string values. These are applied as inline styles to the joystick element.
+
+```javascript
+nipplejs.create({
+    mode: 'static',
+    position: { left: '50%', top: '50%' },
+});
+```
+
+## restJoystick / restOpacity
+
+| | |
+|---|---|
+| **`restJoystick` Type** | `boolean \| { x?: boolean, y?: boolean }` |
+| **`restJoystick` Default** | `true` |
+| **`restOpacity` Type** | `number` |
+| **`restOpacity` Default** | `0.5` |
+
+`restJoystick` controls whether the joystick thumb returns to the center when released. Set to `false` to keep the thumb at its last position. You can also lock individual axes:
+
+- `{ x: false }` -- the thumb rests only on the Y axis, keeping its last X position.
+- `{ y: false }` -- the thumb rests only on the X axis, keeping its last Y position.
+
+`restOpacity` sets the opacity of the joystick element when it is in the rest (inactive) state. In `dynamic` mode, this is automatically set to `0` so the joystick fades out completely.
+
+<JoystickDemo game="space-drift" highlight={['restJoystick']} />
+
+## catchDistance
+
+| | |
+|---|---|
+| **Type** | `number` |
+| **Default** | `200` |
+
+Only relevant in `semi` mode. Defines the distance in pixels within which a new touch will reuse (catch) an existing idle joystick rather than destroying it and creating a new one.
+
+If the touch lands within `catchDistance` of the previous joystick, the same joystick is activated with the new direction. If outside, the old joystick is destroyed and a fresh one is created at the touch point.
+
+## lockX / lockY
+
+| | |
+|---|---|
+| **Type** | `boolean` |
+| **Default** | `false` |
+
+Lock the joystick movement to a single axis:
+
+- `lockX: true` -- restricts movement to the horizontal (X) axis only.
+- `lockY: true` -- restricts movement to the vertical (Y) axis only.
+
+```javascript
+nipplejs.create({
+    lockX: true, // horizontal movement only
+});
+```
+
+<JoystickDemo game="asteroid-dodge" highlight={['lockX']} />
+
+## shape
+
+| | |
+|---|---|
+| **Type** | `'circle' \| 'square'` |
+| **Default** | `'circle'` |
+
+Sets the shape of the joystick boundary. When set to `'square'`, the thumb can move to the corners of a square area rather than being clamped to a circular radius.
+
+## follow
+
+| | |
+|---|---|
+| **Type** | `boolean` |
+| **Default** | `false` |
+
+When `true`, the joystick base follows the user's thumb when the touch moves beyond the joystick radius. The base shifts to keep the thumb at the edge, allowing unlimited directional travel.
+
+When the base moves, the move event includes `baseDelta: { x, y }` — the per-frame displacement of the base. Use `vector` for fine control within the joystick and `baseDelta` for the broader sweep (e.g. camera panning).
+
+<JoystickDemo game="space-observatory" highlight={['follow']} />
+
+## dynamicPage
+
+| | |
+|---|---|
+| **Type** | `boolean` |
+| **Default** | `false` |
+
+Nuclear option: forces a recalculation of the joystick position on **every single move event**. This has a notable performance cost.
+
+In most cases you don't need this — the zone is automatically watched with a `ResizeObserver` that handles size changes. For one-off layout changes (e.g. entering fullscreen, opening a sidebar, toggling elements), call `manager.reposition()` instead.
+
+Only enable `dynamicPage` as a last resort when the zone's position changes continuously without resizing (e.g. CSS animations that shift the zone).
+
+```javascript
+// Preferred: call reposition() after a layout change
+sidebar.addEventListener('transitionend', () => {
+    manager.reposition();
+});
+
+// Last resort: recalculate on every move
+nipplejs.create({ dynamicPage: true });
+```
+
+## dataOnly
+
+| | |
+|---|---|
+| **Type** | `boolean` |
+| **Default** | `false` |
+
+When `true`, no DOM elements are created or manipulated. The joystick only emits events with data, which is useful when you want full control over rendering (e.g. drawing joystick visuals on a canvas).
+
+```javascript
+nipplejs.create({
+    dataOnly: true,
+});
+```

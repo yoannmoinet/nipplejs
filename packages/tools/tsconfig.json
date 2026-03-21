@@ -1,0 +1,15 @@
+{
+    "extends": "../../tsconfig.json",
+    "compilerOptions": {
+        "baseUrl": "./",
+        "esModuleInterop": true,
+        "module": "CommonJS",
+        "moduleResolution": "Node",
+        "outDir": "./dist",
+        "paths": {
+            "@nipple/tools/*": ["./src/*"]
+        }
+    },
+    "include": ["**/*"],
+    "exclude": ["dist", "node_modules"]
+}

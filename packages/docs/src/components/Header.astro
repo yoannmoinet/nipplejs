@@ -1,0 +1,27 @@
+---
+const base = import.meta.env.BASE_URL;
+const links = [
+  { href: `${base}getting-started`, label: 'Docs' },
+  { href: `${base}api`, label: 'API' },
+  { href: `${base}examples`, label: 'Examples' },
+];
+---
+<header class="sticky top-0 z-50 glass" style="border-radius: 0; border-left: none; border-right: none; border-top: none;">
+  <nav class="max-w-7xl mx-auto px-4 h-14 flex items-center gap-6" aria-label="Main navigation">
+    <a href={base} class="flex items-center gap-2.5 shrink-0">
+      <div class="w-7 h-7 rounded-full relative flex items-center justify-center" style="background: rgba(99,102,241,0.25); box-shadow: 0 0 10px rgba(99,102,241,0.2);">
+        <div class="w-3.5 h-3.5 rounded-full" style="background: rgba(129,140,248,0.7); box-shadow: 0 0 6px rgba(129,140,248,0.4);"></div>
+      </div>
+      <span class="text-heading font-bold text-sm tracking-tight">nipplejs</span>
+      <span class="text-muted font-mono text-xs">v1.0</span>
+    </a>
+    <div class="flex-1"></div>
+    {links.map(link => (
+      <a href={link.href} class="text-muted text-sm hover:text-heading transition-colors">{link.label}</a>
+    ))}
+    <div class="w-px h-4 bg-border"></div>
+    <a href="https://github.com/yoannmoinet/nipplejs" class="flex items-center gap-1.5 hover:opacity-80 transition-opacity" target="_blank" rel="noopener">
+      <img src="https://img.shields.io/github/stars/yoannmoinet/nipplejs?style=flat&logo=github&logoColor=white&labelColor=transparent&color=30363d" alt="GitHub stars" height="20" loading="lazy" />
+    </a>
+  </nav>
+</header>

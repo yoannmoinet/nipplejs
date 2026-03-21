@@ -1,0 +1,21 @@
+{
+    "name": "@nipple/docs",
+    "private": true,
+    "scripts": {
+        "dev": "astro dev",
+        "build": "astro build",
+        "preview": "astro preview"
+    },
+    "dependencies": {
+        "nipplejs": "workspace:*"
+    },
+    "devDependencies": {
+        "@astrojs/check": "0.9.8",
+        "@astrojs/mdx": "^5",
+        "@tailwindcss/vite": "^4",
+        "astro": "^6",
+        "tailwindcss": "^4",
+        "typescript": "5.9.3",
+        "vite": "7.3.1"
+    }
+}

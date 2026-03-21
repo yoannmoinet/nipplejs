@@ -1,0 +1,8 @@
+<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 50 50'>
+  <line x1='25' y1='10' x2='25' y2='40' stroke='#ffffff' stroke-width='3' opacity='0.9'/>
+  <line x1='10' y1='25' x2='40' y2='25' stroke='#ffffff' stroke-width='3' opacity='0.9'/>
+  <polygon points='25,3 19,13 31,13' fill='#ffffff' opacity='1'/>
+  <polygon points='25,47 19,37 31,37' fill='#ffffff' opacity='1'/>
+  <polygon points='3,25 13,19 13,31' fill='#ffffff' opacity='1'/>
+  <polygon points='47,25 37,19 37,31' fill='#ffffff' opacity='1'/>
+</svg>

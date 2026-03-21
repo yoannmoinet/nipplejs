@@ -1,0 +1,788 @@
+---
+import { createHighlighter, type Highlighter } from 'shiki';
+
+const g = globalThis as unknown as { __shikiHighlighter?: Highlighter };
+async function getHighlighter() {
+    if (!g.__shikiHighlighter) {
+        g.__shikiHighlighter = await createHighlighter({
+            themes: ['github-dark-default'],
+            langs: ['javascript'],
+        });
+    }
+    return g.__shikiHighlighter;
+}
+
+interface Props {
+    game: string;
+    highlight?: string[];
+    title?: string;
+    description?: string;
+    badges?: string[];
+}
+
+const { game, highlight = [], title, description, badges = [] } = Astro.props;
+
+const codeSnippets: Record<string, string> = {
+    'neon-snake': `import nipplejs from 'nipplejs';
+
+const manager = nipplejs.create({
+  zone: document.getElementById('zone'),
+  mode: 'static',
+  position: { left: '50%', top: '50%' },
+  // color accepts a string or { front, back } object.
+  // Values use CSS 'background', so gradients work.
+  color: {
+    front: 'linear-gradient(135deg, #34d399, #10b981)',
+    back: 'rgba(16, 185, 129, 0.15)',
+  },
+});
+
+manager.on('move', (evt) => {
+  const { vector } = evt.data;
+  // vector.x: -1 (left) to 1 (right)
+  // vector.y: -1 (down) to 1 (up)
+  player.x += vector.x * speed;
+  player.y -= vector.y * speed;
+});
+
+manager.on('end', () => {
+  // Stop moving
+});`,
+
+    'asteroid-dodge': `import nipplejs from 'nipplejs';
+
+const manager = nipplejs.create({
+  zone: document.getElementById('zone'),
+  mode: 'static',
+  position: { left: '50%', bottom: '15%' },
+  lockX: true, // Horizontal movement only
+  color: {
+    front: 'linear-gradient(135deg, #38bdf8, #0ea5e9)',
+    back: 'rgba(56, 189, 248, 0.12)',
+  },
+});
+
+manager.on('move', (evt) => {
+  const { vector } = evt.data;
+  // Only vector.x changes — lockX freezes Y
+  ship.x += vector.x * speed;
+});`,
+
+    'dual-stick-arena': `import nipplejs from 'nipplejs';
+
+// Left stick — movement
+const moveStick = nipplejs.create({
+  zone: document.getElementById('left-zone'),
+  mode: 'static',
+  position: { left: '20%', bottom: '20%' },
+  // Layer an icon over a gradient background
+  color: {
+    front: 'url("move.svg") center/75% no-repeat, ' +
+      'linear-gradient(135deg, #818cf8, #38bdf8)',
+    back: 'rgba(99, 102, 241, 0.12)',
+  },
+});
+
+// Right stick — aim & shoot
+const aimStick = nipplejs.create({
+  zone: document.getElementById('right-zone'),
+  mode: 'static',
+  position: { left: '80%', bottom: '20%' },
+  color: {
+    front: 'url("shoot.svg") center/75% no-repeat, ' +
+      'linear-gradient(135deg, #e879f9, #ec4899)',
+    back: 'rgba(236, 72, 153, 0.12)',
+  },
+});
+
+moveStick.on('move', (evt) => {
+  player.x += evt.data.vector.x * speed;
+  player.y -= evt.data.vector.y * speed;
+});
+
+aimStick.on('move', (evt) => {
+  aimAngle = evt.data.angle.radian;
+  fireProjectile(aimAngle);
+});`,
+
+    'space-observatory': `import nipplejs from 'nipplejs';
+
+const manager = nipplejs.create({
+  zone: document.getElementById('zone'),
+  mode: 'static',
+  position: { left: '50%', bottom: '15%' },
+  follow: true, // Base follows your thumb
+  restOpacity: 0.8, // Keep scope visible at rest
+  // color uses CSS 'background' — images, gradients, anything
+  color: {
+    front: 'url("scope.svg") center/cover',
+    back: 'radial-gradient(circle, ' +
+      'rgba(56,189,248,0.06) 0%, ' +
+      'rgba(56,189,248,0.1) 68%, ' +
+      'rgba(56,189,248,0.3) 68%)',
+  },
+});
+
+manager.on('move', (evt) => {
+  const { vector, baseDelta } = evt.data;
+
+  // vector: fine aim within joystick radius
+  crosshair.x = vector.x * aimRange;
+  crosshair.y = -vector.y * aimRange;
+
+  // baseDelta: camera pan when dragging beyond radius
+  camera.x += baseDelta.x * panSpeed;
+  camera.y -= baseDelta.y * panSpeed;
+});`,
+
+    'space-drift': `import nipplejs from 'nipplejs';
+
+const manager = nipplejs.create({
+  zone: document.getElementById('zone'),
+  mode: 'static',
+  position: { left: '50%', bottom: '15%' },
+  restJoystick: false, // Stays where you leave it
+  color: {
+    front: 'linear-gradient(135deg, #a78bfa, #e879f9)',
+    back: 'rgba(167, 139, 250, 0.12)',
+  },
+});
+
+let velocity = { x: 0, y: 0 };
+
+manager.on('move', (evt) => {
+  const { vector } = evt.data;
+  // Set velocity — persists after release
+  velocity.x = vector.x * speed;
+  velocity.y = -vector.y * speed;
+});
+
+// No 'end' handler needed —
+// restJoystick: false keeps the last input
+// so velocity naturally persists
+
+function gameLoop() {
+  ship.x += velocity.x;
+  ship.y += velocity.y;
+  requestAnimationFrame(gameLoop);
+}`,
+};
+
+const code = codeSnippets[game] || '';
+
+const highlighter = await getHighlighter();
+const highlightedCode = highlighter.codeToHtml(code, {
+    lang: 'javascript',
+    theme: 'github-dark-default',
+});
+---
+
+<div class="joystick-demo-wrapper" data-demo-wrapper>
+    <!-- Code panel -->
+    <div class="demo-code-panel glass" data-code-panel>
+        <div class="demo-code-inner">
+            <div class="flex items-center justify-between px-4 py-2 border-b border-border">
+                <span class="text-xs font-mono text-muted">nipplejs setup</span>
+                <button
+                    class="text-xs text-muted hover:text-heading transition-colors"
+                    data-copy-code>Copy</button
+                >
+            </div>
+            <div
+                class="p-4 overflow-auto text-sm leading-relaxed [&_pre]:!bg-transparent [&_pre]:!m-0 [&_pre]:!p-0 [&_code]:!text-sm"
+                style="max-height: 400px; touch-action: pan-y; -webkit-overflow-scrolling: touch;"
+                set:html={highlightedCode}
+                data-raw-code={code}
+            />
+        </div>
+    </div>
+
+    <!-- Game container -->
+    <div
+        class="joystick-demo glass relative overflow-hidden"
+        style="aspect-ratio: 16/9;"
+        data-game={game}
+        data-highlight={JSON.stringify(highlight)}
+    >
+        <canvas class="absolute inset-0 w-full h-full"></canvas>
+
+        <!-- Click to start overlay -->
+        <div
+            class="absolute inset-0 z-20 flex flex-col items-center justify-center cursor-pointer"
+            style="background: rgba(8, 8, 26, 0.6);"
+            data-start-overlay
+        >
+            {title && <h3 class="text-heading text-xl sm:text-2xl font-bold mb-1">{title}</h3>}
+            {description && <p class="text-body text-sm mb-3 max-w-xs text-center">{description}</p>}
+            {badges.length > 0 && (
+                <div class="flex flex-wrap gap-2 justify-center mb-5">
+                    {badges.map((badge) => (
+                        <span class="glass px-2 py-0.5 text-xs font-mono text-muted">{badge}</span>
+                    ))}
+                </div>
+            )}
+            <span class="glass px-4 py-1.5 text-xs font-mono text-accent-indigo hover:text-heading transition-colors">Start</span>
+        </div>
+
+        <!-- Debug overlay -->
+        <div class="absolute inset-0 z-[2] pointer-events-none hidden" data-debug-overlay>
+            <!-- Live data values (top-left) -->
+            <div
+                class="absolute top-10 left-3 font-mono text-[10px] leading-[1.6] debug-neon-labels"
+                data-debug-data
+            >
+            </div>
+            <!-- Event log (fixed position, top-left offset) -->
+            <div class="absolute top-10 left-[180px]">
+                <div
+                    class="font-mono text-[9px] uppercase tracking-wider mb-1 debug-neon-title"
+                >
+                    Events
+                </div>
+                <div
+                    class="font-mono text-[10px] leading-[1.6] debug-neon-labels"
+                    data-debug-events
+                >
+                </div>
+            </div>
+        </div>
+
+        <!-- Buttons (z-30 to stay above start overlay z-20) -->
+        <div class="absolute bottom-3 right-3 z-30 flex items-center gap-2">
+            <button
+                class="glass px-2.5 py-1.5 text-xs font-mono text-muted hover:text-heading transition-colors cursor-pointer flex items-center gap-1"
+                data-toggle-fullscreen
+                title="Fullscreen"
+            >
+                <svg
+                    width="12"
+                    height="12"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                >
+                    <path d="M8 3H5a2 2 0 0 0-2 2v3"></path>
+                    <path d="M21 8V5a2 2 0 0 0-2-2h-3"></path>
+                    <path d="M3 16v3a2 2 0 0 0 2 2h3"></path>
+                    <path d="M16 21h3a2 2 0 0 0 2-2v-3"></path>
+                </svg>
+            </button>
+            <button
+                class="glass px-2.5 py-1.5 text-xs font-mono text-muted hover:text-heading transition-colors cursor-pointer flex items-center gap-1"
+                data-toggle-debug
+                title="Show event data"
+            >
+                <svg
+                    width="12"
+                    height="12"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                >
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="16" x2="12" y2="12"></line>
+                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                </svg>
+            </button>
+            <button
+                class="glass px-3 py-1.5 text-xs font-mono text-muted hover:text-heading transition-colors cursor-pointer flex items-center gap-1.5"
+                data-toggle-code
+            >
+                <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                >
+                    <polyline points="16 18 22 12 16 6"></polyline>
+                    <polyline points="8 6 2 12 8 18"></polyline>
+                </svg>
+                <span data-toggle-label>Code</span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<style>
+    .joystick-demo-wrapper {
+        position: relative;
+        transition: transform 0.4s ease;
+    }
+
+    .joystick-demo {
+        position: relative;
+        z-index: 1;
+    }
+
+    @media (min-width: 1536px) {
+        .joystick-demo-wrapper.code-open {
+            transform: translateX(210px);
+        }
+    }
+
+    /* Viewport fullscreen mode */
+    .joystick-demo-wrapper.is-fullscreen {
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 100% !important;
+        height: 100% !important;
+        z-index: 9999 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        border-radius: 0 !important;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .joystick-demo-wrapper.is-fullscreen .demo-code-panel {
+        display: none;
+    }
+
+    /* Hide everything except the fullscreen toggle in fullscreen */
+    .joystick-demo-wrapper.is-fullscreen [data-toggle-debug],
+    .joystick-demo-wrapper.is-fullscreen [data-toggle-code],
+    .joystick-demo-wrapper.is-fullscreen .pointer-events-none {
+        display: none;
+    }
+
+    .joystick-demo-wrapper.is-fullscreen .code-open {
+        transform: none;
+    }
+
+    .joystick-demo-wrapper.is-fullscreen .joystick-demo {
+        flex: 1;
+        min-height: 0;
+        border-radius: 0;
+        aspect-ratio: auto;
+    }
+
+    .demo-code-inner {
+        min-height: 200px;
+    }
+
+    /* --- Narrow screens: slide up above the game --- */
+    .demo-code-panel {
+        overflow: hidden;
+        max-height: 0;
+        opacity: 0;
+        border: 1px solid transparent;
+        border-radius: 0.75rem 0.75rem 0 0;
+        transition:
+            max-height 0.4s ease,
+            opacity 0.3s ease,
+            border-color 0.3s ease;
+    }
+
+    .joystick-demo-wrapper.code-open .demo-code-panel {
+        max-height: 450px;
+        opacity: 1;
+        border-color: var(--color-border);
+        border-bottom-color: transparent;
+    }
+
+    .joystick-demo-wrapper.code-open .joystick-demo {
+        border-top-left-radius: 0;
+        border-top-right-radius: 0;
+    }
+
+    /* --- Very wide screens: code sticks out to the left, game untouched --- */
+    @media (min-width: 1536px) {
+        .demo-code-panel {
+            position: absolute;
+            right: 100%;
+            top: 0;
+            height: 100%;
+            width: 420px;
+            max-height: none;
+            border-radius: 0.75rem 0 0 0.75rem;
+            transform: translateX(100%);
+            opacity: 0;
+            border-color: transparent;
+            transition:
+                transform 0.4s ease,
+                opacity 0.3s ease,
+                border-color 0.3s ease;
+        }
+
+        .demo-code-panel .demo-code-inner {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .demo-code-panel pre {
+            flex: 1;
+            max-height: none !important;
+        }
+
+        .joystick-demo-wrapper.code-open .demo-code-panel {
+            transform: translateX(0);
+            opacity: 1;
+            border-color: var(--color-border);
+            border-right-color: transparent;
+            max-height: none;
+        }
+
+        .joystick-demo-wrapper.code-open .joystick-demo {
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+        }
+    }
+</style>
+
+<script>
+    import nipplejs from 'nipplejs';
+    import type { CreateGame, Collection } from '../games/types';
+
+    // --- Fullscreen toggle ---
+    // Move wrapper to body to escape transform containing blocks (carousel)
+    let fsPlaceholder: Comment | null = null;
+    let fsOriginalParent: HTMLElement | null = null;
+
+    function enterFullscreen(wrapper: HTMLElement) {
+        fsOriginalParent = wrapper.parentElement as HTMLElement;
+        fsPlaceholder = document.createComment('fs-placeholder');
+        fsOriginalParent.insertBefore(fsPlaceholder, wrapper);
+        document.body.appendChild(wrapper);
+        wrapper.classList.add('is-fullscreen');
+        document.body.style.overflow = 'hidden';
+        requestAnimationFrame(() => repositionActiveGames());
+    }
+
+    function exitFullscreen(wrapper: HTMLElement) {
+        wrapper.classList.remove('is-fullscreen');
+        document.body.style.overflow = '';
+        if (fsPlaceholder && fsOriginalParent) {
+            fsOriginalParent.insertBefore(wrapper, fsPlaceholder);
+            fsPlaceholder.remove();
+            fsPlaceholder = null;
+            fsOriginalParent = null;
+        }
+        requestAnimationFrame(() => repositionActiveGames());
+    }
+
+    document.querySelectorAll<HTMLElement>('[data-toggle-fullscreen]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+            const wrapper = btn.closest('[data-demo-wrapper]') as HTMLElement;
+            if (!wrapper) return;
+            if (wrapper.classList.contains('is-fullscreen')) {
+                exitFullscreen(wrapper);
+            } else {
+                enterFullscreen(wrapper);
+            }
+        });
+    });
+
+    // Exit fullscreen on Escape
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            const fs = document.querySelector('.joystick-demo-wrapper.is-fullscreen') as HTMLElement;
+            if (fs) exitFullscreen(fs);
+        }
+    });
+
+    // --- Global game management: only one active at a time ---
+    type GameHandle = {
+        destroy: () => void;
+        container: HTMLElement;
+        restore: () => void;
+        collections: Collection[];
+    };
+    const activeGames: GameHandle[] = ((window as any).__nippleGames =
+        (window as any).__nippleGames || []);
+
+    function repositionActiveGames() {
+        for (const g of activeGames) {
+            g.collections.forEach((c) => (c as any).reposition());
+        }
+    }
+
+    function stopOtherGames(current: HTMLElement) {
+        for (let i = activeGames.length - 1; i >= 0; i--) {
+            const g = activeGames[i];
+            if (g.container !== current) {
+                g.destroy();
+                activeGames.splice(i, 1);
+                g.restore();
+                // Close code pane
+                const wrapper = g.container.closest('[data-demo-wrapper]');
+                if (wrapper) {
+                    wrapper.classList.remove('code-open');
+                    const label = wrapper.querySelector('[data-toggle-label]');
+                    if (label) label.textContent = 'Code';
+                }
+            }
+        }
+    }
+
+    const gameModules: Record<string, () => Promise<{ createGame: CreateGame }>> = {
+        'neon-snake': () => import('../games/neon-snake'),
+        'asteroid-dodge': () => import('../games/asteroid-dodge'),
+        'dual-stick-arena': () => import('../games/dual-stick-arena'),
+        'space-observatory': () => import('../games/space-observatory'),
+        'space-drift': () => import('../games/space-drift'),
+    };
+
+    // --- Debug toggle ---
+    document.querySelectorAll<HTMLElement>('[data-toggle-debug]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+            const container = btn.closest('[data-game]')!;
+            const overlay = container.querySelector('[data-debug-overlay]')!;
+            overlay.classList.toggle('hidden');
+        });
+    });
+
+    // --- Code toggle ---
+    document.querySelectorAll<HTMLElement>('[data-toggle-code]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+            const wrapper = btn.closest('[data-demo-wrapper]')!;
+            const label = btn.querySelector('[data-toggle-label]');
+            wrapper.classList.toggle('code-open');
+            if (label) {
+                label.textContent = wrapper.classList.contains('code-open') ? 'Hide' : 'Code';
+            }
+            // Reposition joysticks after the code panel transition (400ms)
+            setTimeout(() => repositionActiveGames(), 450);
+        });
+    });
+
+    // --- Copy button ---
+    document.querySelectorAll<HTMLElement>('[data-copy-code]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+            const panel = btn.closest('[data-code-panel]')!;
+            const rawEl = panel.querySelector<HTMLElement>('[data-raw-code]');
+            const code = rawEl?.dataset.rawCode || rawEl?.textContent || '';
+            navigator.clipboard.writeText(code).then(() => {
+                btn.textContent = 'Copied!';
+                setTimeout(() => {
+                    btn.textContent = 'Copy';
+                }, 1500);
+            });
+        });
+    });
+
+    // --- Game initialization (deferred until click) ---
+    document.querySelectorAll<HTMLElement>('[data-game]').forEach(async (container) => {
+        const gameName = container.dataset.game;
+        if (!gameName || !gameModules[gameName]) return;
+
+        const canvas = container.querySelector<HTMLCanvasElement>('canvas');
+        if (!canvas) return;
+
+        const overlay = container.querySelector<HTMLElement>('[data-start-overlay]');
+
+        // Pre-load the module but don't start until clicked
+        const mod = await gameModules[gameName]();
+        const { config, create } = mod.createGame(container);
+
+        function startGame() {
+            if (overlay) overlay.style.display = 'none';
+            stopOtherGames(container);
+            initGame();
+        }
+
+        function showOverlay() {
+            if (overlay) {
+                overlay.style.display = '';
+                overlay.addEventListener('click', startGame, { once: true });
+            }
+        }
+
+        if (overlay) {
+            overlay.addEventListener('click', startGame, { once: true });
+        } else {
+            initGame();
+        }
+
+        function initGame() {
+            const joysticks: Collection[] = [];
+
+            const isSingleZone = config.zones.length === 1;
+            const isDesktop = window.matchMedia('(min-width: 768px)').matches;
+
+            for (const zone of config.zones) {
+                const zoneEl = document.createElement('div');
+                zoneEl.style.position = 'absolute';
+                zoneEl.style.left = zone.position.left;
+                zoneEl.style.top = zone.position.top;
+                zoneEl.style.width = zone.position.width;
+                zoneEl.style.height = zone.position.height;
+                zoneEl.style.zIndex = '5';
+                container.appendChild(zoneEl);
+
+                // Single joystick: bottom-left on desktop, bottom-right on mobile
+                // Use fixed px so distance is equal regardless of container aspect ratio
+                // Exception: follow mode keeps centered
+                const opts = { ...zone.options };
+                if (isSingleZone && opts.position && !opts.follow) {
+                    const pos: Record<string, string> = {};
+                    if (isDesktop) {
+                        pos.left = '100px';
+                        pos.bottom = '100px';
+                    } else {
+                        pos.right = '100px';
+                        pos.bottom = '100px';
+                    }
+                    opts.position = pos;
+                }
+
+                const collection = nipplejs.create({
+                    ...opts,
+                    zone: zoneEl,
+                });
+                joysticks.push(collection);
+            }
+
+            // --- Debug: structured data display + event log ---
+            const debugOverlay = container.querySelector<HTMLElement>('[data-debug-overlay]');
+            const debugData = container.querySelector<HTMLElement>('[data-debug-data]');
+            const debugEvents = container.querySelector<HTMLElement>('[data-debug-events]');
+            if (debugEvents) debugEvents.textContent = '';
+            const eventLog: { num: number; name: string }[] = [];
+            let eventCounter = 0;
+
+            function fmt(n: number) {
+                return n.toFixed(4);
+            }
+
+            function pushEvent(name: string) {
+                if (!debugEvents || !debugOverlay || debugOverlay.classList.contains('hidden'))
+                    return;
+                eventCounter++;
+                eventLog.push({ num: eventCounter, name });
+                if (eventLog.length > 5) eventLog.shift();
+                // Rebuild with DOM nodes
+                debugEvents.textContent = '';
+                for (const entry of eventLog) {
+                    const line = document.createElement('div');
+                    const label = document.createTextNode(`#${entry.num} : `);
+                    const value = document.createElement('span');
+                    value.style.color = 'rgba(56,189,248,0.6)';
+                    value.textContent = entry.name;
+                    line.appendChild(label);
+                    line.appendChild(value);
+                    debugEvents.appendChild(line);
+                }
+            }
+
+            // Build static DOM structure for data values
+            function createDataDOM(parent: HTMLElement) {
+                const vals: Record<string, HTMLElement> = {};
+                function addLine(indent: number, label: string, key?: string) {
+                    const div = document.createElement('div');
+                    div.style.paddingLeft = `${indent * 12}px`;
+                    div.appendChild(document.createTextNode(`${label}${key ? ' : ' : ''}`));
+                    if (key) {
+                        const span = document.createElement('span');
+                        span.style.color = 'rgba(56,189,248,0.6)';
+                        span.textContent = '—';
+                        div.appendChild(span);
+                        vals[key] = span;
+                    }
+                    parent.appendChild(div);
+                }
+                function addSpacer() {
+                    const s = document.createElement('div');
+                    s.style.height = '6px';
+                    parent.appendChild(s);
+                }
+
+                addLine(0, 'position :');
+                addLine(1, 'x', 'pos.x');
+                addLine(1, 'y', 'pos.y');
+                addSpacer();
+                addLine(0, 'force', 'force');
+                addLine(0, 'pressure', 'pressure');
+                addLine(0, 'distance', 'distance');
+                addLine(0, 'angle :');
+                addLine(1, 'radian', 'angle.rad');
+                addLine(1, 'degree', 'angle.deg');
+                addSpacer();
+                addLine(0, 'vector :');
+                addLine(1, 'x', 'vec.x');
+                addLine(1, 'y', 'vec.y');
+                addSpacer();
+                addLine(0, 'direction :');
+                addLine(1, 'x', 'dir.x');
+                addLine(1, 'y', 'dir.y');
+                addLine(1, 'angle', 'dir.angle');
+
+                return vals;
+            }
+
+            let dataVals: Record<string, HTMLElement> | null = null;
+            if (debugData) {
+                debugData.textContent = '';
+                dataVals = createDataDOM(debugData);
+            }
+
+            function updateData(d: any) {
+                if (!dataVals) return;
+                const dir = d.direction || {};
+                dataVals['pos.x'].textContent = fmt(d.position.x);
+                dataVals['pos.y'].textContent = fmt(d.position.y);
+                dataVals['force'].textContent = fmt(d.force);
+                dataVals['pressure'].textContent = fmt(d.pressure);
+                dataVals['distance'].textContent = fmt(d.distance);
+                dataVals['angle.rad'].textContent = fmt(d.angle.radian);
+                dataVals['angle.deg'].textContent = fmt(d.angle.degree);
+                dataVals['vec.x'].textContent = fmt(d.vector.x);
+                dataVals['vec.y'].textContent = fmt(d.vector.y);
+                dataVals['dir.x'].textContent = dir.x || '—';
+                dataVals['dir.y'].textContent = dir.y || '—';
+                dataVals['dir.angle'].textContent = dir.angle || '—';
+            }
+
+            joysticks.forEach((collection) => {
+                collection.on('move', (evt: any) => {
+                    if (!debugOverlay || debugOverlay.classList.contains('hidden')) return;
+                    updateData(evt.data);
+                });
+
+                collection.on('start', () => pushEvent('start'));
+                collection.on('end', () => pushEvent('end'));
+                collection.on('shown', () => pushEvent('shown'));
+                collection.on('hidden', () => pushEvent('hidden'));
+                collection.on('rested', () => pushEvent('rested'));
+                collection.on('dir:up', () => pushEvent('dir:up'));
+                collection.on('dir:down', () => pushEvent('dir:down'));
+                collection.on('dir:left', () => pushEvent('dir:left'));
+                collection.on('dir:right', () => pushEvent('dir:right'));
+                collection.on('plain:up', () => pushEvent('plain:up'));
+                collection.on('plain:down', () => pushEvent('plain:down'));
+                collection.on('plain:left', () => pushEvent('plain:left'));
+                collection.on('plain:right', () => pushEvent('plain:right'));
+            });
+
+            const instance = create();
+            instance.start(canvas, joysticks);
+
+            // Register in global list for exclusive game management
+            activeGames.push({
+                container,
+                destroy() {
+                    instance.destroy();
+                    joysticks.forEach((j) => j.destroy());
+                    // Remove zone elements
+                    container
+                        .querySelectorAll<HTMLElement>('[style*="z-index: 5"]')
+                        .forEach((el) => el.remove());
+                },
+                restore: showOverlay,
+                collections: joysticks,
+            });
+
+        } // end initGame
+    });
+</script>

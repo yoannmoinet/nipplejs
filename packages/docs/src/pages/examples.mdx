@@ -1,0 +1,52 @@
+---
+layout: ../layouts/DocsLayout.astro
+title: Examples
+---
+
+import JoystickDemo from '../components/JoystickDemo.astro';
+
+# Examples
+
+Interactive cookbook entries demonstrating key nipplejs features. Each game highlights a specific option or combination of options. Try them on a touch device for the best experience -- on desktop, click and drag to control the joystick.
+
+Click the **Code** button on any demo to see the nipplejs setup.
+
+## Neon Snake
+
+Steer a growing snake to collect glowing orbs. Each orb makes the snake longer, and the analog joystick gives smooth directional control.
+
+This demo uses a **static** joystick, ideal for single-stick games where the control should always be visible.
+
+<JoystickDemo game="neon-snake" highlight={['mode']} />
+
+## Asteroid Dodge
+
+Pilot a ship left and right to dodge falling asteroids. The difficulty ramps up over time with faster and more frequent obstacles.
+
+This demo uses **lockX** to restrict the joystick to horizontal movement only, which maps naturally to a lane-dodging mechanic.
+
+<JoystickDemo game="asteroid-dodge" highlight={['lockX']} />
+
+## Dual-Stick Arena
+
+Control movement with the left stick and aim/fire with the right stick. Enemies swarm in from every edge -- survive as long as you can. Best experienced on a mobile device with multitouch.
+
+This demo creates **two separate collections** in split zones, which is the standard pattern for dual-stick controls. Each zone gets its own `nipplejs.create()` call with `multitouch` support.
+
+<JoystickDemo game="dual-stick-arena" highlight={['multitouch']} />
+
+## Space Observatory
+
+Scan the sky with a crosshair to find and lock onto celestial targets. Hold the crosshair on a target for one second to lock on.
+
+This demo uses **follow** mode to split one joystick into two controls: `vector` moves a fine-aim crosshair within the joystick radius, while `baseDelta` pans the camera when you push beyond the edge. This dual-layer control is the key use case for `follow: true`.
+
+<JoystickDemo game="space-observatory" highlight={['follow']} />
+
+## Space Drift
+
+Fly a drifting ship through space collecting waypoints. The ship maintains its last heading when you release the joystick, creating a momentum-like feel.
+
+This demo uses **restJoystick: false** so the joystick thumb stays at its last position instead of snapping back to center. This visual cue reinforces the "drift" mechanic -- the ship keeps moving in the last direction.
+
+<JoystickDemo game="space-drift" highlight={['restJoystick']} />

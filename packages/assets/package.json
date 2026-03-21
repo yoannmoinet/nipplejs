@@ -1,0 +1,17 @@
+{
+    "name": "@nipple/assets",
+    "packageManager": "yarn@4.0.2",
+    "license": "MIT",
+    "private": true,
+    "author": "yoannmoinet",
+    "description": "Assets for NippleJS.",
+    "homepage": "https://github.com/yoannmoinet/nipplejs/tree/main/packages/assets#readme",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/yoannmoinet/nipplejs",
+        "directory": "packages/assets"
+    },
+    "exports": {
+        "./*": "./src/*"
+    }
+}

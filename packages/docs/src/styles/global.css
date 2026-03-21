@@ -1,0 +1,156 @@
+@import 'tailwindcss';
+
+/* Prevent horizontal scrollbar */
+html {
+  overflow-x: hidden;
+  overscroll-behavior-y: none;
+}
+
+body {
+  overscroll-behavior-y: none;
+}
+
+@theme {
+  --color-base: #08081a;
+  --color-surface: rgba(255, 255, 255, 0.04);
+  --color-heading: #f1f5f9;
+  --color-body: #94a3b8;
+  --color-muted: #64748b;
+  --color-accent-indigo: #818cf8;
+  --color-accent-cyan: #38bdf8;
+  --color-accent-purple: #a78bfa;
+  --color-accent-pink: #e879f9;
+  --color-border: rgba(255, 255, 255, 0.08);
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+}
+
+/* Aurora background with grid */
+.aurora-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background-color: var(--color-base);
+  background-image:
+    linear-gradient(rgba(139, 92, 246, 0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(139, 92, 246, 0.07) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+
+/* Frosted glass surface */
+.glass {
+  background: var(--color-surface);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--color-border);
+  border-radius: 0.75rem;
+}
+
+/* Aurora glow blobs */
+.aurora-blob {
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(80px);
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* Debug overlay neon text */
+.debug-neon-labels {
+  color: rgba(56, 189, 248, 0.3);
+  text-shadow: 0 0 4px rgba(56, 189, 248, 0.15);
+}
+
+.debug-neon-title {
+  color: rgba(56, 189, 248, 0.25);
+  text-shadow: 0 0 6px rgba(56, 189, 248, 0.2);
+}
+
+@keyframes aurora-pulse {
+  0%, 100% { opacity: 0.6; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.1); }
+}
+
+/* Cursor grid highlight — illuminates grid lines only near cursor */
+#grid-highlight {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  background-image:
+    linear-gradient(rgba(139, 92, 246, 0.25) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(139, 92, 246, 0.25) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: radial-gradient(
+    250px circle at var(--mx, -100px) var(--my, -100px),
+    black,
+    transparent 70%
+  );
+  -webkit-mask-image: radial-gradient(
+    250px circle at var(--mx, -100px) var(--my, -100px),
+    black,
+    transparent 70%
+  );
+}
+
+/* Logo joystick overrides — hide nipplejs default styling */
+/* Copy button on code blocks */
+.copy-btn {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--color-muted);
+  background: var(--color-surface);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--color-border);
+  border-radius: 0.375rem;
+  padding: 0.2rem 0.5rem;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.2s, color 0.15s;
+}
+
+*:hover > .copy-btn,
+.copy-btn:focus-visible {
+  opacity: 1;
+}
+
+.copy-btn:hover {
+  color: var(--color-heading);
+}
+
+/* Hero title glow + gradient */
+.hero-title-text {
+  background: linear-gradient(135deg, #818cf8 0%, #38bdf8 40%, #a78bfa 70%, #e879f9 100%);
+  background-size: 200% 200%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: hero-gradient-shift 6s ease-in-out infinite;
+}
+
+.hero-title {
+  text-shadow: none;
+}
+
+/* Glow layer behind the text */
+.hero-title::after {
+  content: attr(data-text);
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, #818cf8, #38bdf8, #a78bfa);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: blur(24px);
+  opacity: 0.4;
+  z-index: -1;
+  pointer-events: none;
+}
+
+@keyframes hero-gradient-shift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}

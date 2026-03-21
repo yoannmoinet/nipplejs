@@ -1,0 +1,36 @@
+{
+    "name": "@nipple/tools",
+    "license": "MIT",
+    "private": true,
+    "author": "yoannmoinet",
+    "description": "Developer tools for the NippleJS's monorepo",
+    "homepage": "https://github.com/yoannmoinet/nipplejs/tree/main/packages/tools#readme",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/yoannmoinet/nipplejs",
+        "directory": "packages/tools"
+    },
+    "packageManager": "yarn@4.0.2",
+    "exports": {
+        "./*": "./src/*.ts"
+    },
+    "scripts": {
+        "cli": "ts-node -T --project ./tsconfig.json ./src/index.ts"
+    },
+    "devDependencies": {
+        "@types/chalk": "2.2.0",
+        "@types/glob": "7.1.4",
+        "@types/lodash.template": "^4",
+        "@types/node": "^22",
+        "lodash.template": "4.5.0",
+        "ts-node": "10.9.2",
+        "typescript": "5.4.3"
+    },
+    "dependencies": {
+        "@nipple/assets": "workspace:*",
+        "chalk": "2.3.1",
+        "clipanion": "4.0.0-rc.3",
+        "conventional-changelog": "6.0.0",
+        "glob": "7.1.6"
+    }
+}

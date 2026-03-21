@@ -1,0 +1,12 @@
+{
+    "extends": "../../tsconfig.json",
+    "compilerOptions": {
+        "baseUrl": "./",
+        "lib": ["es2022"],
+        "rootDir": "./",
+        "outDir": "./dist",
+        "types": ["@types/web", "jest"]
+    },
+    "include": ["**/*"],
+    "exclude": ["dist", "node_modules"]
+}

@@ -1,0 +1,75 @@
+---
+layout: ../layouts/DocsLayout.astro
+title: Getting Started
+---
+
+# Getting Started
+
+## Installation
+
+Install nipplejs via your preferred package manager:
+
+```bash
+npm install nipplejs
+```
+
+```bash
+yarn add nipplejs
+```
+
+```bash
+pnpm add nipplejs
+```
+
+Or load it directly from a CDN using an ES module script tag:
+
+```html
+<script type="module" src="https://unpkg.com/nipplejs/dist/index.mjs"></script>
+```
+
+## Quick Start
+
+nipplejs supports multiple module formats. Pick the one that fits your project.
+
+**ESM (recommended)**
+
+```javascript
+import nipplejs from 'nipplejs';
+
+const manager = nipplejs.create(options);
+```
+
+**CommonJS**
+
+```javascript
+const nipplejs = require('nipplejs');
+
+const manager = nipplejs.create(options);
+```
+
+**UMD / global script tag**
+
+```html
+<script src="https://unpkg.com/nipplejs/dist/index.umd.js"></script>
+<script>
+  const manager = nipplejs.create(options);
+</script>
+```
+
+## Your First Joystick
+
+Here is a minimal working example that creates a static joystick and logs the movement vector:
+
+```javascript
+const manager = nipplejs.create({
+    zone: document.getElementById('zone'),
+    mode: 'static',
+    position: { left: '50%', top: '50%' },
+});
+
+manager.on('move', (evt) => {
+    console.log(evt.data.vector);
+});
+```
+
+> **Note:** The container element (`zone`) must have a CSS `position` value set (e.g. `relative`, `absolute`, or `fixed`). Without it, the joystick will not be positioned correctly inside the container.

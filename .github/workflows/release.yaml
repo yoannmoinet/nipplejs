@@ -1,0 +1,64 @@
+name: Release
+
+on:
+    release:
+        types: [published]
+    workflow_dispatch:
+        inputs:
+            version:
+                description: 'Version to publish (e.g. 1.0.0). Leave empty to use the version from package.json.'
+                required: false
+                type: string
+
+jobs:
+    release:
+        name: Publish to NPM
+        runs-on: ubuntu-latest
+
+        # Only run on master
+        if: github.ref == 'refs/heads/master'
+
+        permissions:
+            contents: write
+            id-token: write
+
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Install Node
+              uses: actions/setup-node@v4
+              with:
+                  node-version-file: 'package.json'
+                  registry-url: 'https://registry.npmjs.org'
+
+            - run: yarn install
+
+            - name: Update version
+              if: inputs.version != ''
+              working-directory: packages/nipplejs
+              env:
+                  RELEASE_VERSION: ${{ inputs.version }}
+              run: npm version "$RELEASE_VERSION" --no-git-tag-version
+
+            - name: Commit version bump
+              if: inputs.version != ''
+              env:
+                  RELEASE_VERSION: ${{ inputs.version }}
+              run: |
+                  git config user.name "github-actions[bot]"
+                  git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+                  git add packages/nipplejs/package.json
+                  git commit -m "chore: bump version to $RELEASE_VERSION"
+                  git push
+
+            - run: yarn build
+
+            - run: yarn test:unit
+
+            - run: yarn test:e2e
+
+            - name: Publish
+              working-directory: packages/nipplejs
+              run: npm publish --provenance --access public
+              env:
+                  NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

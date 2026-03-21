@@ -1,0 +1,64 @@
+{
+    "version": "0.10.2",
+    "name": "nipplejs",
+    "description": "A virtual joystick for touch capable interfaces",
+    "author": "Yoann Moinet <yo@nnmoi.net> (https://yoannmoi.net)",
+    "license": "MIT",
+    "homepage": "https://yoannmoinet.github.io/nipplejs",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/yoannmoinet/nipplejs",
+        "directory": "packages/nipplejs"
+    },
+    "bugs": {
+        "url": "https://github.com/yoannmoinet/nipplejs/issues"
+    },
+    "main": "./dist/index.js",
+    "browser": "./dist/index.js",
+    "module": "./dist/index.mjs",
+    "types": "./dist/index.d.ts",
+    "exports": {
+        "./rollup.config.mjs": "./rollup.config.mjs",
+        "./dist/*": "./dist/*",
+        ".": "./src/index.ts",
+        "./*": "./src/*.ts"
+    },
+    "publishConfig": {
+        "access": "public",
+        "types": "./dist/index.d.ts",
+        "exports": {
+            "./package.json": "./package.json",
+            ".": {
+                "import": "./dist/index.mjs",
+                "require": "./dist/index.js",
+                "types": "./dist/index.d.ts"
+            },
+            "./*": "./src/*.ts"
+        }
+    },
+    "files": [
+        "dist",
+        "src"
+    ],
+    "scripts": {
+        "buildCmd": "rollup --config rollup.config.mjs",
+        "build": "yarn clean && yarn buildCmd",
+        "clean": "rm -rf dist",
+        "prepack": "NODE_ENV=production yarn build",
+        "typecheck": "tsc --noEmit",
+        "watch": "yarn build --watch"
+    },
+    "devDependencies": {
+        "@rollup/plugin-commonjs": "28.0.3",
+        "@rollup/plugin-esm-shim": "0.1.8",
+        "@rollup/plugin-json": "6.1.0",
+        "@rollup/plugin-node-resolve": "16.0.0",
+        "@rollup/plugin-terser": "0.4.4",
+        "@types/web": "0.0.206",
+        "esbuild": "0.24.0",
+        "rollup": "4.24.2",
+        "rollup-plugin-dts": "6.1.1",
+        "rollup-plugin-esbuild": "6.2.1",
+        "typescript": "5.4.3"
+    }
+}
