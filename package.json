@@ -6,7 +6,10 @@
     "author": "Yoann Moinet <yo@nnmoi.net> (https://yoannmoi.net)",
     "license": "MIT",
     "homepage": "https://yoannmoinet.github.io/nipplejs",
-    "repository": "git://github.com/yoannmoinet/nipplejs.git",
+    "repository": {
+        "type": "git",
+        "url": "git://github.com/yoannmoinet/nipplejs.git"
+    },
     "bugs": {
         "url": "https://github.com/yoannmoinet/nipplejs/issues"
     },
