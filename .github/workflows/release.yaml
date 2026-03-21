@@ -55,6 +55,8 @@ jobs:
 
             - run: yarn test:unit
 
+            - run: yarn test:e2e
+
             - name: Publish
               working-directory: packages/nipplejs
               run: npm publish --provenance --access public
