@@ -23,7 +23,7 @@ interface Props {
 const { game, highlight = [], title, description, badges = [] } = Astro.props;
 
 const codeSnippets: Record<string, string> = {
-    'fog-explorer': `import nipplejs from 'nipplejs';
+    'neon-snake': `import nipplejs from 'nipplejs';
 
 const manager = nipplejs.create({
   zone: document.getElementById('zone'),
@@ -105,7 +105,7 @@ aimStick.on('move', (evt) => {
   fireProjectile(aimAngle);
 });`,
 
-    'endless-chase': `import nipplejs from 'nipplejs';
+    'space-observatory': `import nipplejs from 'nipplejs';
 
 const manager = nipplejs.create({
   zone: document.getElementById('zone'),
@@ -527,10 +527,10 @@ const highlightedCode = highlighter.codeToHtml(code, {
     }
 
     const gameModules: Record<string, () => Promise<{ createGame: CreateGame }>> = {
-        'fog-explorer': () => import('../games/fog-explorer'),
+        'neon-snake': () => import('../games/neon-snake'),
         'asteroid-dodge': () => import('../games/asteroid-dodge'),
         'dual-stick-arena': () => import('../games/dual-stick-arena'),
-        'endless-chase': () => import('../games/endless-chase'),
+        'space-observatory': () => import('../games/space-observatory'),
         'space-drift': () => import('../games/space-drift'),
     };
 

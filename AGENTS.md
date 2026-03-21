@@ -89,13 +89,11 @@ Astro 6 standalone (no Starlight) with Tailwind CSS 4 via `@tailwindcss/vite`.
 
 | Game | File | Option |
 |------|------|--------|
-| Neon Snake | `fog-explorer.ts` | `mode: 'static'` |
+| Neon Snake | `neon-snake.ts` | `mode: 'static'` |
 | Asteroid Dodge | `asteroid-dodge.ts` | `lockX: true` |
 | Dual-Stick Arena | `dual-stick-arena.ts` | multitouch (two `create()` calls) |
-| Space Observatory | `endless-chase.ts` | `follow: true` + `baseDelta` |
+| Space Observatory | `space-observatory.ts` | `follow: true` + `baseDelta` |
 | Space Drift | `space-drift.ts` | `restJoystick: false` |
-
-**Note:** File names don't match game names (historical). `fog-explorer.ts` is the snake game, `endless-chase.ts` is the space observatory.
 
 #### Game Architecture
 
