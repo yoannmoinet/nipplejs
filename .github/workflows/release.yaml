@@ -15,8 +15,10 @@ jobs:
         name: Publish to NPM
         runs-on: ubuntu-latest
 
-        # Only run on master
-        if: github.ref == 'refs/heads/master'
+        # Only run on master — for releases, check the target branch; for manual dispatch, check the ref
+        if: >-
+            (github.event_name == 'release' && github.event.release.target_commitish == 'master') ||
+            (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/master')
 
         permissions:
             contents: write
