@@ -1,6 +1,6 @@
 {
     "name": "@nipple/assets",
-    "packageManager": "yarn@4.0.2",
+    "packageManager": "yarn@4.13.0",
     "license": "MIT",
     "private": true,
     "author": "yoannmoinet",

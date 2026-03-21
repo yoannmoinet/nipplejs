@@ -10,7 +10,7 @@
         "url": "https://github.com/yoannmoinet/nipplejs",
         "directory": "packages/tools"
     },
-    "packageManager": "yarn@4.0.2",
+    "packageManager": "yarn@4.13.0",
     "exports": {
         "./*": "./src/*.ts"
     },
