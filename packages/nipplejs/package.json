@@ -1,10 +1,10 @@
 {
-    "version": "0.10.2",
+    "version": "1.0.0",
     "name": "nipplejs",
     "description": "A virtual joystick for touch capable interfaces",
     "author": "Yoann Moinet <yo@nnmoi.net> (https://yoannmoi.net)",
     "license": "MIT",
-    "homepage": "https://yoannmoinet.github.io/nipplejs",
+    "homepage": "https://yoannmoi.net/nipplejs/",
     "repository": {
         "type": "git",
         "url": "https://github.com/yoannmoinet/nipplejs",
