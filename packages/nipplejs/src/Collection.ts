@@ -192,20 +192,32 @@ export class Collection extends Super {
             this.deleteIdentifierFromLists(evt.data.identifier);
         });
 
-        // When a Joystick gets hidden, we move it from active to resting.
+        // When a Joystick is released, mark it reusable immediately.
+        // `resting` keeps the identifier-keyed index for same-pointer recovery
+        // in processOnStart; `idles` is the uid-keyed pool getOrCreate uses.
         joystick.on('end', (evt) => {
             if (u.isNumber(evt.data.identifier)) {
                 this.actives.delete(evt.data.identifier);
                 this.resting.set(evt.data.identifier, joystick);
             }
+            this.idles.add(evt.data.uid);
         });
 
-        // When a Joystick gets hidden, we move it from resting to idle.
+        // When a Joystick is reused mid-fade, start() clears the removeTimeout
+        // so `hidden` never fires for the prior identifier. Drop the stale
+        // resting entry here, where `joystick.identifier` still holds it.
+        joystick.on('start', (evt) => {
+            if (u.isNumber(evt.data.identifier)) {
+                this.resting.delete(evt.data.identifier);
+            }
+        });
+
+        // After the fade-out completes, drop the resting index entry.
+        // `idles` was already populated on `end`.
         joystick.on('hidden', (evt) => {
             if (u.isNumber(evt.data.identifier)) {
                 this.resting.delete(evt.data.identifier);
             }
-            this.idles.add(evt.data.uid);
         });
 
         // Other events that will get bubbled up.
@@ -263,28 +275,6 @@ export class Collection extends Super {
         this.resting.delete(identifier);
     }
 
-    /**
-     * In static mode there must only ever be one joystick per collection. When the user
-     * releases, the instance can sit in `resting` (between `end` and `hidden`) with nothing
-     * in `idles` yet; a new pointer id must still resolve to that same instance from `all`.
-     */
-    private getSingletonStaticJoystickIfPresent(): Joystick | undefined {
-        let singletonStaticJoystick: Joystick | undefined;
-        if (this.options.mode === MODES.static && this.all.size > 0) {
-            const uidsOrdered: Uid[] = [...this.all.keys()].sort(
-                (a: Uid, b: Uid): number => Number(a) - Number(b),
-            );
-            const firstJoystickUid: Uid | undefined = uidsOrdered[0];
-            if (u.isNumber(firstJoystickUid)) {
-                const joystickFromMap: Joystick | undefined = this.all.get(firstJoystickUid);
-                if (typeof joystickFromMap !== 'undefined') {
-                    singletonStaticJoystick = joystickFromMap;
-                }
-            }
-        }
-        return singletonStaticJoystick;
-    }
-
     private getOrCreate(position: Coordinates): Joystick {
         // In semi and static modes, we recycle the idle joystick.
         if (this.options.mode === MODES.semi || this.options.mode === MODES.static) {
@@ -299,12 +289,6 @@ export class Collection extends Super {
                 } else {
                     return joystick;
                 }
-            }
-
-            const singletonStaticJoystick: Joystick | undefined =
-                this.getSingletonStaticJoystickIfPresent();
-            if (typeof singletonStaticJoystick !== 'undefined') {
-                return singletonStaticJoystick;
             }
 
             // In semi mode, we may not have an idle joystick.
@@ -323,11 +307,6 @@ export class Collection extends Super {
     }
 
     private createJoystick(position: AnyPosition): Joystick {
-        const existingStaticJoystick: Joystick | undefined =
-            this.getSingletonStaticJoystickIfPresent();
-        if (typeof existingStaticJoystick !== 'undefined') {
-            return existingStaticJoystick;
-        }
         const scroll = this.factory.scroll;
         // Offset converts page-absolute coordinates to zone-relative.
         // In flex containers, absolute children are positioned relative to the
