@@ -25,6 +25,23 @@ const createMockZone = (): HTMLElement => {
     return zone;
 };
 
+// Helper: get the first (and usually only) joystick in a collection.
+// Centralises the non-null assertion so individual tests stay clean.
+const getFirstJoystick = (collection: Collection): Joystick =>
+    collection.all.values().next().value!;
+
+// Helper: get the first joystick and mark it active under a given identifier.
+// Skips the processOnStart machinery for tests that exercise a later event.
+const getFirstJoystickAndSetActive = (
+    collection: Collection,
+    identifier: Identifier = 1 as Identifier,
+): Joystick => {
+    const joystick = getFirstJoystick(collection);
+    joystick.identifier = identifier;
+    collection.actives.set(identifier, joystick);
+    return joystick;
+};
+
 describe('Collection', () => {
     let mockFactory: jest.Mocked<Factory>;
     let mockZone: HTMLElement;
@@ -184,7 +201,7 @@ describe('Collection', () => {
 
             collection.init();
 
-            const joystick = collection.all.values().next().value;
+            const joystick = getFirstJoystick(collection);
             const found = collection.getJoystickByUid(joystick.uid);
 
             expect(found).toBe(joystick);
@@ -198,7 +215,7 @@ describe('Collection', () => {
 
             collection.init();
 
-            const joystick = collection.all.values().next().value;
+            const joystick = getFirstJoystick(collection);
             const found = collection.getJoystickByUid(undefined);
 
             expect(found).toBe(joystick);
@@ -222,7 +239,7 @@ describe('Collection', () => {
 
             collection.init();
 
-            const joystick = collection.all.values().next().value;
+            const joystick = getFirstJoystick(collection);
 
             expect(collection.idles.has(joystick.uid)).toBe(true);
         });
@@ -235,7 +252,7 @@ describe('Collection', () => {
 
             collection.init();
 
-            const joystick = collection.all.values().next().value;
+            const joystick = getFirstJoystick(collection);
             collection.idles.delete(joystick.uid);
 
             expect(collection.idles.has(joystick.uid)).toBe(false);
@@ -356,8 +373,10 @@ describe('Collection', () => {
 
             collection.processOnEnd(evt1 as any);
 
-            // Wait for fadeTime animation to move joystick back to idle
-            jest.advanceTimersByTime(300);
+            // Mid-fade: joystick is in `resting` (identifier-keyed) AND in
+            // `idles` (uid-keyed) so a new touch can reuse it immediately.
+            expect(collection.resting.size).toBe(1);
+            expect(collection.idles.size).toBe(1);
 
             // Create new event within catch distance
             const evt2 = {
@@ -374,6 +393,8 @@ describe('Collection', () => {
             // Should reuse the same joystick
             expect(secondJoystick).toBe(firstJoystick);
             expect(collection.all.size).toBe(1);
+            // Reusing clears the stale resting entry from the prior cycle.
+            expect(collection.resting.size).toBe(0);
 
             jest.useRealTimers();
         });
@@ -400,10 +421,7 @@ describe('Collection', () => {
 
             collection.processOnEnd(evt1 as any);
 
-            // Wait for fadeTime animation to move joystick back to idle
-            jest.advanceTimersByTime(300);
-
-            // Create new event beyond catch distance
+            // Create new event beyond catch distance (joystick still mid-fade).
             const evt2 = {
                 identifier: 2 as Identifier,
                 position: { x: 200, y: 100 },
@@ -463,8 +481,10 @@ describe('Collection', () => {
 
             collection.processOnEnd(evt1 as any);
 
-            // Wait for fadeTime animation to move joystick back to idle
-            jest.advanceTimersByTime(300);
+            // Mid-fade: joystick is in `resting` AND `idles`, so a second
+            // touch reuses it without waiting for `hidden` to fire.
+            expect(collection.resting.size).toBe(1);
+            expect(collection.idles.size).toBe(1);
 
             collection.processOnStart(evt2 as any);
             const secondJoystick = collection.actives.get(evt2.identifier);
@@ -472,8 +492,48 @@ describe('Collection', () => {
             // Should reuse the same joystick
             expect(secondJoystick).toBe(firstJoystick);
             expect(collection.all.size).toBe(1);
+            // Reusing clears the stale resting entry from the prior cycle.
+            expect(collection.resting.size).toBe(0);
 
             jest.useRealTimers();
+        });
+
+        it('static mode + dataOnly: reuses joystick on subsequent taps (hidden never fires)', () => {
+            const collection = new Collection(mockFactory, {
+                zone: mockZone,
+                mode: MODES.static,
+                dataOnly: true,
+            });
+
+            collection.init();
+
+            const evt1 = {
+                identifier: 1 as Identifier,
+                position: { x: 100, y: 100 },
+                pressure: 1,
+                raw: {} as any,
+            };
+
+            const evt2 = {
+                identifier: 2 as Identifier,
+                position: { x: 150, y: 150 },
+                pressure: 1,
+                raw: {} as any,
+            };
+
+            collection.processOnStart(evt1 as any);
+            const firstJoystick = collection.actives.get(evt1.identifier);
+
+            collection.processOnEnd(evt1 as any);
+
+            // dataOnly short-circuits the fade machinery — `hidden` never
+            // fires, but `idles` is populated on `end` so reuse still works.
+            expect(collection.idles.size).toBe(1);
+
+            collection.processOnStart(evt2 as any);
+
+            expect(collection.actives.get(evt2.identifier)).toBe(firstJoystick);
+            expect(collection.all.size).toBe(1);
         });
     });
 
@@ -505,9 +565,7 @@ describe('Collection', () => {
 
             collection.init();
 
-            const joystick = collection.all.values().next().value;
-            joystick.identifier = 1 as Identifier;
-            collection.actives.set(1 as Identifier, joystick);
+            const joystick = getFirstJoystickAndSetActive(collection);
 
             const evt = {
                 identifier: 1 as Identifier,
@@ -532,9 +590,7 @@ describe('Collection', () => {
 
             collection.init();
 
-            const joystick = collection.all.values().next().value;
-            joystick.identifier = 1 as Identifier;
-            collection.actives.set(1 as Identifier, joystick);
+            const joystick = getFirstJoystickAndSetActive(collection);
 
             const triggerSpy = jest.spyOn(joystick, 'trigger');
 
@@ -558,9 +614,7 @@ describe('Collection', () => {
 
             collection.init();
 
-            const joystick = collection.all.values().next().value;
-            joystick.identifier = 1 as Identifier;
-            collection.actives.set(1 as Identifier, joystick);
+            getFirstJoystickAndSetActive(collection);
 
             const evt = {
                 identifier: 1 as Identifier,
@@ -585,9 +639,7 @@ describe('Collection', () => {
 
             collection.init();
 
-            const joystick = collection.all.values().next().value;
-            joystick.identifier = 1 as Identifier;
-            collection.actives.set(1 as Identifier, joystick);
+            const joystick = getFirstJoystickAndSetActive(collection);
 
             const triggerSpy = jest.spyOn(joystick, 'trigger');
 
@@ -654,9 +706,7 @@ describe('Collection', () => {
             });
             collection.init();
 
-            const joystick = collection.all.values().next().value;
-            joystick.identifier = 1 as Identifier;
-            collection.actives.set(1 as Identifier, joystick);
+            const joystick = getFirstJoystickAndSetActive(collection);
 
             const triggerSpy = jest.spyOn(joystick, 'computeDirectionAndTriggerEvents');
 
@@ -680,9 +730,7 @@ describe('Collection', () => {
             });
             collection.init();
 
-            const joystick = collection.all.values().next().value;
-            joystick.identifier = 1 as Identifier;
-            collection.actives.set(1 as Identifier, joystick);
+            const joystick = getFirstJoystickAndSetActive(collection);
 
             const triggerSpy = jest.spyOn(joystick, 'computeDirectionAndTriggerEvents');
 
@@ -708,9 +756,7 @@ describe('Collection', () => {
             });
             collection.init();
 
-            const joystick = collection.all.values().next().value;
-            joystick.identifier = 1 as Identifier;
-            collection.actives.set(1 as Identifier, joystick);
+            const joystick = getFirstJoystickAndSetActive(collection);
 
             const triggerSpy = jest.spyOn(joystick, 'computeDirectionAndTriggerEvents');
 
@@ -798,7 +844,7 @@ describe('Collection', () => {
             });
             collection.init();
 
-            const joystick = collection.all.values().next().value;
+            const joystick = getFirstJoystick(collection);
 
             collection.reposition();
 
