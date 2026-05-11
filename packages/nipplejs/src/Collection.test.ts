@@ -475,6 +475,46 @@ describe('Collection', () => {
 
             jest.useRealTimers();
         });
+
+        it('static mode: reuses singleton when a new touch starts while joystick is still resting (before hidden)', () => {
+            jest.useFakeTimers();
+
+            const collection = new Collection(mockFactory, {
+                zone: mockZone,
+                mode: MODES.static,
+            });
+
+            collection.init();
+
+            const singletonJoystick = collection.all.values().next().value!;
+
+            const evt1 = {
+                identifier: 1 as Identifier,
+                position: { x: 100, y: 100 },
+                pressure: 1,
+                raw: {} as any,
+            };
+
+            const evt2 = {
+                identifier: 2 as Identifier,
+                position: { x: 150, y: 150 },
+                pressure: 1,
+                raw: {} as any,
+            };
+
+            collection.processOnStart(evt1 as any);
+            collection.processOnEnd(evt1 as any);
+
+            expect(collection.idles.size).toBe(0);
+            expect(collection.resting.size).toBe(1);
+
+            collection.processOnStart(evt2 as any);
+
+            expect(collection.all.size).toBe(1);
+            expect(collection.actives.get(evt2.identifier)).toBe(singletonJoystick);
+
+            jest.useRealTimers();
+        });
     });
 
     describe('Event Processing', () => {

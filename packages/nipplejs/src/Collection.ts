@@ -263,6 +263,28 @@ export class Collection extends Super {
         this.resting.delete(identifier);
     }
 
+    /**
+     * In static mode there must only ever be one joystick per collection. When the user
+     * releases, the instance can sit in `resting` (between `end` and `hidden`) with nothing
+     * in `idles` yet; a new pointer id must still resolve to that same instance from `all`.
+     */
+    private getSingletonStaticJoystickIfPresent(): Joystick | undefined {
+        let singletonStaticJoystick: Joystick | undefined;
+        if (this.options.mode === MODES.static && this.all.size > 0) {
+            const uidsOrdered: Uid[] = [...this.all.keys()].sort(
+                (a: Uid, b: Uid): number => Number(a) - Number(b),
+            );
+            const firstJoystickUid: Uid | undefined = uidsOrdered[0];
+            if (u.isNumber(firstJoystickUid)) {
+                const joystickFromMap: Joystick | undefined = this.all.get(firstJoystickUid);
+                if (typeof joystickFromMap !== 'undefined') {
+                    singletonStaticJoystick = joystickFromMap;
+                }
+            }
+        }
+        return singletonStaticJoystick;
+    }
+
     private getOrCreate(position: Coordinates): Joystick {
         // In semi and static modes, we recycle the idle joystick.
         if (this.options.mode === MODES.semi || this.options.mode === MODES.static) {
@@ -277,6 +299,12 @@ export class Collection extends Super {
                 } else {
                     return joystick;
                 }
+            }
+
+            const singletonStaticJoystick: Joystick | undefined =
+                this.getSingletonStaticJoystickIfPresent();
+            if (typeof singletonStaticJoystick !== 'undefined') {
+                return singletonStaticJoystick;
             }
 
             // In semi mode, we may not have an idle joystick.
@@ -295,6 +323,11 @@ export class Collection extends Super {
     }
 
     private createJoystick(position: AnyPosition): Joystick {
+        const existingStaticJoystick: Joystick | undefined =
+            this.getSingletonStaticJoystickIfPresent();
+        if (typeof existingStaticJoystick !== 'undefined') {
+            return existingStaticJoystick;
+        }
         const scroll = this.factory.scroll;
         // Offset converts page-absolute coordinates to zone-relative.
         // In flex containers, absolute children are positioned relative to the
