@@ -652,6 +652,92 @@ describe('Joystick', () => {
         });
     });
 
+    describe('addToDom() / removeFromDom()', () => {
+        it('addToDom() does not add the element twice when already in the zone', () => {
+            const zone = document.createElement('div');
+            document.body.appendChild(zone);
+
+            const collection = createMockCollection();
+            collection.options.zone = zone;
+
+            const joystick = new Joystick(collection, {
+                position: { x: 100, y: 100 },
+                frontPosition: { x: 0, y: 0 },
+                dataOnly: false,
+                zone,
+            });
+
+            joystick.init();
+
+            joystick.addToDom();
+            const childCountAfterFirst = zone.childElementCount;
+
+            joystick.addToDom();
+            expect(zone.childElementCount).toBe(childCountAfterFirst);
+
+            document.body.removeChild(zone);
+        });
+
+        it('addToDom() appends to zone even when zone is not inside document.body', () => {
+            const detachedZone = document.createElement('div');
+
+            const collection = createMockCollection();
+            collection.options.zone = detachedZone;
+
+            const joystick = new Joystick(collection, {
+                position: { x: 100, y: 100 },
+                frontPosition: { x: 0, y: 0 },
+                dataOnly: false,
+                zone: detachedZone,
+            });
+
+            joystick.init();
+
+            joystick.addToDom();
+            expect(detachedZone.contains(joystick.ui.el)).toBe(true);
+        });
+
+        it('removeFromDom() removes the element from the zone', () => {
+            const zone = document.createElement('div');
+            document.body.appendChild(zone);
+
+            const collection = createMockCollection();
+            collection.options.zone = zone;
+
+            const joystick = new Joystick(collection, {
+                position: { x: 100, y: 100 },
+                frontPosition: { x: 0, y: 0 },
+                dataOnly: false,
+                zone,
+            });
+
+            joystick.init();
+
+            joystick.addToDom();
+            expect(zone.contains(joystick.ui.el)).toBe(true);
+
+            joystick.removeFromDom();
+            expect(zone.contains(joystick.ui.el)).toBe(false);
+
+            document.body.removeChild(zone);
+        });
+    });
+
+    describe('buildEl()', () => {
+        it('sets touch-action and user-select to none on the joystick element', () => {
+            const joystick = new Joystick(mockCollection, {
+                position: { x: 100, y: 100 },
+                frontPosition: { x: 0, y: 0 },
+                dataOnly: false,
+            });
+
+            joystick.init();
+
+            expect(joystick.ui.el.style.touchAction).toBe('none');
+            expect(joystick.ui.el.style.userSelect).toBe('none');
+        });
+    });
+
     describe('Move Event Continuity', () => {
         it('fires move event even when direction has not changed', () => {
             const joystick = new Joystick(mockCollection, {

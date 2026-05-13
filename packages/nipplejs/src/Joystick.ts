@@ -137,6 +137,8 @@ export class Joystick extends Super {
             opacity: this.options.restOpacity.toString(),
             display: 'block',
             zIndex: '999',
+            touchAction: 'none',
+            userSelect: 'none',
             ...transitStyle,
         });
 
@@ -196,7 +198,7 @@ export class Joystick extends Super {
     // Inject the Joystick instance into DOM.
     addToDom(): void {
         // We're not adding it if we're dataOnly or already in dom.
-        if (this.options.dataOnly || document.body.contains(this.ui.el)) {
+        if (this.options.dataOnly || this.options.zone.contains(this.ui.el)) {
             return;
         }
         this.options.zone.appendChild(this.ui.el);
@@ -204,7 +206,7 @@ export class Joystick extends Super {
 
     // Remove the Joystick instance from DOM.
     removeFromDom(): void {
-        if (this.options.dataOnly || !document.body.contains(this.ui.el)) {
+        if (this.options.dataOnly || !this.options.zone.contains(this.ui.el)) {
             return;
         }
         this.options.zone.removeChild(this.ui.el);

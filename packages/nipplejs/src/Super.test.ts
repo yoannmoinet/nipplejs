@@ -12,6 +12,21 @@ describe('Super', () => {
             expect((instance as any)._handlers_['start'].has(handler)).toBe(true);
         });
 
+        it('on() resolves overload for plain event names without `as any`', () => {
+            const instance = new Super('super');
+            let triggered = false;
+
+            // SuperEventType<T> = T | `${T}${string}` | `${string}${T}` allows plain
+            // event name literals to resolve the correct overload without casting.
+            instance.on('added', () => {
+                triggered = true;
+            });
+
+            instance.trigger('added', instance as any);
+
+            expect(triggered).toBe(true);
+        });
+
         it('on() registers multiple event handlers (comma-separated)', () => {
             const instance = new Super('super');
             const handler = jest.fn();
