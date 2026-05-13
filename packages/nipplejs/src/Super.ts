@@ -16,7 +16,7 @@ import type {
 } from './types';
 import * as u from './utils';
 
-export type SuperEventType<T extends FactoryEventType> = `${T}${string}` | `${string}${T}`;
+export type SuperEventType<T extends FactoryEventType> = T | `${T}${string}` | `${string}${T}`;
 export type Name = 'super' | 'joystick' | 'collection' | 'factory';
 
 const LOG_LEVELS: Record<LogLevel, number> = {
