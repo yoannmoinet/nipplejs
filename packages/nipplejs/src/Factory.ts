@@ -165,18 +165,24 @@ export class Factory extends Super {
     }
 
     cleanInactiveTouches(evt: DomEvent) {
-        const toucheIdentifiers =
-            'touches' in evt.initial
-                ? Array.from(evt.initial.touches).map((t) => t.identifier)
-                : [evt.identifier];
+        // Only TouchEvents carry a full list of currently-active touches.
+        // Pointer events fire one event per pointer, so each pointer's own
+        // pointerup/pointercancel handles cleanup — running this logic for
+        // pointer events would incorrectly end every other active joystick.
+        if (!('touches' in evt.initial)) {
+            return;
+        }
+
+        const activeIdentifiers = Array.from(evt.initial.touches).map((t) => t.identifier);
         this.log(
             'Cleaning inactive',
-            toucheIdentifiers,
+            activeIdentifiers,
             Array.from(this.joysticksByIdentifier.keys()),
         );
-        // Make some place in the other touches that may be dormant.
-        // Search within our Factory's joysticks.
-        for (const [identifier, joystick] of this.joysticksByIdentifier) {
+
+        // Snapshot entries to avoid mutating the map while iterating.
+        const entries = Array.from(this.joysticksByIdentifier.entries());
+        for (const [identifier, joystick] of entries) {
             // No need to clean if the collection is static or semi.
             if (joystick.collection.options.mode !== MODES.dynamic) {
                 continue;
@@ -185,7 +191,7 @@ export class Factory extends Super {
             // If we don't find a saved identifier in the list of touches
             // that are currently active on the event,
             // we trigger an end event on it.
-            if (!toucheIdentifiers.includes(identifier)) {
+            if (!activeIdentifiers.includes(identifier)) {
                 if (!joystick) {
                     this.error(`No collection found for cleaning identifier ${identifier}`);
                     return;
