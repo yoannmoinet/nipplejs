@@ -194,7 +194,7 @@ export const processEvents = (evt: SupportedEvent): DomEvent[] => {
     // TouchEvent may have multitouches, split them out in an array.
     if ('changedTouches' in evt) {
         // evt.changedTouches doesn't really offer a nice iterable interface.
-        for (const touch of evt.changedTouches) {
+        for (const touch of Array.from(evt.changedTouches)) {
             if (touch) {
                 domEvents.push(touch);
             }
